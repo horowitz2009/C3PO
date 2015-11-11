@@ -10,20 +10,20 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.horowitz.bigbusiness.model.Building;
+import com.horowitz.mickey.Pixel;
 
 public class JsonStorage {
   private Gson _gson = new GsonBuilder().setPrettyPrinting().create();
 
-  public List<Building> loadBuildings() throws IOException {
+  public List<Pixel> loadBuildings() throws IOException {
     String json = FileUtils.readFileToString(new File("data/buildings.json"));
 
-    Building[] buildings = _gson.fromJson(json, Building[].class);
+    Pixel[] buildings = _gson.fromJson(json, Pixel[].class);
 
-    return new ArrayList<Building>(Arrays.asList(buildings));
+    return new ArrayList<Pixel>(Arrays.asList(buildings));
   }
 
-  public void saveBuildings(List<Building> buildings) throws IOException {
+  public void saveBuildings(List<Pixel> buildings) throws IOException {
 
     String json = _gson.toJson(buildings);
 

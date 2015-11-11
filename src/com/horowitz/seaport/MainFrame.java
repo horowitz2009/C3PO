@@ -44,6 +44,9 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import com.horowitz.bigbusiness.FactoryMacros;
+import com.horowitz.bigbusiness.TerminalMacros;
+import com.horowitz.bigbusiness.WarehouseMacros;
 import com.horowitz.bigbusiness.macros.Macros;
 import com.horowitz.bigbusiness.macros.RawMaterialsMacros;
 import com.horowitz.bigbusiness.model.BasicElement;
@@ -87,7 +90,8 @@ public class MainFrame extends JFrame {
 
   private List<Pixel> _fishes;
   private List<Pixel> _shipLocations;
-  private List<Pixel> _buildingLocations;
+  private List<Pixel> _buildingLocationsREF;
+  private List<Pixel> _buildingLocationsABS;
 
   private Pixel _rock;
 
@@ -329,7 +333,7 @@ public class MainFrame extends JFrame {
 
     // COINS
     {
-      AbstractAction action = new AbstractAction("F") {
+      AbstractAction action = new AbstractAction("Relocate industries") {
         public void actionPerformed(ActionEvent e) {
           Thread myThread = new Thread(new Runnable() {
             @Override
@@ -341,8 +345,7 @@ public class MainFrame extends JFrame {
 
                 if (_scanner.isOptimized()) {
                   _mouse.savePosition();
-                  _scanner.scanOne("tags/medical.bmp", null, true);
-                  _scanner.scanOne("tags/fire.bmp", null, true);
+                  relocateIndustries();
                   _mouse.restorePosition();
                 } else {
                   LOGGER.info("I need to know where the game is!");
@@ -358,6 +361,7 @@ public class MainFrame extends JFrame {
                 e.printStackTrace();
               }
             }
+
           });
 
           myThread.start();
@@ -604,6 +608,12 @@ public class MainFrame extends JFrame {
       if (found) {
 
         LOGGER.info("GAME FOUND! Seaport READY.");
+
+        _buildingLocationsREF = new JsonStorage().loadBuildings();
+
+        // locate the rock and recalc
+        recalcPositions(false);
+
         // fixTheGame();
         /*
         _protocol = new ProductionProtocol();
@@ -675,11 +685,10 @@ public class MainFrame extends JFrame {
           _shipLocations.add(goodP);
         }
 
-        Pixel[] bLocations = _scanner.getBuildingLocations();
-        _buildingLocations = new ArrayList<Pixel>();
-        for (Pixel p : bLocations) {
+        _buildingLocationsABS = new ArrayList<Pixel>();
+        for (Pixel p : _buildingLocationsREF) {
           Pixel goodP = new Pixel(rock.x + p.x, rock.y + p.y);
-          _buildingLocations.add(goodP);
+          _buildingLocationsABS.add(goodP);
         }
 
         // for (Building building : _buildingLocations) {
@@ -915,6 +924,42 @@ public class MainFrame extends JFrame {
 
   }
 
+  private void relocateIndustries() throws IOException, AWTException {
+    try {
+      LOGGER.info("Locating buildings. Please wait!");
+
+      _buildingLocationsREF.clear();
+
+      Pixel p = null;
+
+      List<Pixel> whites = _scanner.scanMany("buildings/whiteArrow.bmp", null, false);
+
+      LOGGER.info("buildings found: " + whites.size());
+
+      
+      for (Pixel pAbs : whites) {
+        int xRelative = _rock.x - pAbs.x;
+        int yRelative = _rock.y - pAbs.y;
+
+        _buildingLocationsREF.add(new Pixel(xRelative, yRelative));
+      }
+      
+
+      LOGGER.info("saving building locations...");
+      new JsonStorage().saveBuildings(_buildingLocationsREF);
+      LOGGER.info("done");
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (AWTException e) {
+      e.printStackTrace();
+    } catch (RobotInterruptedException e) {
+      LOGGER.info("interrupted");
+    } catch (CloneNotSupportedException e) {
+      e.printStackTrace();
+    }
+  }
+
   private void doIndustries() throws RobotInterruptedException {
     try {
       if (_rock != null && _buildingLocations != null && !_buildingLocations.isEmpty()) {
@@ -961,7 +1006,6 @@ public class MainFrame extends JFrame {
                   _mouse.delay(300);
                   _mouse.click(_scanner.getSafePoint());
                 }
-                
 
               }
 

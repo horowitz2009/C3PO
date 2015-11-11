@@ -501,6 +501,15 @@ public class ScreenScanner {
     return scanMany(imageData, screen, click);
   }
 
+  public List<Pixel> scanManyFast(String filename, BufferedImage screen, boolean click) throws RobotInterruptedException,
+  IOException, AWTException {
+    
+    ImageData imageData = getImageData(filename);
+    if (imageData == null)
+      return new ArrayList<Pixel>(0);
+    return scanMany(imageData, screen, click);
+  }
+  
   public List<Pixel> scanMany(ImageData imageData, BufferedImage screen, boolean click)
       throws RobotInterruptedException, IOException, AWTException {
     if (imageData == null)
@@ -508,7 +517,7 @@ public class ScreenScanner {
     Rectangle area = imageData.getDefaultArea();
     if (screen == null)
       screen = new Robot().createScreenCapture(area);
-    List<Pixel> matches = _matcher.findMatches(imageData.getImage(), screen);
+    List<Pixel> matches = _matcher.findMatches(imageData.getImage(), screen, imageData.getColorToBypass());
     if (!matches.isEmpty()) {
       Collections.sort(matches);
       Collections.reverse(matches);
@@ -539,13 +548,51 @@ public class ScreenScanner {
     return matches;
   }
 
+  public List<Pixel> scanManyFast(ImageData imageData, BufferedImage screen, boolean click)
+      throws RobotInterruptedException, IOException, AWTException {
+    if (imageData == null)
+      return new ArrayList<Pixel>(0);
+    Rectangle area = imageData.getDefaultArea();
+    if (screen == null)
+      screen = new Robot().createScreenCapture(area);
+    List<Pixel> matches = _matcher.findMatches(imageData.getImage(), screen, imageData.getColorToBypass());
+    if (!matches.isEmpty()) {
+      Collections.sort(matches);
+      Collections.reverse(matches);
+      
+      // filter similar
+      if (matches.size() > 1) {
+        for (int i = matches.size() - 1; i > 0; --i) {
+          for (int j = i - 1; j >= 0; --j) {
+            Pixel p1 = matches.get(i);
+            Pixel p2 = matches.get(j);
+            if (Math.abs(p1.x - p2.x) <= 3 && Math.abs(p1.y - p2.y) <= 3) {
+              // too close to each other
+              // remove one
+              matches.remove(j);
+              --i;
+            }
+          }
+        }
+      }
+      
+      for (Pixel pixel : matches) {
+        pixel.x += (area.x + imageData.get_xOff());
+        pixel.y += (area.y + imageData.get_yOff());
+        if (click)
+          _mouse.click(pixel.x, pixel.y);
+      }
+    }
+    return matches;
+  }
+  
   public Pixel scanOne(ImageData imageData, Rectangle area, boolean click) throws AWTException,
       RobotInterruptedException {
     if (area == null) {
       area = imageData.getDefaultArea();
     }
     BufferedImage screen = new Robot().createScreenCapture(area);
-    Pixel pixel = _matcher.findMatch(imageData.getImage(), screen);
+    Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, imageData.getColorToBypass());
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
       pixel.y += (area.y + imageData.get_yOff());
@@ -567,7 +614,7 @@ public class ScreenScanner {
       area = imageData.getDefaultArea();
 
     BufferedImage screen = new Robot().createScreenCapture(area);
-    Pixel pixel = _matcher.findMatch(imageData.getImage(), screen);
+    Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, imageData.getColorToBypass());
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
       pixel.y += (area.y + imageData.get_yOff());
