@@ -69,7 +69,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static final String APP_TITLE = "Seaport v0.007";
+  private static final String APP_TITLE = "Seaport v0.011";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -458,8 +458,7 @@ public class MainFrame extends JFrame {
     }
     return mainToolbar1;
   }
-  
-  
+
   @SuppressWarnings("serial")
   private JToolBar createToolbar2() {
     JToolBar toolbar = new JToolBar();
@@ -700,7 +699,7 @@ public class MainFrame extends JFrame {
         // }
       } else {
         LOGGER.info("CAN'T FIND THE ROCK!!!");
-        //throw new RobotInterruptedException();
+        // throw new RobotInterruptedException();
         handlePopups();
       }
     } catch (IOException e) {
@@ -759,11 +758,13 @@ public class MainFrame extends JFrame {
     assert _scanner.isOptimized();
     setTitle(APP_TITLE + " RUNNING");
     _stopAllThreads = false;
+
     try {
+
+      recalcPositions(false);
+
       do {
         handlePopups();
-        
-        recalcPositions(false);
 
         // 1. FISH
         LOGGER.info("Fish...");
@@ -782,7 +783,8 @@ public class MainFrame extends JFrame {
         }
 
         _mouse.mouseMove(_scanner.getParkingPoint());
-        _mouse.delay(3000);
+
+        _mouse.delay(200);
 
       } while (!_stopAllThreads);
 
@@ -795,21 +797,22 @@ public class MainFrame extends JFrame {
 
   private void handlePopups() throws RobotInterruptedException {
     try {
+      LOGGER.info("popups...");
       boolean popup = false;
-      //reload
+      // reload
       Rectangle area = _scanner.generateWindowedArea(412, 550);
-      Pixel p = _scanner.scanOne("reload.bmp", area, true);
+      Pixel p = _scanner.scanOneFast("reload.bmp", area, true);
       if (p == null)
-        p = _scanner.scanOne("reload2.bmp", area, true);
+        p = _scanner.scanOneFast("reload2.bmp", area, true);
       popup = p != null;
       if (popup) {
         LOGGER.info("Game crashed. Reloading...");
-        _mouse.delay(6000);
+        _mouse.delay(8000);
       } else {
         _mouse.delay(150);
       }
-      
-      _scanner.scanOne("buildings/x.bmp", area, true);
+
+      _scanner.scanOneFast("buildings/x.bmp", null, true);
       _mouse.delay(150);
       Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, true);
       _mouse.delay(450);
@@ -819,7 +822,6 @@ public class MainFrame extends JFrame {
       e.printStackTrace();
     }
 
-    
   }
 
   private void rescan() {
@@ -883,11 +885,16 @@ public class MainFrame extends JFrame {
 
                 }
                 // throw new RobotInterruptedException();
-
+                if (!shipSent) {
+                  _mouse.delay(300);
+                  _mouse.click(anchor);
+                  _mouse.delay(1300);
+                }
               } else {
                 LOGGER.info("Destination: UNKNOWN!!!");
                 _mouse.delay(300);
                 _mouse.click(anchor);
+                _mouse.delay(1300);
               }
             }
 
@@ -912,33 +919,56 @@ public class MainFrame extends JFrame {
     try {
       if (_rock != null && _buildingLocations != null && !_buildingLocations.isEmpty()) {
         for (Pixel p1 : _buildingLocations) {
-          _mouse.click(p1);
-          _mouse.delay(100);
-          _mouse.mouseMove(_scanner.getParkingPoint());
-          Rectangle area = new Rectangle(p1.x - 80, p1.y + 41, 160, 55);
-          Pixel gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
-          if (gears != null) {
+          Rectangle miniArea = new Rectangle(p1.x - 14, p1.y - 12, 28, 12);
+          Pixel p = _scanner.scanOneFast("buildings/whiteArrow.bmp", miniArea, false);
+          if (p != null) {
+            LOGGER.info("Building busy. Moving on...");
+          } else {
+            _mouse.click(p1);
+            _mouse.delay(800);
             _mouse.mouseMove(_scanner.getParkingPoint());
-            LOGGER.info("GEARS...");
-            Pixel produceButton = _scanner.scanOne("buildings/produce.bmp", null, true);
-            if (produceButton != null) {
-              // nice. we can continue
-              // shipSent = true;
-            } else {
-              // try if gray
-              produceButton = _scanner.scanOne("buildings/produceGray.bmp", null, false);
+
+            // check if popup is opened, else click again
+            Rectangle area = new Rectangle(p1.x - 80, p1.y + 41, 160, 55);
+            Pixel gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
+            if (gears == null) {
+              LOGGER.info("click again...");
+              _mouse.click(p1);
+              _mouse.delay(800);
+              _mouse.mouseMove(_scanner.getParkingPoint());
+            }
+            gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
+            if (gears != null) {
+              LOGGER.info("GEARS...");
+              _mouse.mouseMove(_scanner.getParkingPoint());
+              _mouse.delay(1000);
+
+              Pixel produceButton = _scanner.scanOneFast("buildings/produce.bmp", null, true);
               if (produceButton != null) {
-                LOGGER.info("Production not possible...");
-                area = _scanner.generateWindowedArea(400, 550);
-                _scanner.scanOne("buildings/x.bmp", area, true);
+                _mouse.delay(2000);
               } else {
-                LOGGER.info("Building not ready...");
-                _mouse.delay(300);
-                _mouse.click(_scanner.getSafePoint());
+                // try if gray
+                produceButton = _scanner.scanOneFast("buildings/produceGray.bmp", null, true);
+                if (produceButton != null) {
+                  LOGGER.info("Production not possible...");
+                  _scanner.scanOneFast("buildings/x.bmp", null, true);
+                  _mouse.delay(1000);
+                } else {
+                  LOGGER.info("Building not ready...");
+                  _mouse.delay(300);
+                  _scanner.scanOneFast("buildings/x.bmp", null, true);
+
+                  _mouse.delay(300);
+                  _mouse.click(_scanner.getSafePoint());
+                }
+                
+
               }
+
             }
 
           }
+
           _mouse.delay(1000);// reduce later
           _mouse.click(_scanner.getSafePoint());
           _mouse.delay(1000);

@@ -61,7 +61,6 @@ public class ScreenScanner {
   private Pixel _parkingPoint;
   private Rectangle _labelArea;
   private Rectangle _levelArea;
-  private Rectangle _popupArea;
   private Rectangle _productionArea3;
   private Rectangle _productionArea2;
   private Rectangle _warehouseArea;;
@@ -69,6 +68,10 @@ public class ScreenScanner {
   private Pixel[] _fishes;
   private Pixel[] _shipLocations;
   private Pixel[] _buildingLocations;
+  
+  public Rectangle _popupArea;
+  public Rectangle _popupAreaX;
+  public Rectangle _popupAreaB;
 
   public Pixel[] getShipLocations() {
     return _shipLocations;
@@ -78,6 +81,8 @@ public class ScreenScanner {
     _settings = settings;
     _comparator = new SimilarityImageComparator(0.04, 2000);
     _matcher = new TemplateMatcher();
+    _matcher.setSimilarityThreshold(.91d);
+
     try {
       _mouse = new MouseRobot();
     } catch (AWTException e1) {
@@ -98,7 +103,7 @@ public class ScreenScanner {
     }
 
   }
-  
+
   public Rectangle generateWindowedArea(int width, int height) {
     int xx = (getGameWidth() - width) / 2;
     int yy = (getGameHeight() - height) / 2;
@@ -114,10 +119,11 @@ public class ScreenScanner {
 
     _scanArea = new Rectangle(_tl.x + 125, _tl.y, getGameWidth() - 125 - 125, getGameHeight());
 
-    _fishes = new Pixel[] { new Pixel(-169, -13), new Pixel(-223, -49), new Pixel(-282, -89), new Pixel(-354, -120) };
+    _fishes = new Pixel[] { new Pixel(-94, 14), new Pixel(-169, -13), new Pixel(-223, -49), new Pixel(-282, -89),
+        new Pixel(-354, -120) };
 
     _shipLocations = new Pixel[] { new Pixel(103, 83), new Pixel(103, 187), new Pixel(103, 278) };
-    _buildingLocations = new Pixel[] { new Pixel(57, -59), new Pixel(141, -76) };
+    _buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147, -100) };
 
     // label area
     _labelWidth = 380;
@@ -125,28 +131,40 @@ public class ScreenScanner {
     _labelArea = new Rectangle(_tl.x + xx, _tl.y + 71, _labelWidth, 66);
     _levelArea = new Rectangle(_tl.x + xx, _tl.y + 360, _labelWidth, 35);
 
-    //_popupArea = generateWindowedArea(324, 516);
+    // _popupArea = generateWindowedArea(324, 516);
     _popupArea = generateWindowedArea(328, 520);
+    _popupAreaX = new Rectangle(_popupArea);
+    _popupAreaX.x += (20 + _popupAreaX.width / 2);
+    _popupAreaX.y -= 7;
+    _popupAreaX.height = 60;
+    _popupAreaX.width = _popupAreaX.width / 2;
+
+    _popupAreaB = new Rectangle(_popupArea);
+    _popupAreaB.y = _popupAreaB.y + _popupAreaB.height - 125; 
+    _popupAreaB.height = 125;
+
     _safePoint = new Pixel(_br.x - 15, _br.y - 15);
     _parkingPoint = new Pixel(_br);
 
     getImageData("rockEdge.bmp", _scanArea, -45, 26);
     getImageData("pin.bmp", _scanArea, 8, 8);
-    
-    area = new Rectangle(_br.x-110, _br.y -  75, 60, 40);
+
+    area = new Rectangle(_br.x - 110, _br.y - 75, 60, 40);
     getImageData("anchor.bmp", area, 20, 7);
     getImageData("dest/smallTown.bmp", _scanArea, 41, 45);
     getImageData("dest/smallTownTitle.bmp", _popupArea, 0, 0);
-    //getImageData("dest/missing.bmp", _scanArea, 41, 45);
+    // getImageData("dest/missing.bmp", _scanArea, 41, 45);
     getImageData("dest/setSail.bmp", _popupArea, 30, 6);
 
     ImageData gear2 = getImageData("buildings/gears2.bmp", _popupArea, 0, 0);
     gear2.setColorToBypass(Color.BLACK);
-    
-    getImageData("buildings/produce.bmp", _popupArea, 0, 0);
-    getImageData("buildings/produceGray.bmp", _popupArea, 0, 0);
-    getImageData("buildings/x.bmp", _popupArea, 10, 10);
-    
+    ImageData wa = getImageData("buildings/whiteArrow.bmp", _popupArea, 0, 0);
+    wa.setColorToBypass(Color.BLACK);
+
+    getImageData("buildings/produce.bmp", _popupAreaB, 0, 0);
+    getImageData("buildings/produceGray.bmp", _popupAreaB, 0, 0);
+    getImageData("buildings/x.bmp", _popupAreaX, 10, 10);
+
     /*
     _hooray = new ImageData("Hooray.bmp", area, _comparator, 23, 6);
 
@@ -590,7 +608,7 @@ public class ScreenScanner {
       area = imageData.getDefaultArea();
 
     BufferedImage screen = new Robot().createScreenCapture(area);
-    
+
     Pixel pixel = _comparator.findImage(imageData.getImage(), screen, imageData.getColorToBypass());
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
