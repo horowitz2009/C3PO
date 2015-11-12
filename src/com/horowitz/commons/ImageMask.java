@@ -12,8 +12,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import com.horowitz.mickey.Pixel;
-
 public class ImageMask {
 
   private static final int MIN_LEVEL = 1;

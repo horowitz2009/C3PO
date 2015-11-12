@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.horowitz.mickey.Pixel;
-
 public class Settings {
   Properties                  _properties;
   String                      _filename;

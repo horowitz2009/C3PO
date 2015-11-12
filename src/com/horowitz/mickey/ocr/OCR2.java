@@ -13,8 +13,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import com.horowitz.mickey.Pixel;
-import com.horowitz.mickey.common.MyImageIO;
+import com.horowitz.commons.MyImageIO;
+import com.horowitz.commons.Pixel;
 
 public class OCR2 {
   private Map<Integer, Color> _colors;

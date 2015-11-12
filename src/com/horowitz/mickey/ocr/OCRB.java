@@ -8,11 +8,11 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.horowitz.mickey.ImageComparator;
-import com.horowitz.mickey.ImageManager;
-import com.horowitz.mickey.Pixel;
-import com.horowitz.mickey.SimilarityImageComparator;
-import com.horowitz.mickey.common.MyImageIO;
+import com.horowitz.commons.ImageComparator;
+import com.horowitz.commons.ImageManager;
+import com.horowitz.commons.MyImageIO;
+import com.horowitz.commons.Pixel;
+import com.horowitz.commons.SimilarityImageComparator;
 
 public class OCRB {
 

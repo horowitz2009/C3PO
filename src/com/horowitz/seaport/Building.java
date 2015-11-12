@@ -1,7 +1,7 @@
 package com.horowitz.seaport;
 
-import com.horowitz.bigbusiness.model.Deserializable;
-import com.horowitz.mickey.Pixel;
+import com.horowitz.commons.Deserializable;
+import com.horowitz.commons.Pixel;
 
 public class Building implements Deserializable {
   private String _name;

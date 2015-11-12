@@ -1,4 +1,4 @@
-package com.horowitz.seaport;
+package com.horowitz.seaport.macros;
 
 import java.awt.AWTException;
 import java.awt.Rectangle;
@@ -6,16 +6,15 @@ import java.io.IOException;
 
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
-import com.horowitz.seaport.macros.Macros;
 import com.horowitz.seaport.model.Product;
 
-public class FactoryMacros extends Macros {
+public class RawMaterialsMacros extends Macros {
 
-  private static final long serialVersionUID = -7479781935487662427L;
+  private static final long serialVersionUID = -4027449839548848876L;
 
   public boolean doTheJob(Product pr) throws AWTException, IOException, RobotInterruptedException {
-    boolean result = false;
     // dyra byra
+    boolean result = false;
 
     // Pixel pp = _scanner.scanOne(_scanner.getImageData("labels/Ranch2.bmp"),
     // _scanner.getLabelArea(), false);
@@ -38,18 +37,28 @@ public class FactoryMacros extends Macros {
   }
 
   protected boolean tryProduct(Product pr) throws AWTException, RobotInterruptedException {
-    Rectangle area = _scanner.getProductionArea2();
+    Rectangle area = _scanner.getProductionArea3();
 
     _mouse.click(area.x + 27, area.y + 215);
     _mouse.click(area.x + 27, area.y + 215);
     _mouse.click(area.x + 27, area.y + 215);
     _mouse.click(area.x + 27, area.y + 215);
     _mouse.click(area.x + 27, area.y + 215);
+    
+    Rectangle[] cells = new Rectangle[6];
+    cells[0] = new Rectangle(area.x + 60, area.y + 61, 258, 154);
+    cells[1] = new Rectangle(area.x + 60, area.y + 221, 258, 154);
+    cells[2] = new Rectangle(area.x + 333, area.y + 61, 258, 154);
+    cells[3] = new Rectangle(area.x + 333, area.y + 221, 258, 154);
+    cells[4] = new Rectangle(area.x + 606, area.y + 61, 258, 154);
+    cells[5] = new Rectangle(area.x + 606, area.y + 221, 258, 154);
+
 
     int pos = pr.getPosition();
-    if (pos <= 2) {
+    if (pos <= 6) {
       // no need to move
-      _scanner.scanOne(pr.getLabelImage(), area, true);
+      //_scanner.scanOne(pr.getLabelImage(), new Rectangle(cells[pos - 1].x + 17, cells[pos - 1].y + 3, 222, 23), true);
+      _mouse.click(cells[pos - 1].x + 130, cells[pos -1].y + 75);
       return true;
     } else {
       // TODO paging

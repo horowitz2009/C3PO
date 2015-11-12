@@ -8,8 +8,6 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.horowitz.mickey.Pixel;
-
 public class TemplateMatcher {
 
   private int    precision;

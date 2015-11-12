@@ -42,17 +42,16 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import com.horowitz.bigbusiness.model.BasicElement;
-import com.horowitz.bigbusiness.model.storage.JsonStorage;
+import com.horowitz.commons.MouseRobot;
+import com.horowitz.commons.MyLogger;
+import com.horowitz.commons.Pixel;
+import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
-import com.horowitz.mickey.MouseRobot;
-import com.horowitz.mickey.MyLogger;
-import com.horowitz.mickey.Pixel;
-import com.horowitz.mickey.RobotInterruptedException;
+import com.horowitz.seaport.model.BasicElement;
+import com.horowitz.seaport.model.Task;
+import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class MainFrame extends JFrame {
 
@@ -90,6 +89,16 @@ public class MainFrame extends JFrame {
   private JToggleButton _fullScreenToggle;
 
   private List<Destination> _destinations;
+
+  private List<Task> _tasks;
+
+  private Task _scanTask;
+
+  private Task _fishTask;
+
+  private Task _shipsTask;
+
+  private Task _buildingsTask;
 
   public static void main(String[] args) {
 
@@ -134,6 +143,16 @@ public class MainFrame extends JFrame {
     try {
       _destinations = new JsonStorage().loadDestinations();
       _buildings = new JsonStorage().loadBuildings();
+      _tasks = new ArrayList<Task>();
+      _scanTask = new Task("Scan", 1);
+      _fishTask = new Task("Fish", 1);
+      _shipsTask = new Task("Ships", 2);
+      _buildingsTask = new Task("Buildings", 1);
+      _tasks.add(_scanTask);
+      _tasks.add(_fishTask);
+      _tasks.add(_shipsTask);
+      _tasks.add(_buildingsTask);
+      
     } catch (IOException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();

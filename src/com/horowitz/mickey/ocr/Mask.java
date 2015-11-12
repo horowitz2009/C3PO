@@ -10,7 +10,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 
-import com.horowitz.mickey.Pixel;
+import com.horowitz.commons.Pixel;
 
 public class Mask {
   private String      _name;

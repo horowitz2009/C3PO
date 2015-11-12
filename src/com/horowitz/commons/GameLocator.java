@@ -14,13 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.horowitz.mickey.ImageComparator;
-import com.horowitz.mickey.MouseRobot;
-import com.horowitz.mickey.Pixel;
-import com.horowitz.mickey.RobotInterruptedException;
-import com.horowitz.mickey.SimilarityImageComparator;
-import com.horowitz.mickey.common.MyImageIO;
-
 public class GameLocator {
 
   public final static Logger LOGGER = Logger.getLogger(GameLocator.class.getName());

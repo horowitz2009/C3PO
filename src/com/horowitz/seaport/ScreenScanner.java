@@ -23,19 +23,19 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import com.horowitz.bigbusiness.model.storage.JsonStorage;
 import com.horowitz.commons.GameLocator;
+import com.horowitz.commons.ImageComparator;
 import com.horowitz.commons.ImageData;
+import com.horowitz.commons.ImageManager;
 import com.horowitz.commons.ImageMask;
+import com.horowitz.commons.MouseRobot;
+import com.horowitz.commons.MyImageIO;
+import com.horowitz.commons.Pixel;
+import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
+import com.horowitz.commons.SimilarityImageComparator;
 import com.horowitz.commons.TemplateMatcher;
-import com.horowitz.mickey.ImageComparator;
-import com.horowitz.mickey.ImageManager;
-import com.horowitz.mickey.MouseRobot;
-import com.horowitz.mickey.Pixel;
-import com.horowitz.mickey.RobotInterruptedException;
-import com.horowitz.mickey.SimilarityImageComparator;
-import com.horowitz.mickey.common.MyImageIO;
+import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class ScreenScanner {
 

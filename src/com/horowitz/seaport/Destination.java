@@ -1,6 +1,6 @@
 package com.horowitz.seaport;
 
-import com.horowitz.bigbusiness.model.Deserializable;
+import com.horowitz.commons.Deserializable;
 import com.horowitz.commons.ImageData;
 
 public class Destination implements Deserializable {
