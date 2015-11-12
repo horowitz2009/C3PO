@@ -27,8 +27,8 @@
    "_time": 6,
    "_position":   {
      "weight": 0,
-     "x": 147,
-     "y": -100
+     "x": 156,
+     "y": -111
    },
    
    "_enabled": true
@@ -39,8 +39,8 @@
    "_time": 20,
    "_position":   {
      "weight": 0,
-     "x": 224,
-     "y": -146
+     "x": 244,
+     "y": -155
    },
    
    "_enabled": false

@@ -300,6 +300,8 @@ public class MainFrame extends JFrame {
   }
 
   private void recalcPositions(boolean click, int attempt) throws RobotInterruptedException {
+    Pixel goodRock = new Pixel(_scanner.getTopLeft().x + _scanner.getGameWidth()/2 + 93, _scanner.getTopLeft().y + 254);
+    
     try {
       if (!_scanner.isOptimized()) {
         scan();
@@ -327,6 +329,14 @@ public class MainFrame extends JFrame {
       }
 
       if (_rock != null) {
+        
+        if (Math.abs(_rock.x - goodRock.x) > 5 && Math.abs(_rock.x - goodRock.y) > 5) {
+          //need adjusting
+          _mouse.drag(_rock.x, _rock.y, goodRock.x, goodRock.y);
+          _mouse.delay(2000);
+          _rock = _scanner.findRockAgain(goodRock);
+        }
+        
         LOGGER.info("Recalc positions... ");
         Pixel[] fishes = _scanner.getFishes();
         _fishes = new ArrayList<Pixel>();
