@@ -815,6 +815,8 @@ public class MainFrame extends JFrame {
 
         LOGGER.info("GAME FOUND! Seaport READY.");
         LOGGER.info("Coordinates: " + _scanner.getTopLeft() + " - " + _scanner.getBottomRight());
+        
+        zoomOut();
 
         // locate the rock and recalc
         // recalcPositions(false);
@@ -864,6 +866,9 @@ public class MainFrame extends JFrame {
     }
 
   }
+  private void zoomOut() {
+    //TODO
+  }
 
   private Rectangle generateMiniArea(Pixel p) {
     return new Rectangle(p.x - 2 - 18, p.y - 50 + 35, 44, 60);
@@ -889,8 +894,8 @@ public class MainFrame extends JFrame {
 
       do {
         // 1. SCAN
-        recalcPositions(false, 1);
         handlePopups();
+        recalcPositions(false, 1);
 
         // 2. FISH
         LOGGER.info("Fish...");
@@ -924,12 +929,18 @@ public class MainFrame extends JFrame {
   private void handlePopups() throws RobotInterruptedException {
     try {
       LOGGER.info("Popups...");
-      boolean popup = false;
+      boolean found = false;
+      Pixel p = null;
+      
+      found =  _scanner.scanOneFast("anchor.bmp", null, true) != null;
+      
+      if (found)
+        return;
       // reload
       long start = System.currentTimeMillis();
       long now, t1, t2, t3, t4;
       Rectangle area = _scanner.generateWindowedArea(412, 550);
-      Pixel p = _scanner.scanOneFast("reload.bmp", area, true);
+      p = _scanner.scanOneFast("reload.bmp", area, true);
       now = System.currentTimeMillis();
 
       t1 = now - start;
@@ -939,26 +950,29 @@ public class MainFrame extends JFrame {
         now = System.currentTimeMillis();
         t2 = now - t2;
       }
-      popup = p != null;
-      if (popup) {
+      found = p != null;
+      if (found) {
         LOGGER.info("Game crashed. Reloading...");
         _mouse.delay(8000);
+        return;
       } else {
         _mouse.delay(150);
       }
-
+      
+      
       t3 = now = System.currentTimeMillis();
-      _scanner.scanOneFast("buildings/x.bmp", null, true);
+      found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
       now = System.currentTimeMillis();
       t3 = now - t3;
       _mouse.delay(150);
       t4 = now = System.currentTimeMillis();
-      _scanner.scanOneFast("anchor.bmp", null, true);
+      found = _scanner.scanOneFast("anchor.bmp", null, true) != null;
       now = System.currentTimeMillis();
       t4 = now - t4;
-      // _mouse.delay(450);
+      if (found)
+        _mouse.delay(450);
       now = System.currentTimeMillis();
-      LOGGER.info("[" + t1 + ",  " + t2 + ",  " + t3 + ",  " + t4 + "], TOTAL: " + (now - start));
+      LOGGER.info("[" + t1 + ",  " + t2 + ",  " + t3 + ",  " + t4 + "], TOTAL: " + (now - start) + " - "  + found);
     } catch (IOException e) {
       e.printStackTrace();
     } catch (AWTException e) {
