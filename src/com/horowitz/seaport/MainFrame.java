@@ -50,6 +50,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
 import com.horowitz.seaport.model.BasicElement;
+import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.Task;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
@@ -59,7 +60,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static final String APP_TITLE = "Seaport v0.014f";
+  private static final String APP_TITLE = "Seaport v0.015b";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -152,7 +153,7 @@ public class MainFrame extends JFrame {
       _tasks.add(_fishTask);
       _tasks.add(_shipsTask);
       _tasks.add(_buildingsTask);
-      
+
     } catch (IOException e1) {
       // TODO Auto-generated catch block
       e1.printStackTrace();
@@ -289,7 +290,7 @@ public class MainFrame extends JFrame {
       // new JsonStorage().saveBuildings(_buildingLocationsREF);
       LOGGER.info("done");
 
-      recalcPositions(false);
+      recalcPositions(false, 1);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -298,28 +299,46 @@ public class MainFrame extends JFrame {
     }
   }
 
-  private void recalcPositions(boolean click) throws RobotInterruptedException {
+  private void recalcPositions(boolean click, int attempt) throws RobotInterruptedException {
     try {
-      _mouse.click(_scanner.getSafePoint());
-      _mouse.delay(100);
-      _mouse.mouseMove(_scanner.getParkingPoint());
+      if (!_scanner.isOptimized()) {
+        scan();
+      }
 
-      Pixel rock = _scanner.findRock();
-      if (rock != null) {
-        _rock = rock;
-        LOGGER.info("The rock is found: " + rock);
+      if (_scanner.isOptimized()) {
+        _mouse.click(_scanner.getSafePoint());
+        _mouse.delay(200);
+        _mouse.mouseMove(_scanner.getParkingPoint());
 
+        boolean needRecalc = true;
+        if (_rock == null) {
+          _rock = _scanner.findRock();
+          LOGGER.info("rock is found for the first time.");
+          needRecalc = true;
+        } else {
+          Pixel newRock = _scanner.findRockAgain(_rock);
+          needRecalc = !_rock.equals(newRock);
+          _rock = newRock;
+          if (!needRecalc) {
+            LOGGER.info("rock is found in the same place.");
+            LOGGER.info("Skipping recalc...");
+          }
+        }
+      }
+
+      if (_rock != null) {
+        LOGGER.info("Recalc positions... ");
         Pixel[] fishes = _scanner.getFishes();
         _fishes = new ArrayList<Pixel>();
         for (Pixel fish : fishes) {
-          Pixel goodFish = new Pixel(rock.x + fish.x, rock.y + fish.y);
+          Pixel goodFish = new Pixel(_rock.x + fish.x, _rock.y + fish.y);
           _fishes.add(goodFish);
         }
 
         Pixel[] shipLocations = _scanner.getShipLocations();
         _shipLocations = new ArrayList<Pixel>();
         for (Pixel p : shipLocations) {
-          Pixel goodP = new Pixel(rock.x + p.x, rock.y + p.y);
+          Pixel goodP = new Pixel(_rock.x + p.x, _rock.y + p.y);
           _shipLocations.add(goodP);
         }
 
@@ -328,16 +347,19 @@ public class MainFrame extends JFrame {
         for (Building b : _buildings) {
           if (b.isEnabled()) {
             Pixel p = b.getPosition();
-            Pixel goodP = new Pixel(rock.x + p.x, rock.y + p.y);
+            Pixel goodP = new Pixel(_rock.x + p.x, _rock.y + p.y);
             _buildingLocationsABS.add(goodP);
           }
         }
-
       } else {
         LOGGER.info("CAN'T FIND THE ROCK!!!");
-        // throw new RobotInterruptedException();
         handlePopups();
+        if (attempt <= 2)
+          recalcPositions(false, ++attempt);
+        else
+          _rock = null; // reset the hell
       }
+
     } catch (IOException e) {
       e.printStackTrace();
     } catch (AWTException e) {
@@ -634,14 +656,14 @@ public class MainFrame extends JFrame {
       final JToggleButton toggle = new JToggleButton(b.getName());
       toggle.setSelected(b.isEnabled());
       toggle.addItemListener(new ItemListener() {
-        
+
         @Override
         public void itemStateChanged(ItemEvent e) {
           b.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-          LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled()?"on":"off"));
+          LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
         }
       });
-      // 
+      //
       toolbar.add(toggle);
     }
     return toolbar;
@@ -855,24 +877,24 @@ public class MainFrame extends JFrame {
 
     try {
 
-      recalcPositions(false);
-
       do {
+        // 1. SCAN
+        recalcPositions(false, 1);
         handlePopups();
 
-        // 1. FISH
+        // 2. FISH
         LOGGER.info("Fish...");
         doFishes();
 
-        // 2. SHIPS
+        // 3. SHIPS
         if (_shipsToggle.isSelected()) {
           LOGGER.info("Ships...");
           doShips();
         }
 
-        // 3. INDUSTRIES
+        // 4. BUILDINGS
         if (_industriesToggle.isSelected()) {
-          LOGGER.info("Industries...");
+          LOGGER.info("Buildings...");
           doIndustries();
         }
 
@@ -894,10 +916,19 @@ public class MainFrame extends JFrame {
       LOGGER.info("Popups...");
       boolean popup = false;
       // reload
+      long start = System.currentTimeMillis();
+      long now, t1, t2, t3, t4;
       Rectangle area = _scanner.generateWindowedArea(412, 550);
       Pixel p = _scanner.scanOneFast("reload.bmp", area, true);
-      if (p == null)
+      now = System.currentTimeMillis();
+
+      t1 = now - start;
+      t2 = now;
+      if (p == null) {
         p = _scanner.scanOneFast("reload2.bmp", area, true);
+        now = System.currentTimeMillis();
+        t2 = now - t2;
+      }
       popup = p != null;
       if (popup) {
         LOGGER.info("Game crashed. Reloading...");
@@ -906,10 +937,18 @@ public class MainFrame extends JFrame {
         _mouse.delay(150);
       }
 
+      t3 = now = System.currentTimeMillis();
       _scanner.scanOneFast("buildings/x.bmp", null, true);
+      now = System.currentTimeMillis();
+      t3 = now - t3;
       _mouse.delay(150);
-      Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, true);
-      _mouse.delay(450);
+      t4 = now = System.currentTimeMillis();
+      _scanner.scanOneFast("anchor.bmp", null, true);
+      now = System.currentTimeMillis();
+      t4 = now - t4;
+      // _mouse.delay(450);
+      now = System.currentTimeMillis();
+      LOGGER.info("[" + t1 + ",  " + t2 + ",  " + t3 + ",  " + t4 + "], TOTAL: " + (now - start));
     } catch (IOException e) {
       e.printStackTrace();
     } catch (AWTException e) {
@@ -940,8 +979,6 @@ public class MainFrame extends JFrame {
       boolean shipSent = false;
       if (_shipLocations != null && !_shipLocations.isEmpty() && _dest != null) {
         for (Pixel pixel : _shipLocations) {
-          _mouse.click(pixel);
-          _mouse.delay(50);
           _mouse.click(pixel);
           _mouse.delay(250);
 
@@ -1016,6 +1053,8 @@ public class MainFrame extends JFrame {
               }
             }
 
+          } else {
+            _mouse.delay(500);
           }
 
         }

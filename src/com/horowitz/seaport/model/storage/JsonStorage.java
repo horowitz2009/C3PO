@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.horowitz.commons.Pixel;
 import com.horowitz.seaport.Building;
-import com.horowitz.seaport.Destination;
+import com.horowitz.seaport.model.Destination;
 
 public class JsonStorage {
   private Gson _gson = new GsonBuilder().setPrettyPrinting().create();

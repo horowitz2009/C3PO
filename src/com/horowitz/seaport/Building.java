@@ -2,7 +2,12 @@ package com.horowitz.seaport;
 
 import com.horowitz.commons.Deserializable;
 import com.horowitz.commons.Pixel;
-
+/**
+ * 
+ * @author zhristov
+ * @deprecated
+ * 
+ */
 public class Building implements Deserializable {
   private String _name;
   private int _time;

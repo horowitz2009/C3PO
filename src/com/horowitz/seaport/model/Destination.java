@@ -1,4 +1,4 @@
-package com.horowitz.seaport;
+package com.horowitz.seaport.model;
 
 import com.horowitz.commons.Deserializable;
 import com.horowitz.commons.ImageData;

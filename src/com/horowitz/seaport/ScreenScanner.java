@@ -35,7 +35,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.SimilarityImageComparator;
 import com.horowitz.commons.TemplateMatcher;
-import com.horowitz.seaport.model.storage.JsonStorage;
+import com.horowitz.seaport.model.Destination;
 
 public class ScreenScanner {
 
@@ -125,7 +125,8 @@ public class ScreenScanner {
         new Pixel(-354, -120) };
 
     _shipLocations = new Pixel[] { new Pixel(103, 83), new Pixel(103, 187), new Pixel(103, 278) };
-    //_buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147, -100), new Pixel(-50, -120) };
+    // _buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147,
+    // -100), new Pixel(-50, -120) };
     _buildingLocations = new Pixel[] { new Pixel(147, -100) };
 
     // label area
@@ -280,6 +281,24 @@ public class ScreenScanner {
     if (p == null) {
       LOGGER.info("Rock try 2 ...");
       p = scanOne("rockEdge.bmp", getScanArea(), false);
+    }
+    return p;
+  }
+
+  public Pixel findRockAgain(Pixel oldRock) throws IOException, AWTException, RobotInterruptedException {
+    ImageData rockData = getImageData("rockEdge.bmp");
+    int x = oldRock.x - rockData.get_xOff();
+    int y = oldRock.y - rockData.get_yOff();
+    
+    
+    Rectangle area = new Rectangle(x - 10, y - 10, 55 + 20, 18 + 20);
+    
+    
+    Pixel p = scanOne("rockEdge.bmp", area, false);
+    if (p == null) {
+      LOGGER.info("Rock not found in the same place.");
+      LOGGER.info("Looking again for the rock...");
+      p = findRock();
     }
     return p;
   }

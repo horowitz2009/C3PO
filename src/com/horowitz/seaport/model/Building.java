@@ -16,6 +16,7 @@ public class Building extends BasicElement implements Cloneable, Serializable, C
   private transient Macros _macros;
   private String _macrosClass;
   private int _level;
+  private boolean _enabled;
 
   public Building(String name) {
     super(name);
@@ -70,7 +71,7 @@ public class Building extends BasicElement implements Cloneable, Serializable, C
   @Override
   public void postDeserialize(Object[] transientObjects) throws Exception {
     super.postDeserialize(transientObjects);
-    //TODO
+    // TODO
     System.out.println("mocros class is" + _macrosClass);
     Macros clazz = (Macros) Class.forName(_macrosClass).newInstance();
     _macros = clazz;
@@ -93,5 +94,13 @@ public class Building extends BasicElement implements Cloneable, Serializable, C
     if (res == 0)
       return new CompareToBuilder().append(this._level, ((Building) o)._level).toComparison();
     return res;
+  }
+
+  public boolean isEnabled() {
+    return _enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    _enabled = enabled;
   }
 }
