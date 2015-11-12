@@ -1,0 +1,49 @@
+[
+ {
+   "_name": "Saw Mill 1",
+   "_time": 5,
+   "_position":   {
+     "weight": 0,
+     "x": 54,
+     "y": -71
+   },
+ 
+   "_enabled": false
+ },
+ {
+   "_name": "Saw Mill 2",
+   "_time": 6,
+   "_position":   {
+     "weight": 0,
+     "x": -50,
+     "y": -120
+   },
+   
+   "_enabled": false
+ },
+ 
+ {
+   "_name": "Quarry",
+   "_time": 6,
+   "_position":   {
+     "weight": 0,
+     "x": 147,
+     "y": -100
+   },
+   
+   "_enabled": true
+ },
+ 
+ {
+   "_name": "Foundry",
+   "_time": 20,
+   "_position":   {
+     "weight": 0,
+     "x": 224,
+     "y": -146
+   },
+   
+   "_enabled": false
+ }
+ 
+]

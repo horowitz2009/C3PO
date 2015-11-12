@@ -1,0 +1,20 @@
+[
+  {
+    "_name": "Small Town",
+    "_time": 5,
+    "_image": "dest/SmallTown.bmp",
+    "_imageTitle": "dest/SmallTownTitle.bmp"
+  },
+  {
+    "_name": "Coastline",
+    "_time": 15,
+    "_image": "dest/Coastline.bmp",
+    "_imageTitle": "dest/CoastlineTitle.bmp"
+  },
+  {
+    "_name": "Gulf",
+    "_time": 60,
+    "_image": "dest/Gulf.bmp",
+    "_imageTitle": "dest/GulfTitle.bmp"
+  }
+]

@@ -7,33 +7,32 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -43,28 +42,17 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
-import com.horowitz.bigbusiness.FactoryMacros;
-import com.horowitz.bigbusiness.TerminalMacros;
-import com.horowitz.bigbusiness.WarehouseMacros;
-import com.horowitz.bigbusiness.macros.Macros;
-import com.horowitz.bigbusiness.macros.RawMaterialsMacros;
 import com.horowitz.bigbusiness.model.BasicElement;
-import com.horowitz.bigbusiness.model.Building;
-import com.horowitz.bigbusiness.model.Contract;
-import com.horowitz.bigbusiness.model.Product;
-import com.horowitz.bigbusiness.model.ProductionProtocol;
-import com.horowitz.bigbusiness.model.ProductionProtocol.Entry;
 import com.horowitz.bigbusiness.model.storage.JsonStorage;
-import com.horowitz.commons.ImageData;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
-import com.horowitz.mickey.Location;
 import com.horowitz.mickey.MouseRobot;
 import com.horowitz.mickey.MyLogger;
 import com.horowitz.mickey.Pixel;
 import com.horowitz.mickey.RobotInterruptedException;
-import com.horowitz.mickey.ocr.OCRB;
 
 public class MainFrame extends JFrame {
 
@@ -72,7 +60,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static final String APP_TITLE = "Seaport v0.011";
+  private static final String APP_TITLE = "Seaport v0.014f";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -90,14 +78,18 @@ public class MainFrame extends JFrame {
 
   private List<Pixel> _fishes;
   private List<Pixel> _shipLocations;
-  private List<Pixel> _buildingLocationsREF;
-  private List<Pixel> _buildingLocationsABS;
+  private List<Pixel> _buildingLocationsREF = new ArrayList<>();
+  private List<Pixel> _buildingLocationsABS = new ArrayList<>();
+  private List<Building> _buildings = new ArrayList<>();
 
   private Pixel _rock;
 
   private JToggleButton _shipsToggle;
 
   private JToggleButton _industriesToggle;
+  private JToggleButton _fullScreenToggle;
+
+  private List<Destination> _destinations;
 
   public static void main(String[] args) {
 
@@ -139,6 +131,14 @@ public class MainFrame extends JFrame {
     _scanner = new ScreenScanner(_settings);
     _mouse = _scanner.getMouse();
 
+    try {
+      _destinations = new JsonStorage().loadDestinations();
+      _buildings = new JsonStorage().loadBuildings();
+    } catch (IOException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
+
     JPanel rootPanel = new JPanel(new BorderLayout());
     getContentPane().add(rootPanel, BorderLayout.CENTER);
 
@@ -176,11 +176,14 @@ public class MainFrame extends JFrame {
 
     JToolBar mainToolbar1 = createToolbar1();
     JToolBar mainToolbar2 = createToolbar2();
-    mainToolbar2.setFloatable(false);
+    JToolBar mainToolbar3 = createToolbar3();
+    JToolBar mainToolbar4 = createToolbar4();
 
-    JPanel toolbars = new JPanel(new GridLayout(9, 1));
+    JPanel toolbars = new JPanel(new GridLayout(0, 1));
     toolbars.add(mainToolbar1);
     toolbars.add(mainToolbar2);
+    toolbars.add(mainToolbar3);
+    toolbars.add(mainToolbar4);
 
     Box north = Box.createVerticalBox();
     north.add(toolbars);
@@ -238,6 +241,190 @@ public class MainFrame extends JFrame {
     north.add(_mouseInfoLabel);
     rootPanel.add(north, BorderLayout.NORTH);
 
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new MyKeyEventDispatcher());
+
+  }
+
+  private void clearBuildings() {
+    _buildingLocationsABS.clear();
+  }
+
+  private void addNewBuilding() {
+    try {
+      Point p = _mouse.getCurrentPosition();
+      Pixel pp = new Pixel(p.x, p.y);
+      LOGGER.info("Position: " + pp);
+
+      _buildingLocationsABS.add(pp);
+
+      _buildingLocationsREF.clear();
+
+      for (Pixel pAbs : _buildingLocationsABS) {
+        int xRelative = _rock.x - pAbs.x;
+        int yRelative = _rock.y - pAbs.y;
+
+        _buildingLocationsREF.add(new Pixel(xRelative, yRelative));
+      }
+
+      LOGGER.info("saving building locations...");
+      // new JsonStorage().saveBuildings(_buildingLocationsREF);
+      LOGGER.info("done");
+
+      recalcPositions(false);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    } catch (RobotInterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void recalcPositions(boolean click) throws RobotInterruptedException {
+    try {
+      _mouse.click(_scanner.getSafePoint());
+      _mouse.delay(100);
+      _mouse.mouseMove(_scanner.getParkingPoint());
+
+      Pixel rock = _scanner.findRock();
+      if (rock != null) {
+        _rock = rock;
+        LOGGER.info("The rock is found: " + rock);
+
+        Pixel[] fishes = _scanner.getFishes();
+        _fishes = new ArrayList<Pixel>();
+        for (Pixel fish : fishes) {
+          Pixel goodFish = new Pixel(rock.x + fish.x, rock.y + fish.y);
+          _fishes.add(goodFish);
+        }
+
+        Pixel[] shipLocations = _scanner.getShipLocations();
+        _shipLocations = new ArrayList<Pixel>();
+        for (Pixel p : shipLocations) {
+          Pixel goodP = new Pixel(rock.x + p.x, rock.y + p.y);
+          _shipLocations.add(goodP);
+        }
+
+        // NEWEST
+        _buildingLocationsABS.clear();
+        for (Building b : _buildings) {
+          if (b.isEnabled()) {
+            Pixel p = b.getPosition();
+            Pixel goodP = new Pixel(rock.x + p.x, rock.y + p.y);
+            _buildingLocationsABS.add(goodP);
+          }
+        }
+
+      } else {
+        LOGGER.info("CAN'T FIND THE ROCK!!!");
+        // throw new RobotInterruptedException();
+        handlePopups();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (AWTException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void record() {
+    try {
+      LOGGER.info("Recording the mouse movement (for now)");
+
+      captureDialog = new CaptureDialog();
+      if (_scanner.isOptimized()) {
+        captureDialog.setBounds(_scanner.getTopLeft().x, _scanner.getTopLeft().y, _scanner.getGameWidth(),
+            _scanner.getGameHeight());
+      } else {
+        captureDialog.setBounds(0, 0, 1679, 1009);
+      }
+      captureDialog.setVisible(true);
+      try {
+        while (true) {
+          Point loc = MouseInfo.getPointerInfo().getLocation();
+          // LOGGER.info("location: " + loc.x + ", " + loc.y);
+          _mouseInfoLabel.setText("location: " + loc.x + ", " + loc.y);
+          _mouse.delay(250, false);
+
+        }
+      } catch (RobotInterruptedException e) {
+        LOGGER.info("interrupted");
+      }
+    } catch (Exception e1) {
+      LOGGER.log(Level.WARNING, e1.getMessage());
+      e1.printStackTrace();
+    }
+
+  }
+
+  private boolean isRunning(String threadName) {
+    boolean isRunning = false;
+    Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+    for (Iterator<Thread> it = threadSet.iterator(); it.hasNext();) {
+      Thread thread = it.next();
+      if (thread.getName().equals(threadName)) {
+        isRunning = true;
+        break;
+      }
+    }
+    return isRunning;
+  }
+
+  private final class MyKeyEventDispatcher implements KeyEventDispatcher {
+
+    public boolean dispatchKeyEvent(KeyEvent e) {
+      if (!e.isConsumed()) {
+        // LOGGER.info("pressed " + e.getKeyCode());
+        // e.consume();
+
+        if (e.getKeyCode() == 119 || e.getKeyCode() == 65) {// F8 or a
+          LOGGER.info("pressed " + e.getKeyCode());
+          if (!isRunning("HMM")) {
+            Thread t = new Thread(new Runnable() {
+              public void run() {
+                addNewBuilding();
+              }
+            }, "HMM");
+            t.start();
+          }
+        }
+
+        if (e.getKeyCode() == 88) {// X
+          // massClick(1, (int) (_scanner.getXOffset() * 1.6), true);
+        }
+        if (e.getKeyCode() == 67) {// C
+          // massClick(1, (int) (_scanner.getXOffset() * 3), true);
+        }
+
+        if (e.getKeyCode() == 65 || e.getKeyCode() == 18) {// A or Alt
+          // massClick(2, true);
+        }
+        if (e.getKeyCode() == 83) {// S
+          // massClick(2, (int) (_scanner.getXOffset() * 1.6), true);
+        }
+        if (e.getKeyCode() == 68) {// D
+          // massClick(2, (int) (_scanner.getXOffset() * 3), true);
+        }
+
+        if (e.getKeyCode() == 81 || e.getKeyCode() == 32) {// Q or Space
+          // massClick(4, true);
+        }
+        if (e.getKeyCode() == 87) {// W
+          // massClick(4, (int) (_scanner.getXOffset() * 1.6), true);
+        }
+        if (e.getKeyCode() == 69) {// E
+          // massClick(4, (int) (_scanner.getXOffset() * 3), true);
+        }
+
+        if (e.getKeyCode() == 77) {// M for MAILS
+          // massClick(1, (int) (_scanner.getXOffset() / 2), true);
+        }
+
+        // LOGGER.info("key pressed: " + e.getExtendedKeyCode() + " >>> " +
+        // e.getKeyCode());
+        e.consume();
+      }
+      return false;
+    }
   }
 
   @SuppressWarnings("serial")
@@ -331,35 +518,36 @@ public class MainFrame extends JFrame {
       mainToolbar1.add(action);
     }
 
-    // COINS
+    // RESET BUILDINGS
     {
-      AbstractAction action = new AbstractAction("Relocate industries") {
+      AbstractAction action = new AbstractAction("Reset") {
         public void actionPerformed(ActionEvent e) {
           Thread myThread = new Thread(new Runnable() {
             @Override
             public void run() {
-              try {
-                if (!_scanner.isOptimized()) {
-                  scan();
-                }
-
-                if (_scanner.isOptimized()) {
-                  _mouse.savePosition();
-                  relocateIndustries();
-                  _mouse.restorePosition();
-                } else {
-                  LOGGER.info("I need to know where the game is!");
-                }
-              } catch (RobotInterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              } catch (IOException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              } catch (AWTException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              }
+              clearBuildings();
+              // try {
+              // if (!_scanner.isOptimized()) {
+              // scan();
+              // }
+              //
+              // if (_scanner.isOptimized()) {
+              // _mouse.savePosition();
+              // locateIndustries();
+              // _mouse.restorePosition();
+              // } else {
+              // LOGGER.info("I need to know where the game is!");
+              // }
+              // } catch (RobotInterruptedException e) {
+              // LOGGER.log(Level.WARNING, e.getMessage());
+              // e.printStackTrace();
+              // } catch (IOException e) {
+              // LOGGER.log(Level.WARNING, e.getMessage());
+              // e.printStackTrace();
+              // } catch (AWTException e) {
+              // LOGGER.log(Level.WARNING, e.getMessage());
+              // e.printStackTrace();
+              // }
             }
 
           });
@@ -370,96 +558,6 @@ public class MainFrame extends JFrame {
       mainToolbar1.add(action);
     }
 
-    // COINS
-    {
-      AbstractAction action = new AbstractAction("Coins") {
-        public void actionPerformed(ActionEvent e) {
-          Thread myThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-              try {
-                if (!_scanner.isOptimized()) {
-                  scan();
-                }
-
-                if (_scanner.isOptimized()) {
-
-                  // scanCoins();
-                  LOGGER.info("Scan for coins...");
-                  _mouse.savePosition();
-                  _scanner.scanMany("tags/coins.bmp", null, true);
-                  _mouse.restorePosition();
-                  LOGGER.info("Done");
-
-                } else {
-                  LOGGER.info("I need to know where the game is!");
-                }
-              } catch (RobotInterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              } catch (IOException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              } catch (AWTException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              }
-            }
-          });
-
-          myThread.start();
-        }
-      };
-      mainToolbar1.add(action);
-    }
-
-    // Houses
-    {
-      AbstractAction action = new AbstractAction("Houses") {
-        public void actionPerformed(ActionEvent e) {
-          Thread myThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-              try {
-
-                if (!_scanner.isOptimized()) {
-                  scan();
-                }
-
-                if (_scanner.isOptimized()) {
-                  LOGGER.info("Scan for houses...");
-                  _mouse.savePosition();
-
-                  if (!_scanner.scanMany("tags/houses.bmp", null, true).isEmpty()) {
-                    _mouse.delay(200);
-                  }
-                  _mouse.click(_scanner.getSafePoint());
-                  _mouse.delay(100);
-                  _mouse.click(_scanner.getSafePoint());
-                  _mouse.restorePosition();
-                  LOGGER.info("Done.");
-
-                } else {
-                  LOGGER.info("I need to know where the game is!");
-                }
-              } catch (RobotInterruptedException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              } catch (IOException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              } catch (AWTException e) {
-                LOGGER.log(Level.WARNING, e.getMessage());
-                e.printStackTrace();
-              }
-            }
-          });
-
-          myThread.start();
-        }
-      };
-      mainToolbar1.add(action);
-    }
     return mainToolbar1;
   }
 
@@ -472,9 +570,60 @@ public class MainFrame extends JFrame {
     {
       _shipsToggle = new JToggleButton("Ships");
       toolbar.add(_shipsToggle);
+
       _industriesToggle = new JToggleButton("Industries");
       _industriesToggle.setSelected(true);
       toolbar.add(_industriesToggle);
+
+      _fullScreenToggle = new JToggleButton("Full screen");
+      toolbar.add(_fullScreenToggle);
+    }
+    return toolbar;
+  }
+
+  private Destination _dest = null;
+
+  @SuppressWarnings("serial")
+  private JToolBar createToolbar3() {
+    JToolBar toolbar = new JToolBar();
+    toolbar.setFloatable(false);
+
+    // DESTINATIONS GO HERE
+    ButtonGroup bg = new ButtonGroup();
+    for (final Destination destination : _destinations) {
+      JToggleButton toggle = new JToggleButton(new AbstractAction(destination.getName()) {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          LOGGER.info("Destination: " + destination.getName());
+          _dest = destination;
+        }
+      });
+      bg.add(toggle);
+      toolbar.add(toggle);
+    }
+    return toolbar;
+  }
+
+  @SuppressWarnings("serial")
+  private JToolBar createToolbar4() {
+    JToolBar toolbar = new JToolBar();
+    toolbar.setFloatable(false);
+
+    // DESTINATIONS GO HERE
+    for (final Building b : _buildings) {
+      final JToggleButton toggle = new JToggleButton(b.getName());
+      toggle.setSelected(b.isEnabled());
+      toggle.addItemListener(new ItemListener() {
+        
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          b.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+          LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled()?"on":"off"));
+        }
+      });
+      // 
+      toolbar.add(toggle);
     }
     return toolbar;
   }
@@ -602,17 +751,22 @@ public class MainFrame extends JFrame {
 
   private void scan() throws RobotInterruptedException {
     try {
+      LOGGER.info("Loading data...");
+
+      // _buildingLocationsREF = new JsonStorage().loadBuildings();
+
       LOGGER.info("Scanning...");
       setTitle(APP_TITLE + " ...");
-      boolean found = _scanner.locateGameArea();
+      boolean found = _scanner.locateGameArea(_fullScreenToggle.isSelected());
       if (found) {
 
-        LOGGER.info("GAME FOUND! Seaport READY.");
+        _scanner.deserializeDestinations(_destinations);
 
-        _buildingLocationsREF = new JsonStorage().loadBuildings();
+        LOGGER.info("GAME FOUND! Seaport READY.");
+        LOGGER.info("Coordinates: " + _scanner.getTopLeft() + " - " + _scanner.getBottomRight());
 
         // locate the rock and recalc
-        recalcPositions(false);
+        // recalcPositions(false);
 
         // fixTheGame();
         /*
@@ -660,94 +814,6 @@ public class MainFrame extends JFrame {
 
   }
 
-  private void recalcPositions(boolean click) throws RobotInterruptedException {
-    try {
-      _mouse.click(_scanner.getSafePoint());
-      _mouse.delay(100);
-      _mouse.mouseMove(_scanner.getParkingPoint());
-
-      Pixel rock = _scanner.findRock();
-      if (rock != null) {
-        _rock = rock;
-        LOGGER.info("The rock is found: " + rock);
-
-        Pixel[] fishes = _scanner.getFishes();
-        _fishes = new ArrayList<Pixel>();
-        for (Pixel fish : fishes) {
-          Pixel goodFish = new Pixel(rock.x + fish.x, rock.y + fish.y);
-          _fishes.add(goodFish);
-        }
-
-        Pixel[] shipLocations = _scanner.getShipLocations();
-        _shipLocations = new ArrayList<Pixel>();
-        for (Pixel p : shipLocations) {
-          Pixel goodP = new Pixel(rock.x + p.x, rock.y + p.y);
-          _shipLocations.add(goodP);
-        }
-
-        _buildingLocationsABS = new ArrayList<Pixel>();
-        for (Pixel p : _buildingLocationsREF) {
-          Pixel goodP = new Pixel(rock.x + p.x, rock.y + p.y);
-          _buildingLocationsABS.add(goodP);
-        }
-
-        // for (Building building : _buildingLocations) {
-        // Pixel rel = building.getRelativePosition();
-        // Pixel newAbsPos = new Pixel(rock.x - rel.x, rock.y - rel.y);
-        // building.setPosition(newAbsPos);
-        // if (click) {
-        // _mouse.mouseMove(newAbsPos);
-        // LOGGER.info(building.getName() + " - " + newAbsPos);
-        // _mouse.delay(2000);
-        // _mouse.checkUserMovement();
-        // _mouse.click(_scanner.getSafePoint());
-        // _mouse.delay(200);
-        // _mouse.checkUserMovement();
-        // }
-        //
-        // }
-      } else {
-        LOGGER.info("CAN'T FIND THE ROCK!!!");
-        // throw new RobotInterruptedException();
-        handlePopups();
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (AWTException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void record() {
-    try {
-      LOGGER.info("Recording the mouse movement (for now)");
-
-      captureDialog = new CaptureDialog();
-      if (_scanner.isOptimized()) {
-        captureDialog.setBounds(_scanner.getTopLeft().x, _scanner.getTopLeft().y, _scanner.getGameWidth(),
-            _scanner.getGameHeight());
-      } else {
-        captureDialog.setBounds(0, 0, 1679, 1009);
-      }
-      captureDialog.setVisible(true);
-      try {
-        while (true) {
-          Point loc = MouseInfo.getPointerInfo().getLocation();
-          // LOGGER.info("location: " + loc.x + ", " + loc.y);
-          _mouseInfoLabel.setText("location: " + loc.x + ", " + loc.y);
-          _mouse.delay(250, false);
-
-        }
-      } catch (RobotInterruptedException e) {
-        LOGGER.info("interrupted");
-      }
-    } catch (Exception e1) {
-      LOGGER.log(Level.WARNING, e1.getMessage());
-      e1.printStackTrace();
-    }
-
-  }
-
   private Rectangle generateMiniArea(Pixel p) {
     return new Rectangle(p.x - 2 - 18, p.y - 50 + 35, 44, 60);
   }
@@ -787,7 +853,7 @@ public class MainFrame extends JFrame {
 
         // 3. INDUSTRIES
         if (_industriesToggle.isSelected()) {
-          LOGGER.info("industries...");
+          LOGGER.info("Industries...");
           doIndustries();
         }
 
@@ -806,7 +872,7 @@ public class MainFrame extends JFrame {
 
   private void handlePopups() throws RobotInterruptedException {
     try {
-      LOGGER.info("popups...");
+      LOGGER.info("Popups...");
       boolean popup = false;
       // reload
       Rectangle area = _scanner.generateWindowedArea(412, 550);
@@ -853,7 +919,7 @@ public class MainFrame extends JFrame {
   private void doShips() throws RobotInterruptedException {
     try {
       boolean shipSent = false;
-      if (_shipLocations != null && !_shipLocations.isEmpty()) {
+      if (_shipLocations != null && !_shipLocations.isEmpty() && _dest != null) {
         for (Pixel pixel : _shipLocations) {
           _mouse.click(pixel);
           _mouse.delay(50);
@@ -866,7 +932,9 @@ public class MainFrame extends JFrame {
           if (fp != null) {
             LOGGER.info("SHIP to be sent ...");
             _mouse.click(fp);
-            _mouse.delay(1250);
+            _mouse.delay(50);
+            _mouse.mouseMove(_scanner.getParkingPoint());
+            _mouse.delay(500);
 
             // now choose destination
             // 1. check is map open
@@ -874,14 +942,32 @@ public class MainFrame extends JFrame {
             if (anchor != null) {
               // it is open
               // TODO get destination from buttons
-              Pixel dest = _scanner.scanOne("dest/smallTown.bmp", null, true);
+              // Pixel dest = _scanner.scanOne("dest/smallTown.bmp", null,
+              // true);
+              // Pixel dest = _scanner.scanOne("dest/Coastline.bmp", null,
+              // false);
+
+              Pixel dest = _scanner.scanOne(_dest.getImageData(), null, false);
+
               if (dest != null) {
                 LOGGER.info("Sending to Small Town...");
                 _mouse.click(dest);
-                _mouse.delay(350);
-                Pixel destTitle = _scanner.scanOne("dest/smallTownTitle.bmp", null, false);
+                _mouse.delay(50);
+                _mouse.mouseMove(_scanner.getParkingPoint());
+                _mouse.delay(500);
+
+                // Pixel destTitle = _scanner.scanOne("dest/smallTownTitle.bmp",
+                // null, false);
+                // Pixel destTitle = _scanner.scanOne("dest/CoastlineTitle.bmp",
+                // null, false);
+
+                Pixel destTitle = _scanner.scanOne(_dest.getImageDataTitle(), null, false);
+
                 if (destTitle != null) {
                   LOGGER.info("SEND POPUP OPEN...");
+                  _mouse.mouseMove(_scanner.getParkingPoint());
+                  _mouse.delay(500);
+
                   Pixel destButton = _scanner.scanOne("dest/setSail.bmp", null, true);
                   if (destButton != null) {
                     // nice. we can continue
@@ -897,12 +983,16 @@ public class MainFrame extends JFrame {
                 if (!shipSent) {
                   _mouse.delay(300);
                   _mouse.click(anchor);
+                  _mouse.delay(50);
+                  _mouse.mouseMove(_scanner.getParkingPoint());
                   _mouse.delay(1300);
                 }
               } else {
                 LOGGER.info("Destination: UNKNOWN!!!");
                 _mouse.delay(300);
                 _mouse.click(anchor);
+                _mouse.delay(50);
+                _mouse.mouseMove(_scanner.getParkingPoint());
                 _mouse.delay(1300);
               }
             }
@@ -924,7 +1014,7 @@ public class MainFrame extends JFrame {
 
   }
 
-  private void relocateIndustries() throws IOException, AWTException {
+  private void locateIndustries() throws IOException, AWTException {
     try {
       LOGGER.info("Locating buildings. Please wait!");
 
@@ -936,17 +1026,15 @@ public class MainFrame extends JFrame {
 
       LOGGER.info("buildings found: " + whites.size());
 
-      
       for (Pixel pAbs : whites) {
         int xRelative = _rock.x - pAbs.x;
         int yRelative = _rock.y - pAbs.y;
 
         _buildingLocationsREF.add(new Pixel(xRelative, yRelative));
       }
-      
 
       LOGGER.info("saving building locations...");
-      new JsonStorage().saveBuildings(_buildingLocationsREF);
+      // new JsonStorage().saveBuildings(_buildingLocationsREF);
       LOGGER.info("done");
 
     } catch (IOException e) {
@@ -955,15 +1043,61 @@ public class MainFrame extends JFrame {
       e.printStackTrace();
     } catch (RobotInterruptedException e) {
       LOGGER.info("interrupted");
-    } catch (CloneNotSupportedException e) {
+    }
+  }
+
+  private void doIndustriesOld() throws RobotInterruptedException {
+    try {
+      if (_rock != null && _buildingLocationsABS != null && !_buildingLocationsABS.isEmpty()) {
+        for (Pixel p1 : _buildingLocationsABS) {
+          _mouse.click(p1);
+          _mouse.delay(100);
+          _mouse.mouseMove(_scanner.getParkingPoint());
+          Rectangle area = new Rectangle(p1.x - 80, p1.y + 41, 160, 55);
+          Pixel gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
+          if (gears != null) {
+            _mouse.mouseMove(_scanner.getParkingPoint());
+            LOGGER.info("GEARS...");
+            Pixel produceButton = _scanner.scanOne("buildings/produce.bmp", null, true);
+            if (produceButton != null) {
+              // nice. we can continue
+              // shipSent = true;
+            } else {
+              // try if gray
+              produceButton = _scanner.scanOne("buildings/produceGray.bmp", null, false);
+              if (produceButton != null) {
+                LOGGER.info("Production not possible...");
+                area = _scanner.generateWindowedArea(400, 550);
+                _scanner.scanOne("buildings/x.bmp", area, true);
+              } else {
+                LOGGER.info("Building not ready...");
+                _mouse.delay(300);
+                _mouse.click(_scanner.getSafePoint());
+              }
+            }
+
+          }
+          _mouse.delay(1000);// reduce later
+          _mouse.click(_scanner.getSafePoint());
+          _mouse.delay(1000);
+
+        }
+      }
+
+    } catch (AWTException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
       e.printStackTrace();
     }
+
   }
 
   private void doIndustries() throws RobotInterruptedException {
     try {
-      if (_rock != null && _buildingLocations != null && !_buildingLocations.isEmpty()) {
-        for (Pixel p1 : _buildingLocations) {
+      if (_rock != null && _buildingLocationsABS != null && !_buildingLocationsABS.isEmpty()) {
+        for (Pixel p1 : _buildingLocationsABS) {
           Rectangle miniArea = new Rectangle(p1.x - 14, p1.y - 12, 28, 12);
           Pixel p = _scanner.scanOneFast("buildings/whiteArrow.bmp", miniArea, false);
           if (p != null) {
@@ -976,13 +1110,13 @@ public class MainFrame extends JFrame {
             // check if popup is opened, else click again
             Rectangle area = new Rectangle(p1.x - 80, p1.y + 41, 160, 55);
             Pixel gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
-            if (gears == null) {
-              LOGGER.info("click again...");
-              _mouse.click(p1);
-              _mouse.delay(800);
-              _mouse.mouseMove(_scanner.getParkingPoint());
-            }
-            gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
+            // if (gears == null) {
+            // LOGGER.info("click again...");
+            // _mouse.click(p1);
+            // _mouse.delay(800);
+            // _mouse.mouseMove(_scanner.getParkingPoint());
+            // gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
+            // }
             if (gears != null) {
               LOGGER.info("GEARS...");
               _mouse.mouseMove(_scanner.getParkingPoint());

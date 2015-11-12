@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import com.horowitz.bigbusiness.model.storage.JsonStorage;
 import com.horowitz.commons.GameLocator;
 import com.horowitz.commons.ImageData;
 import com.horowitz.commons.ImageMask;
@@ -68,10 +69,11 @@ public class ScreenScanner {
   private Pixel[] _fishes;
   private Pixel[] _shipLocations;
   private Pixel[] _buildingLocations;
-  
+
   public Rectangle _popupArea;
   public Rectangle _popupAreaX;
   public Rectangle _popupAreaB;
+  private List<Destination> _destinations;
 
   public Pixel[] getShipLocations() {
     return _shipLocations;
@@ -81,7 +83,7 @@ public class ScreenScanner {
     _settings = settings;
     _comparator = new SimilarityImageComparator(0.04, 2000);
     _matcher = new TemplateMatcher();
-    _matcher.setSimilarityThreshold(.91d);
+    // _matcher.setSimilarityThreshold(.91d);
 
     try {
       _mouse = new MouseRobot();
@@ -123,7 +125,8 @@ public class ScreenScanner {
         new Pixel(-354, -120) };
 
     _shipLocations = new Pixel[] { new Pixel(103, 83), new Pixel(103, 187), new Pixel(103, 278) };
-    _buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147, -100) };
+    //_buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147, -100), new Pixel(-50, -120) };
+    _buildingLocations = new Pixel[] { new Pixel(147, -100) };
 
     // label area
     _labelWidth = 380;
@@ -140,7 +143,7 @@ public class ScreenScanner {
     _popupAreaX.width = _popupAreaX.width / 2;
 
     _popupAreaB = new Rectangle(_popupArea);
-    _popupAreaB.y = _popupAreaB.y + _popupAreaB.height - 125; 
+    _popupAreaB.y = _popupAreaB.y + _popupAreaB.height - 125;
     _popupAreaB.height = 125;
 
     _safePoint = new Pixel(_br.x - 15, _br.y - 15);
@@ -151,8 +154,12 @@ public class ScreenScanner {
 
     area = new Rectangle(_br.x - 110, _br.y - 75, 60, 40);
     getImageData("anchor.bmp", area, 20, 7);
-    getImageData("dest/smallTown.bmp", _scanArea, 41, 45);
-    getImageData("dest/smallTownTitle.bmp", _popupArea, 0, 0);
+    getImageData("dest/SmallTown.bmp", _scanArea, 39, 42);
+    getImageData("dest/SmallTownTitle.bmp", _popupArea, 0, 0);
+    getImageData("dest/Gulf.bmp", _scanArea, 13, 44);
+    getImageData("dest/GulfTitle.bmp", _popupArea, 0, 0);
+    getImageData("dest/Coastline.bmp", _scanArea, 31, 43);
+    getImageData("dest/CoastlineTitle.bmp", _popupArea, 0, 0);
     // getImageData("dest/missing.bmp", _scanArea, 41, 45);
     getImageData("dest/setSail.bmp", _popupArea, 30, 6);
 
@@ -164,6 +171,12 @@ public class ScreenScanner {
     getImageData("buildings/produce.bmp", _popupAreaB, 0, 0);
     getImageData("buildings/produceGray.bmp", _popupAreaB, 0, 0);
     getImageData("buildings/x.bmp", _popupAreaX, 10, 10);
+
+    /*_destinations.add(new Destination("Small Town", 5,
+        getImageData("buildings/SmallTown.bmp"),getImageData("buildings/SmallTownTitle.bmp")));
+    _destinations.add(new Destination("Coastline", 15,
+        getImageData("buildings/Coastline.bmp"),getImageData("buildings/coastlineTitle.bmp")));
+    */
 
     /*
     _hooray = new ImageData("Hooray.bmp", area, _comparator, 23, 6);
@@ -234,19 +247,27 @@ public class ScreenScanner {
     }
   }
 
-  public boolean locateGameArea() throws AWTException, IOException, RobotInterruptedException {
+  public boolean locateGameArea(boolean fullScreen) throws AWTException, IOException, RobotInterruptedException {
     LOGGER.fine("Locating game area ... ");
 
-    boolean found = _gameLocator.locateGameArea(new ImageData("topLeft.bmp", null, _comparator, -38, -12),
-        new ImageData("bottomRight.bmp", null, _comparator, 45 + 53, 64), false);
-    if (found) {
-      _tl = _gameLocator.getTopLeft();
-      _br = _gameLocator.getBottomRight();
+    _tl = new Pixel(0, 0);
+
+    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    _br = new Pixel(screenSize.width - 3, screenSize.height - 130);
+
+    if (fullScreen) {
+      // use default
       setKeyAreas();
       return true;
     } else {
-      _tl = new Pixel(0, 0);
-      _br = new Pixel(1600, 1000);
+      boolean found = _gameLocator.locateGameArea(new ImageData("topLeft.bmp", null, _comparator, -38, -12),
+          new ImageData("bottomRight.bmp", null, _comparator, 45 + 53, 64), false);
+      if (found) {
+        _tl = _gameLocator.getTopLeft();
+        _br = _gameLocator.getBottomRight();
+        setKeyAreas();
+        return true;
+      }
     }
     return false;
   }
@@ -375,6 +396,13 @@ public class ScreenScanner {
     return result;
   }
 
+  public void deserializeDestinations(List<Destination> destinations) throws IOException {
+    for (Destination destination : destinations) {
+      destination.setImageData(getImageData(destination.getImage()));
+      destination.setImageDataTitle(getImageData(destination.getImageTitle()));
+    }
+  }
+
   public void scan() {
     try {
       Robot robot = new Robot();
@@ -501,15 +529,15 @@ public class ScreenScanner {
     return scanMany(imageData, screen, click);
   }
 
-  public List<Pixel> scanManyFast(String filename, BufferedImage screen, boolean click) throws RobotInterruptedException,
-  IOException, AWTException {
-    
+  public List<Pixel> scanManyFast(String filename, BufferedImage screen, boolean click)
+      throws RobotInterruptedException, IOException, AWTException {
+
     ImageData imageData = getImageData(filename);
     if (imageData == null)
       return new ArrayList<Pixel>(0);
     return scanMany(imageData, screen, click);
   }
-  
+
   public List<Pixel> scanMany(ImageData imageData, BufferedImage screen, boolean click)
       throws RobotInterruptedException, IOException, AWTException {
     if (imageData == null)
@@ -559,7 +587,7 @@ public class ScreenScanner {
     if (!matches.isEmpty()) {
       Collections.sort(matches);
       Collections.reverse(matches);
-      
+
       // filter similar
       if (matches.size() > 1) {
         for (int i = matches.size() - 1; i > 0; --i) {
@@ -575,7 +603,7 @@ public class ScreenScanner {
           }
         }
       }
-      
+
       for (Pixel pixel : matches) {
         pixel.x += (area.x + imageData.get_xOff());
         pixel.y += (area.y + imageData.get_yOff());
@@ -585,7 +613,7 @@ public class ScreenScanner {
     }
     return matches;
   }
-  
+
   public Pixel scanOne(ImageData imageData, Rectangle area, boolean click) throws AWTException,
       RobotInterruptedException {
     if (area == null) {
