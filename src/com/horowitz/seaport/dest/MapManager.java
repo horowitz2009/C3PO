@@ -65,4 +65,13 @@ public class MapManager {
     }
   }
 
+  public void saveDestinations() {
+    try {
+      new JsonStorage().saveDestinations(_destinations);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    
+  }
+
 }

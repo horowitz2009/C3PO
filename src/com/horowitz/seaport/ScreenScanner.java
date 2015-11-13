@@ -157,7 +157,7 @@ public class ScreenScanner {
     _parkingPoint = new Pixel(_br);
 
     getImageData("rockEdge.bmp", _scanArea, -45, 26);
-    getImageData("pin.bmp", _scanArea, 8, 8);
+    getImageData("pin.bmp", _scanArea, 6, 6);
 
     area = new Rectangle(_br.x - 110, _br.y - 75, 60, 40);
     _anchorButton = getImageData("anchor.bmp", area, 20, 7);
@@ -657,10 +657,11 @@ public class ScreenScanner {
     }
     BufferedImage screen = new Robot().createScreenCapture(area);
     Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, imageData.getColorToBypass());
+    long start = System.currentTimeMillis();
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
       pixel.y += (area.y + imageData.get_yOff());
-      LOGGER.info("found: " + pixel);
+      LOGGER.info("found : " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
       if (click) {
         _mouse.click(pixel.x, pixel.y);
       }
@@ -678,11 +679,14 @@ public class ScreenScanner {
       area = imageData.getDefaultArea();
 
     BufferedImage screen = new Robot().createScreenCapture(area);
+    if (_debugMode)
+      writeImage(screen, imageData.getName() + "_area.png");
+    long start = System.currentTimeMillis();
     Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, imageData.getColorToBypass());
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
       pixel.y += (area.y + imageData.get_yOff());
-      LOGGER.info("found: " + pixel);
+      LOGGER.info("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
       if (click) {
         _mouse.click(pixel.x, pixel.y);
         _mouse.delay(100);
@@ -700,11 +704,12 @@ public class ScreenScanner {
     if (_debugMode) {
       writeImage(screen, imageData.getName() + "_area.png");
     }
+    long start = System.currentTimeMillis();
     Pixel pixel = _comparator.findImage(imageData.getImage(), screen, imageData.getColorToBypass());
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
       pixel.y += (area.y + imageData.get_yOff());
-      LOGGER.info("found: " + pixel);
+      LOGGER.info("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
       if (click) {
         _mouse.click(pixel.x, pixel.y);
       }
@@ -722,12 +727,12 @@ public class ScreenScanner {
       area = imageData.getDefaultArea();
 
     BufferedImage screen = new Robot().createScreenCapture(area);
-
+    long start = System.currentTimeMillis();
     Pixel pixel = _comparator.findImage(imageData.getImage(), screen, imageData.getColorToBypass());
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
       pixel.y += (area.y + imageData.get_yOff());
-      LOGGER.info("found: " + pixel);
+      LOGGER.info("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
       if (click) {
         _mouse.click(pixel.x, pixel.y);
         _mouse.delay(100);

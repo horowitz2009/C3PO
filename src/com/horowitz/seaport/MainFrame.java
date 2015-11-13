@@ -64,7 +64,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static String APP_TITLE = "Seaport v0.017c";
+  private static String APP_TITLE = "Seaport v0.018";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -106,6 +106,8 @@ public class MainFrame extends JFrame {
   private Task _buildingsTask;
 
   private boolean _testMode;
+
+  private JToggleButton _slowToggle;
 
   public static void main(String[] args) {
 
@@ -150,11 +152,10 @@ public class MainFrame extends JFrame {
 
     // LOADING DATA
     try {
-      _settings = Settings.createSettings("bbgun.properties");
+      _settings = Settings.createSettings("seaport.properties");
       _scanner = new ScreenScanner(_settings);
       _scanner.setDebugMode(_testMode);
       _mouse = _scanner.getMouse();
-
       _mapManager = new MapManager(_scanner);
       _mapManager.loadDestinations();
       _market = _mapManager.getMarket();
@@ -180,11 +181,11 @@ public class MainFrame extends JFrame {
       System.exit(1);
     }
 
-    initPayout();
+    initLayout();
 
   }
 
-  private void initPayout() {
+  private void initLayout() {
     if (_testMode)
       APP_TITLE += " TEST";
     setTitle(APP_TITLE);
@@ -673,7 +674,22 @@ public class MainFrame extends JFrame {
       toolbar.add(_industriesToggle);
 
       _fullScreenToggle = new JToggleButton("Full screen");
-      toolbar.add(_fullScreenToggle);
+      ////toolbar.add(_fullScreenToggle);
+      _slowToggle = new JToggleButton("Slow");
+      _slowToggle.addItemListener(new ItemListener() {
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          boolean b = e.getStateChange() == ItemEvent.SELECTED;
+          LOGGER.info("Slow mode: " + (b ? "on" : "off"));
+          if (b) {
+            _mouse.setDelayBetweenActions(500);
+          } else {
+            _mouse.setDelayBetweenActions(0);
+          }
+        }
+      });
+      toolbar.add(_slowToggle);
     }
     return toolbar;
   }
@@ -913,10 +929,9 @@ public class MainFrame extends JFrame {
 
         _mapManager.deserializeDestinations();
 
-        LOGGER.info("GAME FOUND! Seaport READY.");
         LOGGER.info("Coordinates: " + _scanner.getTopLeft() + " - " + _scanner.getBottomRight());
 
-        _scanner.zoomOut();
+        // TEMPORARY _scanner.zoomOut();
 
         // locate the rock and recalc
         // recalcPositions(false);
@@ -955,6 +970,7 @@ public class MainFrame extends JFrame {
         }
         */
 
+        LOGGER.info("GAME FOUND! INSOMNIA READY!");
         setTitle(APP_TITLE + " READY");
       } else {
         LOGGER.info("CAN'T FIND THE GAME!");
@@ -990,18 +1006,50 @@ public class MainFrame extends JFrame {
       Pixel mapP = _scanner.scanOneFast("mapButton.bmp", null, true);
       if (mapP != null) {
         _mouse.delay(2000);
+
+        Destination market = null;
+        Pixel marketPos = null;
         for (Destination destination : _mapManager.getDestinations()) {
+          if (destination.getName().equals("Market"))
+            market = destination;
+
           ImageData id = destination.getImageData();
           Pixel p = _scanner.scanOneFast(id, null, false);
           if (p != null) {
             LOGGER.info("found " + destination.getName());
-
+            destination.setRelativePosition(p);
           } else {
             LOGGER.info("didn't found " + destination.getName());
           }
           // _mouse.delay(1000);
         }
         LOGGER.info("done destinations");
+
+        if (market != null) {
+          Pixel pm = market.getRelativePosition();
+          for (Destination destination : _mapManager.getDestinations()) {
+            if (!destination.getName().equals("Market")) {
+              Pixel pp = destination.getRelativePosition();
+              pp.x = -pm.x + pp.x;
+              pp.y = -pm.y + pp.y;
+            }
+          }
+          _mapManager.saveDestinations();
+          _mouse.drag(pm.x, pm.y, pm.x + 60, pm.y);
+          _mouse.delay(2000);
+          pm = _scanner.scanOneFast(market.getImageData(), null, false);
+          market.setRelativePosition(new Pixel(0, 0));
+          if (pm != null) {
+            for (Destination destination : _mapManager.getDestinations()) {
+              Pixel pp = destination.getRelativePosition();
+              LOGGER.info(destination.getName() + ": " + destination.getRelativePosition());
+              Pixel absP = new Pixel(pm.x + pp.x, pm.y + pp.y);
+              LOGGER.info(destination.getName() + ": " + absP);
+              _mouse.mouseMove(absP);
+              _mouse.delay(2000);
+            }
+          }
+        }
       }
       // TODO more
 
@@ -1145,10 +1193,10 @@ public class MainFrame extends JFrame {
 
           // check for menu
           Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 65, 44, 44);
-          Pixel fp = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
-          if (fp != null) {
+          Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
+          if (pin != null) {
             LOGGER.info("SHIP to be sent ...");
-            _mouse.click(fp);
+            _mouse.click(pin);
             _mouse.delay(50);
             _mouse.mouseMove(_scanner.getParkingPoint());
             _mouse.delay(500);
@@ -1160,7 +1208,19 @@ public class MainFrame extends JFrame {
               // MAP ZONE
               if (_marketPos == null) {
                 LOGGER.info("Looking for market for the first time");
-                _marketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+
+                Rectangle smallerArea = _scanner.generateWindowedArea(260, 500);
+                smallerArea.x += 50 + _scanner.getTopLeft().x;
+                smallerArea.width = 260;
+                smallerArea.y = _scanner.getTopLeft().y + _scanner.getGameHeight() / 2;
+                smallerArea.height = _scanner.getGameHeight() / 2;
+                _marketPos = _scanner.scanOneFast(_market.getImageData(), smallerArea, false);
+                if (_marketPos == null) {
+                  _marketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+                  LOGGER.info("DAMMMMMMMMMMMMMMMMMMMMMMMMN");
+                } else {
+                  LOGGER.info("BINGO");
+                }
               } else {
                 // int x = oldRock.x - rockData.get_xOff();
                 // int y = oldRock.y - rockData.get_yOff();
@@ -1180,9 +1240,9 @@ public class MainFrame extends JFrame {
 
               Pixel dest = null;
               if (!_dest.getName().equals("Market") && _marketPos != null) {
-                int x = _marketPos.x + _dest.getRelativePosition().x;
-                int y = _marketPos.y + _dest.getRelativePosition().y;
-                Rectangle destArea = new Rectangle(x, y, 153, 30);
+                int x = _marketPos.x + _dest.getRelativePosition().x - _market.getImageData().get_xOff() - 10;
+                int y = _marketPos.y + _dest.getRelativePosition().y - _market.getImageData().get_yOff() - 10;
+                Rectangle destArea = new Rectangle(x, y, 153 + 20, 25);
                 LOGGER.info("Using custom area for " + _dest.getImage());
                 dest = _scanner.scanOneFast(_dest.getImageData(), destArea, false);
               } else {
@@ -1210,7 +1270,7 @@ public class MainFrame extends JFrame {
                   _mouse.mouseMove(_scanner.getParkingPoint());
                   _mouse.delay(100);
 
-                  Pixel destButton = _scanner.scanOne("dest/setSail.bmp", null, true);
+                  Pixel destButton = _scanner.scanOneFast("dest/setSail.bmp", null, true);
                   if (destButton != null) {
                     // nice. we can continue
                     shipSent = true;
@@ -1225,7 +1285,7 @@ public class MainFrame extends JFrame {
                 // throw new RobotInterruptedException();
                 if (!shipSent) {
                   _mouse.delay(300);
-                  anchor = _scanner.scanOne("anchor.bmp", null, true);
+                  anchor = _scanner.scanOneFast("anchor.bmp", null, true);
                   // _mouse.click(anchor);
                   // _mouse.delay(50);
                   _mouse.mouseMove(_scanner.getParkingPoint());

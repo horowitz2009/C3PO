@@ -188,4 +188,28 @@ public class MouseRobot {
       e.printStackTrace();
     }
   }
+
+  public int getClickDelay() {
+    return _clickDelay;
+  }
+
+  public void setClickDelay(int clickDelay) {
+    _clickDelay = clickDelay;
+  }
+
+  public int getDoubleClickDelay() {
+    return _doubleClickDelay;
+  }
+
+  public void setDoubleClickDelay(int doubleClickDelay) {
+    _doubleClickDelay = doubleClickDelay;
+  }
+
+  public int getDelayBetweenActions() {
+    return _delayBetweenActions;
+  }
+
+  public void setDelayBetweenActions(int delayBetweenActions) {
+    _delayBetweenActions = delayBetweenActions;
+  }
 }
