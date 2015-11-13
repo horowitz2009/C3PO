@@ -2,19 +2,65 @@
   {
     "_name": "Small Town",
     "_time": 5,
+    "_favorite" : true,
     "_image": "dest/SmallTown.bmp",
     "_imageTitle": "dest/SmallTownTitle.bmp"
   },
   {
     "_name": "Coastline",
     "_time": 15,
+    "_favorite" : true,
     "_image": "dest/Coastline.bmp",
     "_imageTitle": "dest/CoastlineTitle.bmp"
   },
   {
     "_name": "Gulf",
     "_time": 60,
+    "_favorite" : true,
     "_image": "dest/Gulf.bmp",
     "_imageTitle": "dest/GulfTitle.bmp"
+  },
+  {
+    "_name": "Cocoa Plant",
+    "_time": 120,
+    "_favorite" : true,
+    "_image": "dest/CocoaPlant.bmp",
+    "_imageTitle": "dest/CocoaPlantTitle.bmp"
+  },
+  {
+    "_name": "Market",
+    "_time": 30,
+    "_favorite" : true,
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
+    "_name": "Bamboo",
+    "_time": 60,
+    "_favorite" : false,
+    "_image": "dest/Bamboo.bmp",
+    "_imageTitle": "dest/BambooTitle.bmp"
+  },
+  {
+    "_name": "Rubble",
+    "_time": 60,
+    "_favorite" : false,
+    "_image": "dest/Rubble.bmp",
+    "_imageTitle": "dest/RubbleTitle.bmp"
+  },
+  {
+    "_name": "Forest",
+    "_time": 60,
+    "_favorite" : false,
+    "_image": "dest/Forest.bmp",
+    "_imageTitle": "dest/ForestTitle.bmp"
+  },
+  {
+    "_name": "Neighborhood",
+    "_time": 60,
+    "_favorite" : false,
+    "_image": "dest/Neighborhood.bmp",
+    "_imageTitle": "dest/NeighborhoodTitle.bmp"
   }
+  
 ]

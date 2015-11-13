@@ -3,6 +3,7 @@ package com.horowitz.seaport;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -31,6 +32,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -43,12 +45,14 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
+import com.horowitz.commons.ImageData;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.MyLogger;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
+import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.BasicElement;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.Task;
@@ -60,7 +64,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static final String APP_TITLE = "Seaport v0.015b";
+  private static String APP_TITLE = "Seaport v0.017c";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -81,6 +85,7 @@ public class MainFrame extends JFrame {
   private List<Pixel> _buildingLocationsREF = new ArrayList<>();
   private List<Pixel> _buildingLocationsABS = new ArrayList<>();
   private List<Building> _buildings = new ArrayList<>();
+  private MapManager _mapManager;
 
   private Pixel _rock;
 
@@ -88,8 +93,6 @@ public class MainFrame extends JFrame {
 
   private JToggleButton _industriesToggle;
   private JToggleButton _fullScreenToggle;
-
-  private List<Destination> _destinations;
 
   private List<Task> _tasks;
 
@@ -101,11 +104,22 @@ public class MainFrame extends JFrame {
 
   private Task _buildingsTask;
 
+  private boolean _testMode;
+
   public static void main(String[] args) {
 
     try {
-      MainFrame frame = new MainFrame();
-
+      boolean isTestmode = false;
+      if (args.length > 0) {
+        for (String arg : args) {
+          System.err.println(arg);
+          if (arg.equalsIgnoreCase("test")) {
+            isTestmode = true;
+            break;
+          }
+        }
+      }
+      MainFrame frame = new MainFrame(isTestmode);
       frame.pack();
       frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
       int w = frame.getSize().width;
@@ -132,17 +146,17 @@ public class MainFrame extends JFrame {
 
   @SuppressWarnings("serial")
   private void init() throws AWTException {
-    setTitle(APP_TITLE);
 
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setAlwaysOnTop(true);
-
-    _settings = Settings.createSettings("bbgun.properties");
-    _scanner = new ScreenScanner(_settings);
-    _mouse = _scanner.getMouse();
-
+    // LOADING DATA
     try {
-      _destinations = new JsonStorage().loadDestinations();
+      _settings = Settings.createSettings("bbgun.properties");
+      _scanner = new ScreenScanner(_settings);
+      _scanner.setDebugMode(_testMode);
+      _mouse = _scanner.getMouse();
+
+      _mapManager = new MapManager(_scanner);
+      _mapManager.loadDestinations();
+
       _buildings = new JsonStorage().loadBuildings();
       _tasks = new ArrayList<Task>();
       _scanTask = new Task("Scan", 1);
@@ -154,17 +168,115 @@ public class MainFrame extends JFrame {
       _tasks.add(_shipsTask);
       _tasks.add(_buildingsTask);
 
+      _matcher = _scanner.getMatcher();
+
+      _stopAllThreads = false;
+
     } catch (IOException e1) {
-      // TODO Auto-generated catch block
+      System.err.println("Something went wrong!");
       e1.printStackTrace();
+      System.exit(1);
     }
+
+    initPayout();
+
+  }
+
+  private void initPayout() {
+    if (_testMode)
+      APP_TITLE += " TEST";
+    setTitle(APP_TITLE);
+
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    setAlwaysOnTop(true);
 
     JPanel rootPanel = new JPanel(new BorderLayout());
     getContentPane().add(rootPanel, BorderLayout.CENTER);
 
-    final JTextArea outputConsole = new JTextArea(8, 14);
+    // CONSOLE
+    rootPanel.add(buildConsole(), BorderLayout.CENTER);
 
-    rootPanel.add(new JScrollPane(outputConsole), BorderLayout.CENTER);
+    // TOOLBARS
+    JToolBar mainToolbar1 = createToolbar1();
+    JToolBar mainToolbar2 = createToolbar2();
+    List<JToolBar> mainToolbars3 = createToolbars3();
+    JToolBar mainToolbar4 = createToolbar4();
+
+    JPanel toolbars = new JPanel(new GridLayout(0, 1));
+    toolbars.add(mainToolbar1);
+    toolbars.add(mainToolbar2);
+    for (JToolBar jToolBar : mainToolbars3) {
+      toolbars.add(jToolBar);
+    }
+    toolbars.add(mainToolbar4);
+
+    Box north = Box.createVerticalBox();
+    north.add(toolbars);
+
+    if (_testMode) {
+
+      JToolBar testToolbar = createTestToolbar();
+      toolbars.add(testToolbar);
+      _findThisTF = new JTextField();
+      Box box = Box.createHorizontalBox();
+      box.add(_findThisTF);
+      JButton findButton = new JButton(new AbstractAction("Find") {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+          LOGGER.info("scan for " + _findThisTF.getText());
+          final String filename = _findThisTF.getText();
+          new Thread(new Runnable() {
+            public void run() {
+              try {
+
+                _scanner.getImageData(filename);
+                Pixel p = _scanner.scanOne(filename, null, true);
+                if (p != null) {
+                  LOGGER.info("found it: " + p);
+                } else {
+                  LOGGER.info(filename + " not found");
+                  LOGGER.info("trying with redused threshold");
+                  double old = _matcher.getSimilarityThreshold();
+                  _matcher.setSimilarityThreshold(0.91d);
+                  p = _scanner.scanOne(filename, null, true);
+                  if (p != null) {
+                    LOGGER.info("found it: " + p);
+                  } else {
+                    LOGGER.info(filename + " not found");
+                  }
+                  _matcher.setSimilarityThreshold(old);
+
+                }
+              } catch (RobotInterruptedException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+                e.printStackTrace();
+              } catch (IOException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+                e.printStackTrace();
+              } catch (AWTException e) {
+                LOGGER.log(Level.WARNING, e.getMessage());
+                e.printStackTrace();
+              }
+
+            }
+          }).start();
+
+        }
+      });
+      box.add(findButton);
+      north.add(box);
+
+    }
+    _mouseInfoLabel = new JLabel(" ");
+    north.add(_mouseInfoLabel);
+    rootPanel.add(north, BorderLayout.NORTH);
+
+    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new MyKeyEventDispatcher());
+  }
+
+  private Container buildConsole() {
+    final JTextArea outputConsole = new JTextArea(8, 14);
 
     Handler handler = new Handler() {
 
@@ -193,76 +305,7 @@ public class MainFrame extends JFrame {
     };
     LOGGER.addHandler(handler);
     ScreenScanner.LOGGER.addHandler(handler);
-
-    JToolBar mainToolbar1 = createToolbar1();
-    JToolBar mainToolbar2 = createToolbar2();
-    JToolBar mainToolbar3 = createToolbar3();
-    JToolBar mainToolbar4 = createToolbar4();
-
-    JPanel toolbars = new JPanel(new GridLayout(0, 1));
-    toolbars.add(mainToolbar1);
-    toolbars.add(mainToolbar2);
-    toolbars.add(mainToolbar3);
-    toolbars.add(mainToolbar4);
-
-    Box north = Box.createVerticalBox();
-    north.add(toolbars);
-
-    _findThisTF = new JTextField();
-    Box box = Box.createHorizontalBox();
-    box.add(_findThisTF);
-    JButton findButton = new JButton(new AbstractAction("Find") {
-
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        LOGGER.info("scan for " + _findThisTF.getText());
-        final String filename = _findThisTF.getText();
-        new Thread(new Runnable() {
-          public void run() {
-            try {
-
-              _scanner.getImageData(filename);
-              Pixel p = _scanner.scanOne(filename, null, true);
-              if (p != null) {
-                LOGGER.info("found it: " + p);
-              } else {
-                LOGGER.info(filename + " not found");
-                LOGGER.info("trying with redused threshold");
-                double old = _matcher.getSimilarityThreshold();
-                _matcher.setSimilarityThreshold(0.91d);
-                p = _scanner.scanOne(filename, null, true);
-                if (p != null) {
-                  LOGGER.info("found it: " + p);
-                } else {
-                  LOGGER.info(filename + " not found");
-                }
-                _matcher.setSimilarityThreshold(old);
-
-              }
-            } catch (RobotInterruptedException e) {
-              LOGGER.log(Level.WARNING, e.getMessage());
-              e.printStackTrace();
-            } catch (IOException e) {
-              LOGGER.log(Level.WARNING, e.getMessage());
-              e.printStackTrace();
-            } catch (AWTException e) {
-              LOGGER.log(Level.WARNING, e.getMessage());
-              e.printStackTrace();
-            }
-
-          }
-        }).start();
-
-      }
-    });
-    box.add(findButton);
-    north.add(box);
-    _mouseInfoLabel = new JLabel(" ");
-    north.add(_mouseInfoLabel);
-    rootPanel.add(north, BorderLayout.NORTH);
-
-    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new MyKeyEventDispatcher());
-
+    return new JScrollPane(outputConsole);
   }
 
   private void clearBuildings() {
@@ -300,8 +343,9 @@ public class MainFrame extends JFrame {
   }
 
   private void recalcPositions(boolean click, int attempt) throws RobotInterruptedException {
-    Pixel goodRock = new Pixel(_scanner.getTopLeft().x + _scanner.getGameWidth()/2 + 93, _scanner.getTopLeft().y + 254);
-    
+    Pixel goodRock = new Pixel(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 + 93,
+        _scanner.getTopLeft().y + 254);
+
     try {
       if (!_scanner.isOptimized()) {
         scan();
@@ -329,14 +373,14 @@ public class MainFrame extends JFrame {
       }
 
       if (_rock != null) {
-        
+
         if (Math.abs(_rock.x - goodRock.x) > 5 && Math.abs(_rock.x - goodRock.y) > 5) {
-          //need adjusting
+          // need adjusting
           _mouse.drag(_rock.x, _rock.y, goodRock.x, goodRock.y);
           _mouse.delay(2000);
           _rock = _scanner.findRockAgain(goodRock);
         }
-        
+
         LOGGER.info("Recalc positions... ");
         Pixel[] fishes = _scanner.getFishes();
         _fishes = new ArrayList<Pixel>();
@@ -363,7 +407,7 @@ public class MainFrame extends JFrame {
         }
       } else {
         LOGGER.info("CAN'T FIND THE ROCK!!!");
-        handlePopups();
+        handlePopups(false);
         if (attempt <= 2)
           recalcPositions(false, ++attempt);
         else
@@ -635,13 +679,17 @@ public class MainFrame extends JFrame {
   private Destination _dest = null;
 
   @SuppressWarnings("serial")
-  private JToolBar createToolbar3() {
+  private List<JToolBar> createToolbars3() {
+    List<JToolBar> toolbars = new ArrayList<>();
     JToolBar toolbar = new JToolBar();
     toolbar.setFloatable(false);
 
     // DESTINATIONS GO HERE
     ButtonGroup bg = new ButtonGroup();
-    for (final Destination destination : _destinations) {
+    int itemsPerRow = 3;
+    int n = 0;
+    for (final Destination destination : _mapManager.getDestinations()) {
+
       JToggleButton toggle = new JToggleButton(new AbstractAction(destination.getName()) {
 
         @Override
@@ -651,9 +699,18 @@ public class MainFrame extends JFrame {
         }
       });
       bg.add(toggle);
+
+      n++;
+      if (n > itemsPerRow) {
+        toolbars.add(toolbar);
+        toolbar = new JToolBar();
+        toolbar.setFloatable(false);
+        n = 0;
+      }
       toolbar.add(toggle);
+
     }
-    return toolbar;
+    return toolbars;
   }
 
   @SuppressWarnings("serial")
@@ -675,6 +732,45 @@ public class MainFrame extends JFrame {
       });
       //
       toolbar.add(toggle);
+    }
+    return toolbar;
+  }
+
+  @SuppressWarnings("serial")
+  private JToolBar createTestToolbar() {
+    JToolBar toolbar = new JToolBar();
+    toolbar.setFloatable(false);
+    {
+      Action action = new AbstractAction("Test") {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          Thread myThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+              LOGGER.info("Testing...");
+              if (!_scanner.isOptimized()) {
+                try {
+                  scan();
+                } catch (RobotInterruptedException e) {
+                  e.printStackTrace();
+                }
+              }
+
+              if (_scanner.isOptimized()) {
+                // DO THE JOB
+                test();
+              } else {
+                LOGGER.info("I need to know where the game is!");
+              }
+            }
+          });
+
+          myThread.start();
+        }
+      };
+
+      toolbar.add(action);
     }
     return toolbar;
   }
@@ -811,12 +907,12 @@ public class MainFrame extends JFrame {
       boolean found = _scanner.locateGameArea(_fullScreenToggle.isSelected());
       if (found) {
 
-        _scanner.deserializeDestinations(_destinations);
+        _mapManager.deserializeDestinations();
 
         LOGGER.info("GAME FOUND! Seaport READY.");
         LOGGER.info("Coordinates: " + _scanner.getTopLeft() + " - " + _scanner.getBottomRight());
-        
-        zoomOut();
+
+        _scanner.zoomOut();
 
         // locate the rock and recalc
         // recalcPositions(false);
@@ -866,22 +962,55 @@ public class MainFrame extends JFrame {
     }
 
   }
-  private void zoomOut() {
-    //TODO
-  }
 
   private Rectangle generateMiniArea(Pixel p) {
     return new Rectangle(p.x - 2 - 18, p.y - 50 + 35, 44, 60);
   }
 
-  public MainFrame() throws HeadlessException, AWTException {
+  public MainFrame(boolean isTestmode) throws HeadlessException, AWTException {
     super();
+    _testMode = isTestmode;
+
     setupLogger();
+
     init();
+  }
 
-    _matcher = _scanner.getMatcher();
+  private void test() {
+    setTitle(APP_TITLE + " testing");
 
-    _stopAllThreads = false;
+    try {
+      handlePopups(true);
+      recalcPositions(false, 1);
+
+      Pixel mapP = _scanner.scanOneFast("mapButton.bmp", null, true);
+      if (mapP != null) {
+        _mouse.delay(2000);
+        for (Destination destination : _mapManager.getDestinations()) {
+          ImageData id = destination.getImageData();
+          Pixel p = _scanner.scanOneFast(id, null, false);
+          if (p != null) {
+            LOGGER.info("found " + destination.getName());
+
+          } else {
+            LOGGER.info("didn't found " + destination.getName());
+          }
+          // _mouse.delay(1000);
+        }
+        LOGGER.info("done destinations");
+      }
+      // TODO more
+
+      LOGGER.info("TEST DONE");
+      setTitle(APP_TITLE + " DONE");
+
+    } catch (RobotInterruptedException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (AWTException e) {
+      e.printStackTrace();
+    }
 
   }
 
@@ -894,7 +1023,7 @@ public class MainFrame extends JFrame {
 
       do {
         // 1. SCAN
-        handlePopups();
+        handlePopups(false);
         recalcPositions(false, 1);
 
         // 2. FISH
@@ -905,6 +1034,8 @@ public class MainFrame extends JFrame {
         if (_shipsToggle.isSelected()) {
           LOGGER.info("Ships...");
           doShips();
+          // handlePopups(true);//TEMPORARY
+          // recalcPositions(false, 1);
         }
 
         // 4. BUILDINGS
@@ -926,40 +1057,42 @@ public class MainFrame extends JFrame {
     }
   }
 
-  private void handlePopups() throws RobotInterruptedException {
+  private void handlePopups(boolean fast) throws RobotInterruptedException {
     try {
       LOGGER.info("Popups...");
       boolean found = false;
       Pixel p = null;
-      
-      found =  _scanner.scanOneFast("anchor.bmp", null, true) != null;
-      
+
+      found = _scanner.scanOneFast("anchor.bmp", null, true) != null;
+
       if (found)
         return;
       // reload
       long start = System.currentTimeMillis();
-      long now, t1, t2, t3, t4;
-      Rectangle area = _scanner.generateWindowedArea(412, 550);
-      p = _scanner.scanOneFast("reload.bmp", area, true);
-      now = System.currentTimeMillis();
-
-      t1 = now - start;
-      t2 = now;
-      if (p == null) {
-        p = _scanner.scanOneFast("reload2.bmp", area, true);
+      long now, t1 = 0, t2 = 0, t3, t4;
+      if (!fast) {
+        Rectangle area = _scanner.generateWindowedArea(412, 550);
+        p = _scanner.scanOneFast("reload.bmp", area, true);
         now = System.currentTimeMillis();
-        t2 = now - t2;
+
+        t1 = now - start;
+        t2 = now;
+        if (p == null) {
+          p = _scanner.scanOneFast("reload2.bmp", area, true);
+          now = System.currentTimeMillis();
+          t2 = now - t2;
+        }
+
+        found = p != null;
+        if (found) {
+          LOGGER.info("Game crashed. Reloading...");
+          _mouse.delay(8000);
+          return;
+        } else {
+          _mouse.delay(150);
+        }
       }
-      found = p != null;
-      if (found) {
-        LOGGER.info("Game crashed. Reloading...");
-        _mouse.delay(8000);
-        return;
-      } else {
-        _mouse.delay(150);
-      }
-      
-      
+
       t3 = now = System.currentTimeMillis();
       found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
       now = System.currentTimeMillis();
@@ -972,7 +1105,7 @@ public class MainFrame extends JFrame {
       if (found)
         _mouse.delay(450);
       now = System.currentTimeMillis();
-      LOGGER.info("[" + t1 + ",  " + t2 + ",  " + t3 + ",  " + t4 + "], TOTAL: " + (now - start) + " - "  + found);
+      LOGGER.info("[" + t1 + ",  " + t2 + ",  " + t3 + ",  " + t4 + "], TOTAL: " + (now - start) + " - " + found);
     } catch (IOException e) {
       e.printStackTrace();
     } catch (AWTException e) {
@@ -998,9 +1131,9 @@ public class MainFrame extends JFrame {
     }
   }
 
-  private void doShips() throws RobotInterruptedException {
+  private boolean doShips() throws RobotInterruptedException {
+    boolean shipSent = false;
     try {
-      boolean shipSent = false;
       if (_shipLocations != null && !_shipLocations.isEmpty() && _dest != null) {
         for (Pixel pixel : _shipLocations) {
           _mouse.click(pixel);
@@ -1027,26 +1160,25 @@ public class MainFrame extends JFrame {
               // Pixel dest = _scanner.scanOne("dest/Coastline.bmp", null,
               // false);
 
-              Pixel dest = _scanner.scanOne(_dest.getImageData(), null, false);
+              Pixel dest = _scanner.scanOneFast(_dest.getImageData(), null, false);
 
               if (dest != null) {
-                LOGGER.info("Sending to Small Town...");
+                LOGGER.info("Sending to " + _dest.getName() + "...");
                 _mouse.click(dest);
-                _mouse.delay(50);
                 _mouse.mouseMove(_scanner.getParkingPoint());
-                _mouse.delay(500);
+                _mouse.delay(400);
 
                 // Pixel destTitle = _scanner.scanOne("dest/smallTownTitle.bmp",
                 // null, false);
                 // Pixel destTitle = _scanner.scanOne("dest/CoastlineTitle.bmp",
                 // null, false);
 
-                Pixel destTitle = _scanner.scanOne(_dest.getImageDataTitle(), null, false);
+                Pixel destTitle = _scanner.scanOneFast(_dest.getImageDataTitle(), null, false);
 
                 if (destTitle != null) {
                   LOGGER.info("SEND POPUP OPEN...");
                   _mouse.mouseMove(_scanner.getParkingPoint());
-                  _mouse.delay(500);
+                  _mouse.delay(100);
 
                   Pixel destButton = _scanner.scanOne("dest/setSail.bmp", null, true);
                   if (destButton != null) {
@@ -1056,14 +1188,16 @@ public class MainFrame extends JFrame {
                     LOGGER.info("Destination unreachable! Skipping...");
                     _mouse.delay(300);
                     _mouse.click(anchor);
+                    _mouse.delay(300);
                   }
 
                 }
                 // throw new RobotInterruptedException();
                 if (!shipSent) {
                   _mouse.delay(300);
-                  _mouse.click(anchor);
-                  _mouse.delay(50);
+                  anchor = _scanner.scanOne("anchor.bmp", null, true);
+                  // _mouse.click(anchor);
+                  // _mouse.delay(50);
                   _mouse.mouseMove(_scanner.getParkingPoint());
                   _mouse.delay(1300);
                 }
@@ -1080,6 +1214,7 @@ public class MainFrame extends JFrame {
           } else {
             _mouse.delay(500);
           }
+          handlePopups(true);
 
         }
       } else {
@@ -1094,6 +1229,7 @@ public class MainFrame extends JFrame {
       e.printStackTrace();
     }
 
+    return shipSent;
   }
 
   private void locateIndustries() throws IOException, AWTException {

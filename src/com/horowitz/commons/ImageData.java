@@ -5,9 +5,16 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -47,8 +54,44 @@ public class ImageData implements Serializable, Deserializable {
   private void loadImage(String filename) throws IOException {
     _image = ImageIO.read(ImageManager.getImageURL(filename));
     ImageMask imageMask = new ImageMask(filename);
+    _colorToBypass = lookForColorToBypass(filename);
     _mask = imageMask.getMask();
     _colors = imageMask.getColors();
+  }
+
+  private Color lookForColorToBypass(String name) {
+    Color c = null;
+
+    InputStream stream = ImageMask.class.getClassLoader().getResourceAsStream(name + ".colorToBypass.txt");
+    if (stream != null) {
+      DataInputStream reader = new DataInputStream(stream);
+      BufferedReader br = new BufferedReader(new InputStreamReader(reader));
+      try {
+        String line = null;
+        while ((line = br.readLine()) != null) {
+          // System.err.println(line);
+          line = line.trim();
+          if (line.length() > 0) {
+            String[] ss = line.split(",");
+            int r = Integer.parseInt(ss[0].trim());
+            int g = Integer.parseInt(ss[1].trim());
+            int b = Integer.parseInt(ss[2].trim());
+
+            c = new Color(r, g, b);
+            break;
+          }
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      } finally {
+        try {
+          br.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return c;
   }
 
   public void postDeserialize(Object[] transientObjects) throws Exception {
@@ -157,7 +200,7 @@ public class ImageData implements Serializable, Deserializable {
   public void setComparator(ImageComparator comparator) {
     _comparator = comparator;
   }
-  
+
   public Color getColorToBypass() {
     return _colorToBypass;
   }

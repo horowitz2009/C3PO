@@ -49,6 +49,7 @@ public class ScreenScanner {
   private Pixel _br = null;
   private Pixel _tl = null;
   private boolean _fullyOptimized = false;
+  private boolean _debugMode = false;
 
   private ImageData _hooray = null;
 
@@ -74,6 +75,11 @@ public class ScreenScanner {
   public Rectangle _popupAreaX;
   public Rectangle _popupAreaB;
   private List<Destination> _destinations;
+  private Pixel _zoomIn;
+  private Pixel _zoomOut;
+  private Pixel _fullScreen;
+  private ImageData _mapButton;
+  private ImageData _anchorButton;
 
   public Pixel[] getShipLocations() {
     return _shipLocations;
@@ -119,7 +125,7 @@ public class ScreenScanner {
     int xx;
     int yy;
 
-    _scanArea = new Rectangle(_tl.x + 125, _tl.y, getGameWidth() - 125 - 125, getGameHeight());
+    _scanArea = new Rectangle(_tl.x + 125, _tl.y, getGameWidth() - 125, getGameHeight());
 
     _fishes = new Pixel[] { new Pixel(-94, 14), new Pixel(-169, -13), new Pixel(-223, -49), new Pixel(-282, -89),
         new Pixel(-354, -120) };
@@ -154,13 +160,33 @@ public class ScreenScanner {
     getImageData("pin.bmp", _scanArea, 8, 8);
 
     area = new Rectangle(_br.x - 110, _br.y - 75, 60, 40);
-    getImageData("anchor.bmp", area, 20, 7);
-    getImageData("dest/SmallTown.bmp", _scanArea, 39, 42);
-    getImageData("dest/SmallTownTitle.bmp", _popupArea, 0, 0);
-    getImageData("dest/Gulf.bmp", _scanArea, 13, 44);
-    getImageData("dest/GulfTitle.bmp", _popupArea, 0, 0);
-    getImageData("dest/Coastline.bmp", _scanArea, 31, 43);
-    getImageData("dest/CoastlineTitle.bmp", _popupArea, 0, 0);
+    _anchorButton = getImageData("anchor.bmp", area, 20, 7);
+    _mapButton = getImageData("mapButton.bmp", area, 20, 7);
+
+    area = new Rectangle(_br.x - 30, _tl.y + 100, 30, getGameHeight() / 2 - 100);
+    ImageData sb = getImageData("scoreBoard.bmp", area, 0, 17);
+
+    try {
+      Pixel sbp = scanOne(sb, null, false);
+      if (sbp != null) {
+        _zoomIn = new Pixel(sbp.x + 8, sbp.y + 108);
+        _zoomOut = new Pixel(sbp.x + 8, sbp.y + 142);
+        _fullScreen = new Pixel(sbp.x + 8, sbp.y + 179);
+        LOGGER.info("left toolbar ok!");
+      } else {
+        _zoomIn = null;
+        _zoomOut = null;
+        _fullScreen = null;
+        LOGGER.info("left toolbar NOT FOUND!");
+      }
+    } catch (AWTException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (RobotInterruptedException e) {
+    }
+
+    // ATTENTION - Destinations are fixed in deserilizeDestinations()
+
     // getImageData("dest/missing.bmp", _scanArea, 41, 45);
     getImageData("dest/setSail.bmp", _popupArea, 30, 6);
 
@@ -289,11 +315,9 @@ public class ScreenScanner {
     ImageData rockData = getImageData("rockEdge.bmp");
     int x = oldRock.x - rockData.get_xOff();
     int y = oldRock.y - rockData.get_yOff();
-    
-    
+
     Rectangle area = new Rectangle(x - 10, y - 10, 55 + 20, 18 + 20);
-    
-    
+
     Pixel p = scanOne("rockEdge.bmp", area, false);
     if (p == null) {
       LOGGER.info("Rock not found in the same place.");
@@ -413,13 +437,6 @@ public class ScreenScanner {
       }
     }
     return result;
-  }
-
-  public void deserializeDestinations(List<Destination> destinations) throws IOException {
-    for (Destination destination : destinations) {
-      destination.setImageData(getImageData(destination.getImage()));
-      destination.setImageDataTitle(getImageData(destination.getImageTitle()));
-    }
   }
 
   public void scan() {
@@ -680,7 +697,10 @@ public class ScreenScanner {
       area = imageData.getDefaultArea();
     }
     BufferedImage screen = new Robot().createScreenCapture(area);
-    Pixel pixel = _comparator.findImage(imageData.getImage(), screen);
+    if (_debugMode) {
+      writeImage(screen, imageData.getName() + "_area.png");
+    }
+    Pixel pixel = _comparator.findImage(imageData.getImage(), screen, imageData.getColorToBypass());
     if (pixel != null) {
       pixel.x += (area.x + imageData.get_xOff());
       pixel.y += (area.y + imageData.get_yOff());
@@ -734,6 +754,75 @@ public class ScreenScanner {
 
   public void restoreThreshold() {
     _matcher.setSimilarityThreshold(.95d);
+
+  }
+
+  public boolean isDebugMode() {
+    return _debugMode;
+  }
+
+  public void setDebugMode(boolean debugMode) {
+    _debugMode = debugMode;
+  }
+
+  public Pixel getZoomIn() {
+    return _zoomIn;
+  }
+
+  public void setZoomIn(Pixel zoomIn) {
+    _zoomIn = zoomIn;
+  }
+
+  public Pixel getZoomOut() {
+    return _zoomOut;
+  }
+
+  public void setZoomOut(Pixel zoomOut) {
+    _zoomOut = zoomOut;
+  }
+
+  public Pixel getFullScreen() {
+    return _fullScreen;
+  }
+
+  public void setFullScreen(Pixel fullScreen) {
+    _fullScreen = fullScreen;
+  }
+
+  public void zoomOut() throws RobotInterruptedException {
+    if (_zoomOut != null) {
+      try {
+        Pixel mp = scanOne(_mapButton, null, false);
+        if (mp != null) {
+          // we're home
+          for (int i = 0; i < 14; i++) {
+            _mouse.click(_zoomOut);
+            _mouse.delay(200);
+          }
+          _mouse.click(mp);
+
+        }
+        _mouse.mouseMove(_parkingPoint);
+        _mouse.delay(500);
+
+        Pixel ap = scanOne(_anchorButton, null, false);
+        if (ap != null) {
+          // map opened
+          for (int i = 0; i < 14; i++) {
+            _mouse.click(_zoomOut);
+            _mouse.delay(200);
+          }
+          _mouse.click(ap);
+          _mouse.delay(250);
+        }
+
+        _mouse.mouseMove(_parkingPoint);
+        _mouse.delay(500);
+
+      } catch (AWTException e) {
+        e.printStackTrace();
+      }
+    }
 
   }
 
