@@ -3,6 +3,12 @@
     "_name": "Small Town",
     "_time": 5,
     "_favorite" : true,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": -99,
+      "y": -173
+    },
+ 
     "_image": "dest/SmallTown.bmp",
     "_imageTitle": "dest/SmallTownTitle.bmp"
   },
@@ -10,6 +16,11 @@
     "_name": "Coastline",
     "_time": 15,
     "_favorite" : true,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": 86,
+      "y": -185
+    },
     "_image": "dest/Coastline.bmp",
     "_imageTitle": "dest/CoastlineTitle.bmp"
   },
@@ -17,6 +28,11 @@
     "_name": "Gulf",
     "_time": 60,
     "_favorite" : true,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": 128,
+      "y": -303
+    },
     "_image": "dest/Gulf.bmp",
     "_imageTitle": "dest/GulfTitle.bmp"
   },
@@ -24,6 +40,11 @@
     "_name": "Cocoa Plant",
     "_time": 120,
     "_favorite" : true,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": 316,
+      "y": 44
+    },
     "_image": "dest/CocoaPlant.bmp",
     "_imageTitle": "dest/CocoaPlantTitle.bmp"
   },
@@ -31,6 +52,11 @@
     "_name": "Market",
     "_time": 30,
     "_favorite" : true,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": 0,
+      "y": 0
+    },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"
   },
@@ -38,6 +64,11 @@
     "_name": "Bamboo",
     "_time": 60,
     "_favorite" : false,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": 119,
+      "y": -84
+    },
     "_image": "dest/Bamboo.bmp",
     "_imageTitle": "dest/BambooTitle.bmp"
   },
@@ -45,6 +76,11 @@
     "_name": "Rubble",
     "_time": 60,
     "_favorite" : false,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": 281,
+      "y": -200
+    },
     "_image": "dest/Rubble.bmp",
     "_imageTitle": "dest/RubbleTitle.bmp"
   },
@@ -52,6 +88,11 @@
     "_name": "Forest",
     "_time": 60,
     "_favorite" : false,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": 286,
+      "y": -368
+    },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
   },
@@ -59,6 +100,11 @@
     "_name": "Neighborhood",
     "_time": 60,
     "_favorite" : false,
+    "_relativePosition":   {
+      "weight": 0,
+      "x": -205,
+      "y": -332
+    },
     "_image": "dest/Neighborhood.bmp",
     "_imageTitle": "dest/NeighborhoodTitle.bmp"
   }

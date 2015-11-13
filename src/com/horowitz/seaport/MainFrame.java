@@ -88,6 +88,7 @@ public class MainFrame extends JFrame {
   private MapManager _mapManager;
 
   private Pixel _rock;
+  private Pixel _marketPos;
 
   private JToggleButton _shipsToggle;
 
@@ -156,6 +157,7 @@ public class MainFrame extends JFrame {
 
       _mapManager = new MapManager(_scanner);
       _mapManager.loadDestinations();
+      _market = _mapManager.getMarket();
 
       _buildings = new JsonStorage().loadBuildings();
       _tasks = new ArrayList<Task>();
@@ -678,6 +680,8 @@ public class MainFrame extends JFrame {
 
   private Destination _dest = null;
 
+  private Destination _market;
+
   @SuppressWarnings("serial")
   private List<JToolBar> createToolbars3() {
     List<JToolBar> toolbars = new ArrayList<>();
@@ -1153,14 +1157,40 @@ public class MainFrame extends JFrame {
             // 1. check is map open
             Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
             if (anchor != null) {
-              // it is open
-              // TODO get destination from buttons
-              // Pixel dest = _scanner.scanOne("dest/smallTown.bmp", null,
-              // true);
-              // Pixel dest = _scanner.scanOne("dest/Coastline.bmp", null,
-              // false);
+              // MAP ZONE
+              if (_marketPos == null) {
+                LOGGER.info("Looking for market for the first time");
+                _marketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+              } else {
+                // int x = oldRock.x - rockData.get_xOff();
+                // int y = oldRock.y - rockData.get_yOff();
 
-              Pixel dest = _scanner.scanOneFast(_dest.getImageData(), null, false);
+                Rectangle areaSpec = new Rectangle(_marketPos.x - 10, _marketPos.y - 10, _market.getImageData()
+                    .getImage().getWidth() + 20, _market.getImageData().getImage().getHeight() + 20);
+
+                Pixel newMarketPos = _scanner.scanOneFast(_market.getImageData(), areaSpec, false);
+                if (newMarketPos == null)
+                  newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+
+                _marketPos = newMarketPos;
+                if (_marketPos.equals(newMarketPos)) {
+                  LOGGER.info("Market found in the same place.");
+                }
+              }
+
+              Pixel dest = null;
+              if (!_dest.getName().equals("Market") && _marketPos != null) {
+                int x = _marketPos.x + _dest.getRelativePosition().x;
+                int y = _marketPos.y + _dest.getRelativePosition().y;
+                Rectangle destArea = new Rectangle(x, y, 153, 30);
+                LOGGER.info("Using custom area for " + _dest.getImage());
+                dest = _scanner.scanOneFast(_dest.getImageData(), destArea, false);
+              } else {
+                if (_marketPos != null)
+                  dest = _marketPos;
+                else
+                  dest = _scanner.scanOneFast(_dest.getImageData(), null, false);
+              }
 
               if (dest != null) {
                 LOGGER.info("Sending to " + _dest.getName() + "...");

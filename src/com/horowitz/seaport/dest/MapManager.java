@@ -30,14 +30,26 @@ public class MapManager {
 
   public void update() throws IOException, RobotInterruptedException {
     deserializeDestinations();
-    
+
     _scanner.zoomOut();
-    
-    //TODO check is map moved
-    
+
+    // TODO check is map moved
+
+  }
+
+  public Destination getMarket() {
+    Destination market = null;
+    for (Destination destination : _destinations) {
+      if (destination.getName().startsWith("Market")) {
+        market = destination;
+        break;
+      }
+    }
+    return market;
   }
 
   public void deserializeDestinations() throws IOException {
+
     for (Destination destination : _destinations) {
       destination.setImageData(_scanner.getImageData(destination.getImage()));
       destination.setImageDataTitle(_scanner.getImageData(destination.getImageTitle()));
@@ -46,7 +58,6 @@ public class MapManager {
       id.set_xOff(id.getImage().getWidth() / 2);
       id.set_yOff(43);
       id.setDefaultArea(_scanner.getScanArea());
-
       id = destination.getImageDataTitle();
       id.setDefaultArea(_scanner.getPopupArea());
       id.set_xOff(0);

@@ -2,7 +2,7 @@
  {
    "_name": "Saw Mill 1",
    "_time": 5,
-   "_enabled": false
+   "_enabled": false,
 
    "_relativePosition":   {
      "weight": 0,
@@ -16,7 +16,7 @@
  {
    "_name": "Saw Mill 2",
    "_time": 5,
-   "_enabled": false
+   "_enabled": false,
    
    "_relativePosition":   {
      "weight": 0,
@@ -31,7 +31,7 @@
  {
    "_name": "Quarry",
    "_time": 5,
-   "_enabled": true
+   "_enabled": true,
    
    "_relativePosition":   {
      "weight": 0,
@@ -46,7 +46,7 @@
  {
    "_name": "Foundry",
    "_time": 5,
-   "_enabled": true
+   "_enabled": true,
    
    "_relativePosition":   {
      "weight": 0,

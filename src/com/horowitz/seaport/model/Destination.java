@@ -2,10 +2,13 @@ package com.horowitz.seaport.model;
 
 import com.horowitz.commons.Deserializable;
 import com.horowitz.commons.ImageData;
+import com.horowitz.commons.Pixel;
 
 public class Destination implements Deserializable {
   private String _name;
   private int _time;
+  private boolean _favorite;
+  private Pixel _relativePosition;
   private String _image;
   private String _imageTitle;
   
@@ -84,5 +87,21 @@ public class Destination implements Deserializable {
   public void postDeserialize(Object[] transientObjects) throws Exception {
     // TODO Auto-generated method stub
     
+  }
+
+  public boolean isFavorite() {
+    return _favorite;
+  }
+
+  public void setFavorite(boolean favorite) {
+    _favorite = favorite;
+  }
+
+  public Pixel getRelativePosition() {
+    return _relativePosition;
+  }
+
+  public void setRelativePosition(Pixel relativePosition) {
+    _relativePosition = relativePosition;
   }
 }
