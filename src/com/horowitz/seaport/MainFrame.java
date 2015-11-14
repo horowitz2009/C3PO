@@ -9,7 +9,6 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.KeyEventDispatcher;
-import java.awt.KeyboardFocusManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -64,7 +63,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static String APP_TITLE = "Seaport v0.018";
+  private static String APP_TITLE = "Seaport v0.019";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -234,7 +233,7 @@ public class MainFrame extends JFrame {
               try {
 
                 _scanner.getImageData(filename);
-                Pixel p = _scanner.scanOne(filename, null, true);
+                Pixel p = _scanner.scanOneFast(filename, null, true);
                 if (p != null) {
                   LOGGER.info("found it: " + p);
                 } else {
@@ -275,7 +274,8 @@ public class MainFrame extends JFrame {
     north.add(_mouseInfoLabel);
     rootPanel.add(north, BorderLayout.NORTH);
 
-    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new MyKeyEventDispatcher());
+    // //KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new
+    // MyKeyEventDispatcher());
   }
 
   private Container buildConsole() {
@@ -674,7 +674,7 @@ public class MainFrame extends JFrame {
       toolbar.add(_industriesToggle);
 
       _fullScreenToggle = new JToggleButton("Full screen");
-      ////toolbar.add(_fullScreenToggle);
+      // //toolbar.add(_fullScreenToggle);
       _slowToggle = new JToggleButton("Slow");
       _slowToggle.addItemListener(new ItemListener() {
 
@@ -928,10 +928,11 @@ public class MainFrame extends JFrame {
       if (found) {
 
         _mapManager.deserializeDestinations();
+        _marketPos = null;
 
         LOGGER.info("Coordinates: " + _scanner.getTopLeft() + " - " + _scanner.getBottomRight());
 
-        // TEMPORARY _scanner.zoomOut();
+        _scanner.zoomOut();
 
         // locate the rock and recalc
         // recalcPositions(false);
@@ -1072,7 +1073,7 @@ public class MainFrame extends JFrame {
     _stopAllThreads = false;
 
     try {
-
+      long start = System.currentTimeMillis();
       do {
         // 1. SCAN
         handlePopups(false);
@@ -1080,7 +1081,11 @@ public class MainFrame extends JFrame {
 
         // 2. FISH
         LOGGER.info("Fish...");
+        // long now = System.currentTimeMillis();
+        // if (now - start > 11*60000) {
         doFishes();
+        // start = System.currentTimeMillis();
+        // }
 
         // 3. SHIPS
         if (_shipsToggle.isSelected()) {
@@ -1179,23 +1184,34 @@ public class MainFrame extends JFrame {
         _mouse.delay(200);
       }
     } else {
-      LOGGER.info("UHOH");
+      LOGGER.info("Fishes empty! Why?");
     }
   }
 
-  private boolean doShips() throws RobotInterruptedException {
-    boolean shipSent = false;
+  private int doShips() throws RobotInterruptedException {
+    int numShipsSent = 0;
     try {
       if (_shipLocations != null && !_shipLocations.isEmpty() && _dest != null) {
         for (Pixel pixel : _shipLocations) {
+
+          boolean shipSent = false;
           _mouse.click(pixel);
           _mouse.delay(250);
 
+          Destination dest = _dest;
           // check for menu
           Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 65, 44, 44);
           Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
           if (pin != null) {
-            LOGGER.info("SHIP to be sent ...");
+            // scan the name
+            Rectangle nameArea = new Rectangle(pin.x - 75, pin.y - 67, 150, 40);
+            Pixel nameP = _scanner.scanOne("ships/MaryRoseS.bmp", nameArea, false);
+            if (nameP != null) {
+              // it's Mary Rose
+              dest = _mapManager.getDestination("Coastline");
+              LOGGER.info("Mary Rose ...");
+            }
+
             _mouse.click(pin);
             _mouse.delay(50);
             _mouse.mouseMove(_scanner.getParkingPoint());
@@ -1238,88 +1254,106 @@ public class MainFrame extends JFrame {
                 }
               }
 
-              Pixel dest = null;
-              if (!_dest.getName().equals("Market") && _marketPos != null) {
-                int x = _marketPos.x + _dest.getRelativePosition().x - _market.getImageData().get_xOff() - 10;
-                int y = _marketPos.y + _dest.getRelativePosition().y - _market.getImageData().get_yOff() - 10;
-                Rectangle destArea = new Rectangle(x, y, 153 + 20, 25);
-                LOGGER.info("Using custom area for " + _dest.getImage());
-                dest = _scanner.scanOneFast(_dest.getImageData(), destArea, false);
-              } else {
-                if (_marketPos != null)
-                  dest = _marketPos;
-                else
-                  dest = _scanner.scanOneFast(_dest.getImageData(), null, false);
-              }
-
-              if (dest != null) {
-                LOGGER.info("Sending to " + _dest.getName() + "...");
-                _mouse.click(dest);
-                _mouse.mouseMove(_scanner.getParkingPoint());
-                _mouse.delay(400);
-
-                // Pixel destTitle = _scanner.scanOne("dest/smallTownTitle.bmp",
-                // null, false);
-                // Pixel destTitle = _scanner.scanOne("dest/CoastlineTitle.bmp",
-                // null, false);
-
-                Pixel destTitle = _scanner.scanOneFast(_dest.getImageDataTitle(), null, false);
-
-                if (destTitle != null) {
-                  LOGGER.info("SEND POPUP OPEN...");
-                  _mouse.mouseMove(_scanner.getParkingPoint());
-                  _mouse.delay(100);
-
-                  Pixel destButton = _scanner.scanOneFast("dest/setSail.bmp", null, true);
-                  if (destButton != null) {
-                    // nice. we can continue
-                    shipSent = true;
-                  } else {
-                    LOGGER.info("Destination unreachable! Skipping...");
-                    _mouse.delay(300);
-                    _mouse.click(anchor);
-                    _mouse.delay(300);
-                  }
-
-                }
-                // throw new RobotInterruptedException();
-                if (!shipSent) {
-                  _mouse.delay(300);
-                  anchor = _scanner.scanOneFast("anchor.bmp", null, true);
-                  // _mouse.click(anchor);
-                  // _mouse.delay(50);
-                  _mouse.mouseMove(_scanner.getParkingPoint());
-                  _mouse.delay(1300);
-                }
-              } else {
-                LOGGER.info("Destination: UNKNOWN!!!");
-                _mouse.delay(300);
-                _mouse.click(anchor);
-                _mouse.delay(50);
-                _mouse.mouseMove(_scanner.getParkingPoint());
-                _mouse.delay(1300);
-              }
+              Pixel destP = null;
+              shipSent = sendShip(dest, true);
+              if (shipSent)
+                numShipsSent++;
             }
 
-          } else {
-            _mouse.delay(500);
           }
+          if (shipSent) {
+            _mouse.delay(300);
+            _scanner.scanOneFast("anchor.bmp", null, true);
+            _mouse.delay(300);
+            _mouse.mouseMove(_scanner.getParkingPoint());
+            _mouse.delay(1250);
+          }
+          // next slot
+          _mouse.delay(750);
           handlePopups(true);
 
         }
       } else {
-        LOGGER.info("UHOH");
+        LOGGER.info("UHOH doing ships");
       }
 
     } catch (AWTException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
-    return shipSent;
+    return numShipsSent;
+  }
+
+  private boolean sendShip(Destination dest, boolean redirect) throws AWTException, RobotInterruptedException,
+      IOException {
+    boolean success = false;
+    Pixel destP;
+    if (!dest.getName().equals("Market") && _marketPos != null) {
+      int x = _marketPos.x + dest.getRelativePosition().x - _market.getImageData().get_xOff() - 25;
+      int y = _marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 25;
+      Rectangle destArea = new Rectangle(x, y, 153 + 20 + 30, 25 + 30);
+      LOGGER.info("Using custom area for " + dest.getImage());
+      destP = _scanner.scanOneFast(dest.getImageData(), destArea, false);
+    } else {
+      if (_marketPos != null)
+        destP = _marketPos;
+      else
+        destP = _scanner.scanOneFast(dest.getImageData(), null, false);
+    }
+
+    if (destP != null) {
+      LOGGER.info("Sending to " + dest.getName() + "...");
+      _mouse.click(destP);
+      _mouse.mouseMove(_scanner.getParkingPoint());
+      _mouse.delay(400);
+
+      Pixel destTitle = _scanner.scanOneFast(dest.getImageDataTitle(), null, false);
+
+      if (destTitle != null) {
+        LOGGER.info("SEND POPUP OPEN...");
+        _mouse.mouseMove(_scanner.getParkingPoint());
+        _mouse.delay(100);
+
+        if (dest.getName().equals("Market")) {
+
+        }
+
+        Pixel destButton = _scanner.scanOneFast("dest/setSail.bmp", null, false);
+        if (destButton != null) {
+          // nice. we can continue
+          if (dest.getName().equals("Market")) {
+            LOGGER.info("Market! I choose coins...");
+            Pixel coins = new Pixel(destTitle);
+            coins.y += 228;
+            _mouse.click(coins);
+            _mouse.delay(250);
+            success = true;
+          }
+
+          _mouse.click(destButton);
+        } else {
+          if (redirect)
+            if (dest.getName().equals("Market")) {
+              Pixel destButtonGray = _scanner.scanOneFast("dest/setSailGray.bmp", null, false);
+              if (destButtonGray != null) {
+                LOGGER.info("Material not available! Go to buy it...");
+                boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+                success = sendShip(_mapManager.getDestination("Cocoa Plant"), false);
+                // SEND to Cocoa plant (for now)
+
+              }
+            }
+          LOGGER.info("Destination unreachable! Skipping...");
+          _mouse.delay(300);
+        }
+
+      }
+    } else {
+      LOGGER.info("Destination: UNKNOWN!!!");
+    }
+    return success;
   }
 
   private void locateIndustries() throws IOException, AWTException {

@@ -677,6 +677,8 @@ public class ScreenScanner {
       return null;
     if (area == null)
       area = imageData.getDefaultArea();
+    if (area == null)
+      area = new Rectangle(new Point(0, 0), Toolkit.getDefaultToolkit().getScreenSize());
 
     BufferedImage screen = new Robot().createScreenCapture(area);
     if (_debugMode)
@@ -725,6 +727,8 @@ public class ScreenScanner {
       return null;
     if (area == null)
       area = imageData.getDefaultArea();
+    if (area == null)
+      area = new Rectangle(new Point(0, 0), Toolkit.getDefaultToolkit().getScreenSize());
 
     BufferedImage screen = new Robot().createScreenCapture(area);
     long start = System.currentTimeMillis();

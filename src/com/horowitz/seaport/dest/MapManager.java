@@ -38,14 +38,7 @@ public class MapManager {
   }
 
   public Destination getMarket() {
-    Destination market = null;
-    for (Destination destination : _destinations) {
-      if (destination.getName().startsWith("Market")) {
-        market = destination;
-        break;
-      }
-    }
-    return market;
+    return getDestination("Market");
   }
 
   public void deserializeDestinations() throws IOException {
@@ -71,7 +64,16 @@ public class MapManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
+
+  }
+
+  public Destination getDestination(String name) {
+    for (Destination destination : _destinations) {
+      if (destination.getName().startsWith(name)) {
+        return destination;
+      }
+    }
+    return null;
   }
 
 }
