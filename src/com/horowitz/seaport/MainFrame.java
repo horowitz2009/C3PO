@@ -147,7 +147,7 @@ public class MainFrame extends JFrame {
       _scanner.setDebugMode(_testMode);
       _mouse = _scanner.getMouse();
       _mapManager = new MapManager(_scanner);
-      _mapManager.loadDestinations();
+      _mapManager.loadData();
       _market = _mapManager.getMarket();
 
       _buildings = new JsonStorage().loadBuildings();
@@ -918,7 +918,7 @@ public class MainFrame extends JFrame {
       boolean found = _scanner.locateGameArea(_fullScreenToggle.isSelected());
       if (found) {
 
-        _mapManager.deserializeDestinations();
+        _mapManager.update();
         _marketPos = null;
 
         LOGGER.info("Coordinates: " + _scanner.getTopLeft() + " - " + _scanner.getBottomRight());

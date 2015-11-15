@@ -1,110 +1,83 @@
 [
   {
     "_name": "Berrio",
-    "_time": 5,
+    "_crew": 50,
+    "_capacity": 14,
     "_favorite": true,
-    "_relativePosition": {
-      "weight": 0,
-      "x": -82,
-      "y": -139
-    },
-    "_image": "dest/SmallTown.bmp",
-    "_imageTitle": "dest/SmallTownTitle.bmp"
+    "_active": true,
+    
+    "_imageTitle": "ships/BerrioS.bmp"
   },
   {
-    "_name": "Coastline",
-    "_time": 15,
+    "_name": "Hulk Zigmund",
+    "_crew": 50,
+    "_capacity": 14,
     "_favorite": true,
-    "_relativePosition": {
-      "weight": 0,
-      "x": 74,
-      "y": -153
-    },
-    "_image": "dest/Coastline.bmp",
-    "_imageTitle": "dest/CoastlineTitle.bmp"
+    "_active": true,
+    
+    "_imageTitle": "ships/HulkZigmundS.bmp"
   },
   {
-    "_name": "Gulf",
-    "_time": 60,
+    "_name": "Mary Rose",
+    "_crew": 50,
+    "_capacity": 14,
     "_favorite": true,
-    "_relativePosition": {
-      "weight": 0,
-      "x": 95,
-      "y": -255
-    },
-    "_image": "dest/Gulf.bmp",
-    "_imageTitle": "dest/GulfTitle.bmp"
+    "_active": true,
+    
+    "_imageTitle": "ships/MaryRoseS.bmp"
   },
   {
-    "_name": "Cocoa Plant",
-    "_time": 120,
+    "_name": "Peter Von Danzig",
+    "_crew": 50,
+    "_capacity": 14,
     "_favorite": true,
-    "_relativePosition": {
-      "weight": 0,
-      "x": -1294,
-      "y": -727
-    },
-    "_image": "dest/CocoaPlant.bmp",
-    "_imageTitle": "dest/CocoaPlantTitle.bmp"
+    "_active": true,
+    
+    "_imageTitle": "ships/PeterVonDanzigS.bmp"
   },
   {
-    "_name": "Market",
-    "_time": 30,
+    "_name": "Roland Von Bremen",
+    "_crew": 50,
+    "_capacity": 14,
     "_favorite": true,
-    "_relativePosition": {
-      "weight": 0,
-      "x": 926,
-      "y": 665
-    },
-    "_image": "dest/MarketTown.bmp",
-    "_imageTitle": "dest/MarketTownTitle.bmp"
+    "_active": true,
+    
+    "_imageTitle": "ships/RolandVonBremenS.bmp"
   },
   {
-    "_name": "Bamboo",
-    "_time": 60,
-    "_favorite": false,
-    "_relativePosition": {
-      "weight": 0,
-      "x": 95,
-      "y": -63
-    },
-    "_image": "dest/Bamboo.bmp",
-    "_imageTitle": "dest/BambooTitle.bmp"
+    "_name": "Sao Gabriel",
+    "_crew": 50,
+    "_capacity": 14,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/SaoGabrielS.bmp"
   },
   {
-    "_name": "Rubble",
-    "_time": 60,
-    "_favorite": false,
-    "_relativePosition": {
-      "weight": 0,
-      "x": 234,
-      "y": -166
-    },
-    "_image": "dest/Rubble.bmp",
-    "_imageTitle": "dest/RubbleTitle.bmp"
+    "_name": "Sao Miguel",
+    "_crew": 50,
+    "_capacity": 14,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/SaoMiguelS.bmp"
   },
   {
-    "_name": "Forest",
-    "_time": 60,
-    "_favorite": false,
-    "_relativePosition": {
-      "weight": 0,
-      "x": 241,
-      "y": -311
-    },
-    "_image": "dest/Forest.bmp",
-    "_imageTitle": "dest/ForestTitle.bmp"
+    "_name": "Sao Rafael",
+    "_crew": 50,
+    "_capacity": 14,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/SaoRafaelS.bmp"
   },
   {
-    "_name": "Neighborhood",
-    "_time": 60,
-    "_favorite": false,
-    "_relativePosition": {
-      "weight": 0,
-      "x": -169,
-      "y": -279
-    },
-    "_image": "dest/Neighborhood.bmp",
-    "_imageTitle": "dest/NeighborhoodTitle.bmp"
+    "_name": "Venetian",
+    "_crew": 50,
+    "_capacity": 14,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/VenetianS.bmp"
   }
 ]

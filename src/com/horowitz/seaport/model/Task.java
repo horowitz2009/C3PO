@@ -8,6 +8,7 @@ public class Task implements Cloneable, Serializable {
   private int _frequency;
   private boolean _active;
   private String _imageName;
+  private GameProtocol _protocol;
 
   public Task(String name, int frequency) {
     super();

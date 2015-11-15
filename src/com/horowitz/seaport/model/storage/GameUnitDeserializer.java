@@ -18,16 +18,20 @@ public class GameUnitDeserializer implements Deserializer {
   public void deserialize(Deserializable deserializable) throws IOException {
     if (deserializable instanceof GameUnit) {
       GameUnit gameUnit = (GameUnit) deserializable;
-
-      ImageData imageData = _scanner.getImageData(gameUnit.getImage());
-      ImageData imageDataTitle = _scanner.getImageData(gameUnit.getImageTitle());
-      gameUnit.setImageData(imageData);
-      gameUnit.setImageDataTitle(imageDataTitle);
-
-      if (imageData != null)
-        imageData.setComparator(_scanner.getComparator());
-      if (imageDataTitle != null)
-        imageDataTitle.setComparator(_scanner.getComparator());
+      if (gameUnit.getImage() != null) {
+        ImageData imageData = _scanner.getImageData(gameUnit.getImage());
+        if (imageData != null) {
+          gameUnit.setImageData(imageData);
+          imageData.setComparator(_scanner.getComparator());
+        }
+      }
+      if (gameUnit.getImageTitle() != null) {
+        ImageData imageData = _scanner.getImageData(gameUnit.getImageTitle());
+        if (imageData != null) {
+          gameUnit.setImageDataTitle(imageData);
+          imageData.setComparator(_scanner.getComparator());
+        }
+      }
     }
   }
 }

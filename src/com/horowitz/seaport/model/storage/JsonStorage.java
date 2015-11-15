@@ -13,6 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.horowitz.commons.Pixel;
 import com.horowitz.seaport.model.Building2;
 import com.horowitz.seaport.model.Destination;
+import com.horowitz.seaport.model.Ship;
 
 public class JsonStorage {
   private Gson _gson = new GsonBuilder().setPrettyPrinting().create();
@@ -45,6 +46,21 @@ public class JsonStorage {
     String json = _gson.toJson(destinations);
     
     FileUtils.writeStringToFile(new File("data/destinations.json"), json);
+  }
+  
+  public List<Ship> loadShips() throws IOException {
+    String json = FileUtils.readFileToString(new File("data/ships.json"));
+    
+    Ship[] array = _gson.fromJson(json, Ship[].class);
+    
+    return new ArrayList<Ship>(Arrays.asList(array));
+  }
+  
+  public void saveShips(List<Ship> ships) throws IOException {
+    
+    String json = _gson.toJson(ships);
+    
+    FileUtils.writeStringToFile(new File("data/ships.json"), json);
   }
   
 }
