@@ -12,14 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-public class ImageData implements Serializable, Deserializable {
+public class ImageData implements Serializable {
 
   private static final long serialVersionUID = 1665414091139220640L;
 
@@ -92,11 +89,6 @@ public class ImageData implements Serializable, Deserializable {
       }
     }
     return c;
-  }
-
-  public void postDeserialize(Object[] transientObjects) throws Exception {
-    _comparator = (ImageComparator) transientObjects[0];
-    loadImage(_filename);
   }
 
   public Pixel findImage() {

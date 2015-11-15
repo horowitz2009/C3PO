@@ -4,18 +4,18 @@ import java.awt.AWTException;
 import java.io.IOException;
 import java.io.Serializable;
 
-import com.horowitz.commons.Deserializable;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
-import com.horowitz.seaport.model.Product;
+import com.horowitz.seaport.model.GameUnit;
 
-public abstract class Macros implements Serializable, Deserializable {
+public abstract class Macros implements Serializable {
 
   private static final long serialVersionUID = -4336238263778301896L;
 
   private String _name;
   protected transient ScreenScanner _scanner;
+
   public ScreenScanner getScanner() {
     return _scanner;
   }
@@ -26,7 +26,6 @@ public abstract class Macros implements Serializable, Deserializable {
 
   protected transient MouseRobot _mouse;
 
-  
   public Macros() {
     super();
     try {
@@ -36,7 +35,7 @@ public abstract class Macros implements Serializable, Deserializable {
     }
   }
 
-  public abstract boolean doTheJob(Product pr) throws AWTException, IOException, RobotInterruptedException;
+  public abstract boolean doTheJob(GameUnit gameUnit) throws AWTException, IOException, RobotInterruptedException;
 
   public String getName() {
     return _name;
@@ -47,9 +46,4 @@ public abstract class Macros implements Serializable, Deserializable {
 
   }
 
-  @Override
-  public void postDeserialize(Object[] transientObjects) throws Exception {
-    _scanner = (ScreenScanner) transientObjects[1];
-
-  }
 }

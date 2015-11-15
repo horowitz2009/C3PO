@@ -1,0 +1,110 @@
+[
+  {
+    "_name": "Berrio",
+    "_time": 5,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -82,
+      "y": -139
+    },
+    "_image": "dest/SmallTown.bmp",
+    "_imageTitle": "dest/SmallTownTitle.bmp"
+  },
+  {
+    "_name": "Coastline",
+    "_time": 15,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 74,
+      "y": -153
+    },
+    "_image": "dest/Coastline.bmp",
+    "_imageTitle": "dest/CoastlineTitle.bmp"
+  },
+  {
+    "_name": "Gulf",
+    "_time": 60,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 95,
+      "y": -255
+    },
+    "_image": "dest/Gulf.bmp",
+    "_imageTitle": "dest/GulfTitle.bmp"
+  },
+  {
+    "_name": "Cocoa Plant",
+    "_time": 120,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -1294,
+      "y": -727
+    },
+    "_image": "dest/CocoaPlant.bmp",
+    "_imageTitle": "dest/CocoaPlantTitle.bmp"
+  },
+  {
+    "_name": "Market",
+    "_time": 30,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 926,
+      "y": 665
+    },
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
+    "_name": "Bamboo",
+    "_time": 60,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 95,
+      "y": -63
+    },
+    "_image": "dest/Bamboo.bmp",
+    "_imageTitle": "dest/BambooTitle.bmp"
+  },
+  {
+    "_name": "Rubble",
+    "_time": 60,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 234,
+      "y": -166
+    },
+    "_image": "dest/Rubble.bmp",
+    "_imageTitle": "dest/RubbleTitle.bmp"
+  },
+  {
+    "_name": "Forest",
+    "_time": 60,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 241,
+      "y": -311
+    },
+    "_image": "dest/Forest.bmp",
+    "_imageTitle": "dest/ForestTitle.bmp"
+  },
+  {
+    "_name": "Neighborhood",
+    "_time": 60,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -169,
+      "y": -279
+    },
+    "_image": "dest/Neighborhood.bmp",
+    "_imageTitle": "dest/NeighborhoodTitle.bmp"
+  }
+]

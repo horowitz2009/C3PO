@@ -1,7 +1,11 @@
 package com.horowitz.commons;
 
+import java.io.IOException;
+
+import com.horowitz.seaport.model.storage.Deserializer;
+
 public interface Deserializable {
   
-  void postDeserialize(Object[] transientObjects) throws Exception;
+  void deserialize(Deserializer deserializer) throws IOException;
   
 }

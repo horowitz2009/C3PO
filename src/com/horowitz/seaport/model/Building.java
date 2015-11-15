@@ -8,7 +8,8 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import com.horowitz.commons.Pixel;
 import com.horowitz.seaport.macros.Macros;
 
-public class Building extends BasicElement implements Cloneable, Serializable, Comparable {
+@SuppressWarnings("rawtypes")
+public class Building extends GameUnit implements Cloneable, Serializable, Comparable {
 
   private static final long serialVersionUID = -2556252202052545991L;
   private Pixel _position;
@@ -68,17 +69,17 @@ public class Building extends BasicElement implements Cloneable, Serializable, C
     return _macros;
   }
 
-  @Override
-  public void postDeserialize(Object[] transientObjects) throws Exception {
-    super.postDeserialize(transientObjects);
-    // TODO
-    System.out.println("mocros class is" + _macrosClass);
-    Macros clazz = (Macros) Class.forName(_macrosClass).newInstance();
-    _macros = clazz;
-    if (_macros != null) {
-      _macros.postDeserialize(transientObjects);
-    }
-  }
+//  @Override
+//  public void postDeserialize(Object[] transientObjects) throws Exception {
+//    super.postDeserialize(transientObjects);
+//    // TODO
+//    System.out.println("mocros class is" + _macrosClass);
+//    Macros clazz = (Macros) Class.forName(_macrosClass).newInstance();
+//    _macros = clazz;
+//    if (_macros != null) {
+//      _macros.postDeserialize(transientObjects);
+//    }
+//  }
 
   public void setLevel(int level) {
     _level = level;

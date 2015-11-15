@@ -52,7 +52,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
 import com.horowitz.seaport.dest.MapManager;
-import com.horowitz.seaport.model.BasicElement;
+import com.horowitz.seaport.model.Building2;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.Task;
 import com.horowitz.seaport.model.storage.JsonStorage;
@@ -83,7 +83,7 @@ public class MainFrame extends JFrame {
   private List<Pixel> _shipLocations;
   private List<Pixel> _buildingLocationsREF = new ArrayList<>();
   private List<Pixel> _buildingLocationsABS = new ArrayList<>();
-  private List<Building> _buildings = new ArrayList<>();
+  private List<Building2> _buildings = new ArrayList<>();
   private MapManager _mapManager;
 
   private Pixel _rock;
@@ -135,15 +135,6 @@ public class MainFrame extends JFrame {
     } catch (Throwable e) {
       e.printStackTrace();
     }
-  }
-
-  private void createLabelImageData(BasicElement element) throws IOException {
-    element.setLabelImage(_scanner.getImageData("labels/" + element.getName() + ".bmp", _scanner.getLabelArea(), 0, 0));
-  }
-
-  private void createPictureImageData(BasicElement element, String folder) throws IOException {
-    element.setPictureImage(_scanner.getImageData(folder + "/" + element.getName() + ".bmp", _scanner.getScanArea(), 0,
-        0));
   }
 
   @SuppressWarnings("serial")
@@ -401,7 +392,7 @@ public class MainFrame extends JFrame {
 
         // NEWEST
         _buildingLocationsABS.clear();
-        for (Building b : _buildings) {
+        for (Building2 b : _buildings) {
           if (b.isEnabled()) {
             Pixel p = b.getPosition();
             Pixel goodP = new Pixel(_rock.x + p.x, _rock.y + p.y);
@@ -739,7 +730,7 @@ public class MainFrame extends JFrame {
     toolbar.setFloatable(false);
 
     // DESTINATIONS GO HERE
-    for (final Building b : _buildings) {
+    for (final Building2 b : _buildings) {
       final JToggleButton toggle = new JToggleButton(b.getName());
       toggle.setSelected(b.isEnabled());
       toggle.addItemListener(new ItemListener() {
@@ -1254,7 +1245,6 @@ public class MainFrame extends JFrame {
                 }
               }
 
-              Pixel destP = null;
               shipSent = sendShip(dest, true);
               if (shipSent)
                 numShipsSent++;
