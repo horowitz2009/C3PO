@@ -1,8 +1,5 @@
 package com.horowitz.seaport.model;
 
-import java.util.ArrayList;
-
-import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 
 public interface GameProtocol {

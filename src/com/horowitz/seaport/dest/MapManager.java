@@ -1,9 +1,13 @@
 package com.horowitz.seaport.dest;
 
+import java.awt.AWTException;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.horowitz.commons.ImageData;
+import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.Destination;
@@ -13,10 +17,13 @@ import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class MapManager {
 
+  public final static Logger LOGGER = Logger.getLogger(MapManager.class.getName());
+
   private ScreenScanner _scanner;
 
   private List<Destination> _destinations;
   private List<Ship> _ships;
+  private Pixel _marketPos = null;
 
   public MapManager(ScreenScanner scanner) {
     super();
@@ -94,14 +101,14 @@ public class MapManager {
       id.set_yOff(0);
     }
   }
-  
+
   public void deserializeShips() throws IOException {
     GameUnitDeserializer deserializer = new GameUnitDeserializer(_scanner);
-    
+
     for (Ship ship : _ships) {
       ship.deserialize(deserializer);
     }
-    
+
   }
 
   public void saveDestinations() {
@@ -120,6 +127,52 @@ public class MapManager {
       }
     }
     return null;
+  }
+
+
+
+  public void ensureMap() throws AWTException, RobotInterruptedException {
+    // MAP ZONE
+    Destination _market = getMarket();
+
+    if (_marketPos == null) {
+      LOGGER.info("Looking for market for the first time");
+
+      Rectangle smallerArea = _scanner.generateWindowedArea(260, 500);
+      smallerArea.x += 50 + _scanner.getTopLeft().x;
+      smallerArea.width = 260;
+      smallerArea.y = _scanner.getTopLeft().y + _scanner.getGameHeight() / 2;
+      smallerArea.height = _scanner.getGameHeight() / 2;
+      _marketPos = _scanner.scanOneFast(_market.getImageData(), smallerArea, false);
+      if (_marketPos == null) {
+        _marketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+        LOGGER.info("DAMMMMMMMMMMMMMMMMMMMMMMMMN");
+      } else {
+        LOGGER.info("BINGO");
+      }
+    } else {
+      Rectangle areaSpec = new Rectangle(_marketPos.x - 10, _marketPos.y - 10, _market.getImageData().getImage()
+          .getWidth() + 20, _market.getImageData().getImage().getHeight() + 20);
+
+      Pixel newMarketPos = _scanner.scanOneFast(_market.getImageData(), areaSpec, false);
+      if (newMarketPos == null)
+        newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+
+      
+      if (_marketPos.equals(newMarketPos)) {
+        LOGGER.info("Market found in the same place.");
+      }
+      _marketPos = newMarketPos;
+    }
+
+  }
+
+  public Pixel getMarketPos() {
+    return _marketPos;
+  }
+
+  public void setMarketPos(Pixel marketPos) {
+    _marketPos = marketPos;
   }
 
 }

@@ -41,8 +41,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -1294,
-      "y": -727
+      "x": 302,
+      "y": 49
     },
     "_image": "dest/CocoaPlant.bmp",
     "_imageTitle": "dest/CocoaPlantTitle.bmp"
@@ -53,8 +53,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 926,
-      "y": 665
+      "x": 0,
+      "y": 0
     },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"

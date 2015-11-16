@@ -3,6 +3,7 @@ package com.horowitz.seaport.model;
 import java.awt.AWTException;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -11,109 +12,200 @@ import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.BuildingManager;
+import com.horowitz.seaport.dest.MapManager;
 
 public class FirstShipsProtocol implements GameProtocol {
 
-  private final static Logger LOGGER = Logger.getLogger(FirstShipsProtocol.class.getName());
+  public final static Logger LOGGER = Logger.getLogger(FirstShipsProtocol.class.getName());
 
-  private List<Pixel> _fishes;
+  private List<Pixel> _shipLocations;
 
   private ScreenScanner _scanner;
   private MouseRobot _mouse;
 
-  private BuildingManager _buildingManager;
+  private MapManager _mapManager;
 
-  public FirstShipsProtocol(ScreenScanner scanner, MouseRobot mouse, BuildingManager buildinghManager)
-      throws IOException {
+  List<String> _cocoaShips;
+  List<String> _otherShips;
+
+  private String _sellingShip;
+
+  public FirstShipsProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
     _scanner = scanner;
     _mouse = mouse;
-    _buildingManager = buildinghManager;
-    _buildingManager.loadBuildings();
+    _mapManager = mapManager;
+    _cocoaShips = new ArrayList<>();
+    _cocoaShips.add("Berrio");
+    _cocoaShips.add("Sao Rafael");
+    _cocoaShips.add("Venetian");
+    _cocoaShips.add("Roland Von Bremen");
+
+    _otherShips = new ArrayList<>();
+    _otherShips.add("Mary Rose");
+    _otherShips.add("Hulk Zigmund");
+    _otherShips.add("Sao Gabriel");
+    _otherShips.add("Peter Von Danzig");
+
+    _sellingShip = "Sao Miguel";
   }
 
   @Override
   public void execute() throws RobotInterruptedException {
-    List<Building> buildings = _buildingManager.getBuildings();
-    for (Building b : buildings) {
-      if (b.isEnabled()) {
+    if (_shipLocations != null && !_shipLocations.isEmpty()) {
+      for (Pixel pixel : _shipLocations) {
         try {
+          boolean shipSent = false;
+          _mouse.click(pixel);
+          _mouse.delay(250);
 
-          doBuilding(b);
+          Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 65, 44, 44);
+          Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
+          if (pin != null) {
+            doShip(pin);
 
-        } catch (IOException e) {
-          e.printStackTrace();
+          }
         } catch (AWTException e) {
           e.printStackTrace();
+        } catch (IOException e) {
+          e.printStackTrace();
         }
+
+      }
+
+    }
+
+    List<Ship> ships = _mapManager.getShips();
+    for (Ship b : ships) {
+      if (b.isActive()) {
+        // TODO
       }
     }
   }
 
-  private void doBuilding(Building b) throws IOException, AWTException, RobotInterruptedException {
-    Pixel p1 = b.getPosition();
-    Rectangle miniArea = new Rectangle(p1.x - 46, p1.y - 22, 46 * 2, 22 * 2);
-    Pixel p = _scanner.scanOneFast("buildings/whiteArrow.bmp", miniArea, false);
-    if (p != null) {
-      LOGGER.info(b.getName() + " busy! Moving on...");
-    } else {
-      _mouse.click(p1);
-      _mouse.delay(800);
+  private void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
+
+    // scan the name
+    Rectangle nameArea = new Rectangle(pin.x - 75, pin.y - 67, 150, 40);
+    List<Ship> ships = _mapManager.getShips();
+    Ship whatShip = null;
+    for (Ship ship : ships) {
+      if (ship.isActive()) {
+        if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false) != null) {
+          whatShip = ship;
+          break;
+        }
+        ;
+      }
+    }
+
+    Destination dest = null;
+    if (whatShip != null) {
+      if (whatShip.getName().equals(_sellingShip)) {
+        dest = _mapManager.getMarket();
+      } else {
+        for (String name : _cocoaShips) {
+          if (whatShip.getName().equals(name)) {
+            dest = _mapManager.getDestination("Cocoa Plant");
+            break;
+          }
+        }
+        if (dest == null)
+          dest = _mapManager.getDestination("Gulf");
+      }
+    }
+
+    if (dest != null) {
+
+      _mouse.click(pin);
+      _mouse.delay(50);
       _mouse.mouseMove(_scanner.getParkingPoint());
+      _mouse.delay(500);
 
-      // check if popup is opened, else click again
-      Rectangle area = new Rectangle(p1.x - 80, p1.y + 41, 160, 75);
-      Pixel gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
-      // if (gears == null) {
-      // LOGGER.info("click again...");
-      // _mouse.click(p1);
-      // _mouse.delay(800);
-      // _mouse.mouseMove(_scanner.getParkingPoint());
-      // gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
-      // }
-      if (gears != null) {
-        LOGGER.info("GEARS...");
+      Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
+      if (anchor != null) {
+        // MAP IS OPEN
+        _mapManager.ensureMap();
+        sendShip(dest, true);
+      }
+    }
+
+  }
+
+  private void sendShip(Destination dest, boolean redirect) throws AWTException, RobotInterruptedException, IOException {
+    Pixel _marketPos = _mapManager.getMarketPos();
+    Destination _market = _mapManager.getMarket();
+
+    Pixel destP;
+    if (!dest.getName().equals("Market") && _marketPos != null) {
+      int x = _marketPos.x + dest.getRelativePosition().x - _market.getImageData().get_xOff() - 35;
+      int y = _marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 35;
+      Rectangle destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
+
+      LOGGER.info("Using custom area for " + dest.getImage());
+      destP = _scanner.scanOneFast(dest.getImageData(), destArea, false);
+    } else {
+      destP = _marketPos;
+    }
+
+    if (destP != null) {
+      LOGGER.info("Sending to " + dest.getName() + "...");
+      _mouse.click(destP);
+      _mouse.mouseMove(_scanner.getParkingPoint());
+      _mouse.delay(400);
+
+      Pixel destTitle = _scanner.scanOneFast(dest.getImageDataTitle(), null, false);
+
+      if (destTitle != null) {
+        LOGGER.info("SEND POPUP OPEN...");
         _mouse.mouseMove(_scanner.getParkingPoint());
-        _mouse.delay(1000);
+        _mouse.delay(100);
 
-        Pixel produceButton = _scanner.scanOneFast("buildings/produce.bmp", null, true);
-        if (produceButton != null) {
-          _mouse.delay(2000);
-        } else {
-          // try if gray
-          produceButton = _scanner.scanOneFast("buildings/produceGray.bmp", null, true);
-          if (produceButton != null) {
-            LOGGER.info("Production not possible...");
-            _scanner.scanOneFast("buildings/x.bmp", null, true);
-            _mouse.delay(1000);
-          } else {
-            LOGGER.info(b.getName() + " not ready...");
-            _mouse.delay(300);
-            _scanner.scanOneFast("buildings/x.bmp", null, true);
-
-            _mouse.delay(300);
-            _mouse.click(_scanner.getSafePoint());
+        Pixel destButton = _scanner.scanOneFast("dest/setSail.bmp", null, false);
+        if (destButton != null) {
+          // nice. we can continue
+          if (dest.getName().equals("Market")) {
+            LOGGER.info("Market! I choose coins...");
+            Pixel coins = new Pixel(destTitle);
+            coins.y += 228;
+            _mouse.click(coins);
+            _mouse.delay(250);
           }
 
+          _mouse.click(destButton);
+        } else {
+          if (redirect)
+            if (dest.getName().equals("Market")) {
+              Pixel destButtonGray = _scanner.scanOneFast("dest/setSailGray.bmp", null, false);
+              if (destButtonGray != null) {
+                LOGGER.info("Material not available! Go do something else...");
+                boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+                _mouse.delay(1800);
+                sendShip(_mapManager.getDestination("Gulf"), false);
+                // SEND to Cocoa plant (for now)
+
+              }
+            }
+          LOGGER.info("Destination unreachable! Skipping...");
+          _mouse.delay(300);
         }
 
       }
-
+    } else {
+      LOGGER.info("Destination: UNKNOWN!!!");
     }
 
-    _mouse.delay(1000);// reduce later
-    _mouse.click(_scanner.getSafePoint());
-    _mouse.delay(1000);
   }
 
   @Override
   public void update() {
-    Pixel rock = _scanner.getRock();
-    List<Building> buildings = _buildingManager.getBuildings();
-
-    for (Building b : buildings) {
-      Pixel absPos = new Pixel(rock.x + b.getRelativePosition().x, rock.y + b.getRelativePosition().y);
-      b.setPosition(absPos);
-    }
-
+    _shipLocations = new ArrayList<>();
+    Pixel[] shipLocations = _scanner.getShipLocations();
+    _shipLocations = new ArrayList<Pixel>();
+    Pixel r = _scanner.getRock();
+    if (r != null)
+      for (Pixel p : shipLocations) {
+        Pixel goodP = new Pixel(r.x + p.x, r.y + p.y);
+        _shipLocations.add(goodP);
+      }
   }
 }

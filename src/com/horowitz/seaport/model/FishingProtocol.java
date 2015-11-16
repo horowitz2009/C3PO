@@ -11,7 +11,7 @@ import com.horowitz.seaport.ScreenScanner;
 
 public class FishingProtocol implements GameProtocol {
 
-  private final static Logger LOGGER = Logger.getLogger(FishingProtocol.class.getName());
+  public final static Logger LOGGER = Logger.getLogger(FishingProtocol.class.getName());
 
   private Pixel _rock;
 
