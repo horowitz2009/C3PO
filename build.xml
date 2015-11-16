@@ -2,12 +2,12 @@
 <project default="create_run_jar" name="Create Runnable Jar for Project Mickey2">
 	<!--<taskdef resource="net/sf/antcontrib/antcontrib.properties" />-->
 
-	<property name="versionNumber" value="019" />
+	<property name="versionNumber" value="021" />
 
 	<property name="jarname" value="Seaport${versionNumber}.jar" description="" />
 	<property name="dropboxjarname" value="DropboxRemote${versionNumber}.jar" description="" />
 
-	<property name="dropbox" location="${user.home}/Dropbox" />
+	<property name="dropbox" location="${dropbox.home}" />
 
 
 	<target name="create_run_jar">
@@ -40,6 +40,7 @@
 		<copy file="data/destinations.json" todir="${dropbox}/${subfolder}/data" />
 		<copy file="data/buildings.json" todir="${dropbox}/${subfolder}/data" />
 		<copy file="data/buildings2.json" todir="${dropbox}/${subfolder}/data" />
+		<copy file="data/ships.json" todir="${dropbox}/${subfolder}/data" />
 
 		
 		<copy todir="${dropbox}/${subfolder}/lib">

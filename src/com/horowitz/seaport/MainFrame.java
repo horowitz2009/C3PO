@@ -54,7 +54,6 @@ import com.horowitz.commons.TemplateMatcher;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.Building;
-import com.horowitz.seaport.model.CocoaProtocol;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.FirstShipsProtocol;
 import com.horowitz.seaport.model.FishingProtocol;
@@ -67,7 +66,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static String APP_TITLE = "Seaport v0.020";
+  private static String APP_TITLE = "Seaport v0.021";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -92,7 +91,7 @@ public class MainFrame extends JFrame {
   private JToggleButton _shipsToggle;
 
   private JToggleButton _industriesToggle;
-  private JToggleButton _fullScreenToggle;
+  private JToggleButton _xpToggle;
 
   private List<Task> _tasks;
 
@@ -608,8 +607,6 @@ public class MainFrame extends JFrame {
       _industriesToggle.setSelected(true);
       toolbar.add(_industriesToggle);
 
-      _fullScreenToggle = new JToggleButton("Full screen");
-      // //toolbar.add(_fullScreenToggle);
       _slowToggle = new JToggleButton("Slow");
       _slowToggle.addItemListener(new ItemListener() {
 
@@ -625,6 +622,21 @@ public class MainFrame extends JFrame {
         }
       });
       toolbar.add(_slowToggle);
+
+      _xpToggle = new JToggleButton("XP");
+      _xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
+      _xpToggle.addItemListener(new ItemListener() {
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          boolean b = e.getStateChange() == ItemEvent.SELECTED;
+          String strategy = b ? "XP" : "COINS";
+          LOGGER.info("MARKET STRATEGY: " + strategy);
+          _mapManager.setMarketStrategy(strategy);
+        }
+      });
+      toolbar.add(_xpToggle);
+
     }
     return toolbar;
   }
@@ -860,7 +872,7 @@ public class MainFrame extends JFrame {
 
       LOGGER.info("Scanning...");
       setTitle(APP_TITLE + " ...");
-      boolean found = _scanner.locateGameArea(_fullScreenToggle.isSelected());
+      boolean found = _scanner.locateGameArea(false);
       if (found) {
 
         _mapManager.update();
@@ -1030,6 +1042,14 @@ public class MainFrame extends JFrame {
 
         found = p != null;
         if (found) {
+          // check is this 'logged twice' message
+          p = _scanner.scanOneFast("accountLoggedTwice.bmp", area, false);
+          if (p != null) {
+            LOGGER.info("Logged somewhere else. I'm done here!");
+            _stopAllThreads = true;
+            throw new RobotInterruptedException();
+          }
+
           LOGGER.info("Game crashed. Reloading...");
           _mouse.delay(8000);
           return;

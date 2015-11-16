@@ -24,6 +24,7 @@ public class MapManager {
   private List<Destination> _destinations;
   private List<Ship> _ships;
   private Pixel _marketPos = null;
+  private String _marketStrategy = "XP";
 
   public MapManager(ScreenScanner scanner) {
     super();
@@ -173,6 +174,14 @@ public class MapManager {
 
   public void setMarketPos(Pixel marketPos) {
     _marketPos = marketPos;
+  }
+
+  public String getMarketStrategy() {
+    return _marketStrategy;
+  }
+
+  public void setMarketStrategy(String marketStrategy) {
+    _marketStrategy = marketStrategy;
   }
 
 }

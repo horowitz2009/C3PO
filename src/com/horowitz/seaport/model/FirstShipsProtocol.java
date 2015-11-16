@@ -25,8 +25,8 @@ public class FirstShipsProtocol implements GameProtocol {
 
   private MapManager _mapManager;
 
-  List<String> _cocoaShips;
-  List<String> _otherShips;
+  private List<String> _cocoaShips;
+  private List<String> _otherShips;
 
   private String _sellingShip;
 
@@ -164,11 +164,16 @@ public class FirstShipsProtocol implements GameProtocol {
         if (destButton != null) {
           // nice. we can continue
           if (dest.getName().equals("Market")) {
-            LOGGER.info("Market! I choose coins...");
-            Pixel coins = new Pixel(destTitle);
-            coins.y += 228;
-            _mouse.click(coins);
-            _mouse.delay(250);
+            LOGGER.info("Market! I choose " + _mapManager.getMarketStrategy());
+            if (_mapManager.getMarketStrategy().equals("XP")) {
+              // do XP
+            } else {
+              // do money
+              Pixel coins = new Pixel(destTitle);
+              coins.y += 228;
+              _mouse.click(coins);
+              _mouse.delay(250);
+            }
           }
 
           _mouse.click(destButton);
