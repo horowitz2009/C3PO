@@ -1,62 +1,50 @@
 [
- {
-   "_name": "Saw Mill 1",
-   "_time": 5,
-   "_enabled": false,
-
-   "_relativePosition":   {
-     "weight": 0,
-     "x": 54,
-     "y": -71
-   },
-   
-   "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
-   "_level": 6,
- },
- {
-   "_name": "Saw Mill 2",
-   "_time": 5,
-   "_enabled": false,
-   
-   "_relativePosition":   {
-     "weight": 0,
-     "x": -50,
-     "y": -120
-   },
-   
-   "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
-   "_level": 6,
- },
-
- {
-   "_name": "Quarry",
-   "_time": 5,
-   "_enabled": true,
-   
-   "_relativePosition":   {
-     "weight": 0,
-     "x": 147,
-     "y": -100
-   },
-   
-   "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
-   "_level": 6,
- },
- 
- {
-   "_name": "Foundry",
-   "_time": 5,
-   "_enabled": true,
-   
-   "_relativePosition":   {
-     "weight": 0,
-     "x": 224,
-     "y": -146
-   },
-   
-   "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
-   "_level": 2,
- }
- 
- 
+  {
+    "_name": "Saw Mill 1",
+    "_time": 5,
+    "_enabled": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 50,
+      "y": -73
+    },
+    "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
+    "_level": 6
+  },
+  {
+    "_name": "Saw Mill 2",
+    "_time": 5,
+    "_enabled": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -54,
+      "y": -122
+    },
+    "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
+    "_level": 6
+  },
+  {
+    "_name": "Quarry",
+    "_time": 5,
+    "_enabled": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 156,
+      "y": -115
+    },
+    "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
+    "_level": 6
+  },
+  {
+    "_name": "Foundry",
+    "_time": 5,
+    "_enabled": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 243,
+      "y": -157
+    },
+    "_macrosClass": "com.horowitz.seaport.macros.RawMaterialsMacros",
+    "_level": 2
+  }
 ]

@@ -11,12 +11,13 @@ import com.horowitz.seaport.macros.Macros;
 @SuppressWarnings("rawtypes")
 public class Building extends GameUnit implements Cloneable, Serializable, Comparable {
 
-  private static final long serialVersionUID = -2556252202052545991L;
-  private Pixel _position;
+  private static final long serialVersionUID = 8896813419424306670L;
+  private transient Pixel _position;
   private Pixel _relativePosition;
   private transient Macros _macros;
   private String _macrosClass;
   private int _level;
+  private int _time;
   private boolean _enabled;
 
   public Building(String name) {
@@ -48,7 +49,7 @@ public class Building extends GameUnit implements Cloneable, Serializable, Compa
   }
 
   public void setMacros(Macros macros) {
-    _macrosClass = macros.getClass().getName();
+    //setMacrosClass(macros.getClass().getName());
     _macros = macros;
   }
 
@@ -103,5 +104,21 @@ public class Building extends GameUnit implements Cloneable, Serializable, Compa
 
   public void setEnabled(boolean enabled) {
     _enabled = enabled;
+  }
+
+  public String getMacrosClass() {
+    return _macrosClass;
+  }
+
+  public void setMacrosClass(String macrosClass) {
+    _macrosClass = macrosClass;
+  }
+
+  public int getTime() {
+    return _time;
+  }
+
+  public void setTime(int time) {
+    _time = time;
   }
 }

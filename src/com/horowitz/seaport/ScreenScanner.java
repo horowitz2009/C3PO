@@ -299,6 +299,38 @@ public class ScreenScanner {
     return false;
   }
 
+  Pixel _rock = null;
+  
+  public boolean checkAndAdjustRock() throws IOException, AWTException, RobotInterruptedException {
+    boolean needRecalc = true;
+    if (_rock == null) {
+      _rock = findRock();
+      LOGGER.info("rock found for the first time.");
+      needRecalc = true;
+    } else {
+      Pixel newRock = findRockAgain(_rock);
+      needRecalc = !_rock.equals(newRock);
+      _rock = newRock;
+      if (!needRecalc) {
+        LOGGER.info("rock found in the same place.");
+        LOGGER.info("Skipping recalc...");
+      }
+    }
+    
+    Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93, _tl.y + 254);
+    
+    if (Math.abs(_rock.x - goodRock.x) > 5 && Math.abs(_rock.x - goodRock.y) > 5) {
+      // need adjusting
+      _mouse.drag(_rock.x, _rock.y, goodRock.x, goodRock.y);
+      _mouse.delay(1200);
+      _rock = findRockAgain(goodRock);
+    }
+
+    
+    
+    return needRecalc;
+  }
+  
   public Pixel findRock() throws IOException, AWTException, RobotInterruptedException {
     Rectangle area = new Rectangle(_tl.x + 450, _tl.y + 43, 760, 450);
 
@@ -308,6 +340,7 @@ public class ScreenScanner {
       LOGGER.info("Rock try 2 ...");
       p = scanOne("rockEdge.bmp", getScanArea(), false);
     }
+    _rock = p;
     return p;
   }
 
@@ -833,6 +866,10 @@ public class ScreenScanner {
       }
     }
 
+  }
+
+  public Pixel getRock() {
+    return _rock;
   }
 
 }

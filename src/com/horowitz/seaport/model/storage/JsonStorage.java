@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.horowitz.commons.Pixel;
+import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Building2;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.Ship;
@@ -18,19 +19,19 @@ import com.horowitz.seaport.model.Ship;
 public class JsonStorage {
   private Gson _gson = new GsonBuilder().setPrettyPrinting().create();
 
-  public List<Building2> loadBuildings() throws IOException {
-    String json = FileUtils.readFileToString(new File("data/buildings2.json"));
+  public List<Building> loadBuildings() throws IOException {
+    String json = FileUtils.readFileToString(new File("data/buildings.json"));
 
-    Building2[] buildings = _gson.fromJson(json, Building2[].class);
+    Building[] buildings = _gson.fromJson(json, Building[].class);
 
-    return new ArrayList<Building2>(Arrays.asList(buildings));
+    return new ArrayList<Building>(Arrays.asList(buildings));
   }
 
-  public void saveBuildings(List<Building2> buildings) throws IOException {
+  public void saveBuildings(List<Building> buildings) throws IOException {
 
     String json = _gson.toJson(buildings);
 
-    FileUtils.writeStringToFile(new File("data/buildings2.json"), json);
+    FileUtils.writeStringToFile(new File("data/buildings.json"), json);
   }
 
   public List<Destination> loadDestinations() throws IOException {

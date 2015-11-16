@@ -106,7 +106,7 @@ public class MouseRobot {
         // checkUserMovement();
       }
     }
-    delay(400);
+    delay(2000);
     robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
     saveCurrentPosition();
   }

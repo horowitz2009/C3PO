@@ -2,6 +2,8 @@ package com.horowitz.seaport.model;
 
 import java.io.Serializable;
 
+import com.horowitz.commons.RobotInterruptedException;
+
 public class Task implements Cloneable, Serializable {
 
   private String _name;
@@ -46,6 +48,25 @@ public class Task implements Cloneable, Serializable {
 
   public void setActive(boolean active) {
     _active = active;
+  }
+
+  public GameProtocol getProtocol() {
+    return _protocol;
+  }
+
+  public void setProtocol(GameProtocol protocol) {
+    _protocol = protocol;
+  }
+
+  public void update() {
+    if (_protocol != null)
+      _protocol.update();
+  }
+
+  public void execute() throws RobotInterruptedException {
+    // TODO Auto-generated method stub
+    if (_protocol != null)
+      _protocol.execute();
   }
 
 }

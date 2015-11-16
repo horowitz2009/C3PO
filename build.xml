@@ -7,7 +7,7 @@
 	<property name="jarname" value="Seaport${versionNumber}.jar" description="" />
 	<property name="dropboxjarname" value="DropboxRemote${versionNumber}.jar" description="" />
 
-	<property name="dropbox" location="d:/Dropbox" />
+	<property name="dropbox" location="${user.home}/Dropbox" />
 
 
 	<target name="create_run_jar">

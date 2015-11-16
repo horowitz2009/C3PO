@@ -1,6 +1,6 @@
 package com.horowitz.seaport.model;
 
-import com.horowitz.seaport.macros.Macros;
+import com.horowitz.commons.RobotInterruptedException;
 
 /**
  * The Cocoa protocol v.2. Divide the ships to two groups. Group1 delivers cocoa
@@ -12,7 +12,14 @@ import com.horowitz.seaport.macros.Macros;
  */
 public class CocoaProtocol implements GameProtocol {
 
-  Macros _shipGroup1Macros;
-  Macros _shipGroup2Macros;
+  private String _name;
+
+  ShipCommand[] _shipCommands;
+
+  public void update() {
+  }
+
+  public void execute() throws RobotInterruptedException {
+  }
 
 }
