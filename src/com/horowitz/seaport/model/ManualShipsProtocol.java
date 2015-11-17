@@ -12,42 +12,43 @@ import com.horowitz.seaport.dest.MapManager;
 
 public class ManualShipsProtocol extends ShipsProtocol {
 
-  private Destination _dest;
+	private Destination _dest;
 
-  public ManualShipsProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
-    super(scanner, mouse, mapManager);
-  }
+	public ManualShipsProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+		super(scanner, mouse, mapManager);
+	}
 
-  void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
+	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
 
-    if (_dest != null) {
+		if (_dest != null) {
+			scanShipName(pin);
 
-      _mouse.click(pin);
-      _mouse.delay(50);
-      _mouse.mouseMove(_scanner.getParkingPoint());
-      _mouse.delay(500);
+			_mouse.click(pin);
+			_mouse.delay(50);
+			_mouse.mouseMove(_scanner.getParkingPoint());
+			_mouse.delay(500);
 
-      Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
-      if (anchor != null) {
-        // MAP IS OPEN
-        _mapManager.ensureMap();
-        sendShip(new LinkedList<Destination>(_destChain));
-      }
-    }
-  }
+			Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
+			if (anchor != null) {
+				// MAP IS OPEN
+				_mapManager.ensureMap();
+				sendShip(new LinkedList<Destination>(_destChain));
+			}
+		}
+	}
 
-  public Destination getDestination() {
-    return _dest;
-  }
+	public Destination getDestination() {
+		return _dest;
+	}
 
-  public void setDestination(Destination dest) {
-    _dest = dest;
-    _destChain.clear();
-    _destChain.add(_dest);
-  }
+	public void setDestination(Destination dest) {
+		_dest = dest;
+		_destChain.clear();
+		_destChain.add(_dest);
+	}
 
-  @Override
-  public void update() {
-    super.update();
-  }
+	@Override
+	public void update() {
+		super.update();
+	}
 }

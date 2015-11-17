@@ -138,7 +138,7 @@ public class MapManager {
     return null;
   }
 
-  public void ensureMap() throws AWTException, RobotInterruptedException {
+  public Pixel ensureMap() throws AWTException, RobotInterruptedException {
     // MAP ZONE
     Destination _market = getMarket();
     //_marketPos = null;
@@ -170,7 +170,7 @@ public class MapManager {
       }
       _marketPos = newMarketPos;
     }
-
+    return _marketPos;
   }
 
   public Pixel getMarketPos() {
