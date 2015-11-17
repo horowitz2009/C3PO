@@ -14,7 +14,7 @@ import com.horowitz.seaport.dest.BuildingManager;
 
 public class ManualBuildingsProtocol implements GameProtocol {
 
-  public final static Logger LOGGER = Logger.getLogger(ManualBuildingsProtocol.class.getName());
+  private final static Logger LOGGER = Logger.getLogger("MAIN");
 
   private ScreenScanner _scanner;
   private MouseRobot _mouse;

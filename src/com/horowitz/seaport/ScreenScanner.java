@@ -39,7 +39,8 @@ import com.horowitz.seaport.model.Destination;
 
 public class ScreenScanner {
 
-  public final static Logger LOGGER = Logger.getLogger(ScreenScanner.class.getName());
+  private final static Logger LOGGER = Logger.getLogger("MAIN");
+
   private static final boolean DEBUG = false;
 
   private ImageComparator _comparator;

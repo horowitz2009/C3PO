@@ -16,7 +16,8 @@ import com.horowitz.seaport.dest.MapManager;
 
 public abstract class ShipsProtocol implements GameProtocol {
 
-  public static final Logger LOGGER = Logger.getLogger(ShipsProtocol.class.getName());
+  private final static Logger LOGGER = Logger.getLogger("MAIN");
+
   private List<Pixel> _shipLocations;
   protected ScreenScanner _scanner;
   protected MouseRobot _mouse;

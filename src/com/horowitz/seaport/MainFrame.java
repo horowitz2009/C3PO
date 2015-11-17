@@ -66,7 +66,7 @@ public class MainFrame extends JFrame {
 
   private static final long serialVersionUID = -4827959393249146870L;
 
-  private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
+  private final static Logger LOGGER = Logger.getLogger("MAIN");
 
   private static String APP_TITLE = "Seaport v0.22ab";
 
@@ -326,11 +326,6 @@ public class MainFrame extends JFrame {
       }
     };
     LOGGER.addHandler(handler);
-    ScreenScanner.LOGGER.addHandler(handler);
-    // TODO THIS IS UGLY
-    FishingProtocol.LOGGER.addHandler(handler);
-    ManualBuildingsProtocol.LOGGER.addHandler(handler);
-    CocoaProtocol2.LOGGER.addHandler(handler);
 
     return new JScrollPane(outputConsole);
   }
@@ -728,7 +723,7 @@ public class MainFrame extends JFrame {
       });
 
       bg.add(toggle);
-      //toggle.setSelected(destination.getName().equals("Coastline"));
+      // toggle.setSelected(destination.getName().equals("Coastline"));
 
       n++;
       if (n > itemsPerRow) {

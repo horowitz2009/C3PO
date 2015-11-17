@@ -17,7 +17,7 @@ import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class MapManager {
 
-  public final static Logger LOGGER = Logger.getLogger(MapManager.class.getName());
+  private final static Logger LOGGER = Logger.getLogger("MAIN");
 
   private ScreenScanner _scanner;
 

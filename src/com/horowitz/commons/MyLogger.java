@@ -14,7 +14,7 @@ public class MyLogger {
 	static public void setup() throws IOException {
 
 		// get the global logger to configure it
-		Logger logger = Logger.getLogger("");// Logger.GLOBAL_LOGGER_NAME
+    Logger logger = Logger.getLogger("");// Logger.GLOBAL_LOGGER_NAME
 
 		// suppress the logging output to the console
 		Handler[] handlers = logger.getHandlers();
