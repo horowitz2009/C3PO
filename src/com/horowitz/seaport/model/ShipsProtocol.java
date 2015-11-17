@@ -16,7 +16,7 @@ import com.horowitz.seaport.dest.MapManager;
 
 public abstract class ShipsProtocol implements GameProtocol {
 
-  public static final Logger LOGGER = Logger.getLogger(CocoaProtocol1.class.getName());
+  public static final Logger LOGGER = Logger.getLogger(ShipsProtocol.class.getName());
   private List<Pixel> _shipLocations;
   protected ScreenScanner _scanner;
   protected MouseRobot _mouse;
@@ -81,7 +81,13 @@ public abstract class ShipsProtocol implements GameProtocol {
         int x = _marketPos.x + dest.getRelativePosition().x - _market.getImageData().get_xOff() - 35;
         int y = _marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 35;
         Rectangle destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
-
+        Pixel pp = _scanner.ensureAreaInGame(destArea);
+        if (pp.x != 0 || pp.y != 0) {
+          _mapManager.ensureMap();
+          x = _marketPos.x + dest.getRelativePosition().x - _market.getImageData().get_xOff() - 35;
+          y = _marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 35;
+          destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
+        }
         LOGGER.info("Using custom area for " + dest.getImage());
         destP = _scanner.scanOneFast(dest.getImageData(), destArea, false);
       }

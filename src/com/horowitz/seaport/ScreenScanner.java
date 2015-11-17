@@ -539,6 +539,37 @@ public class ScreenScanner {
     return width != 0 ? width : Toolkit.getDefaultToolkit().getScreenSize().width;
   }
 
+  public Pixel ensureAreaInGame(Rectangle area) throws RobotInterruptedException {
+    Rectangle gameArea = new Rectangle(_tl.x, _tl.y, getGameHeight(), getGameHeight());
+    int yy = area.y - gameArea.y;
+
+    int x1 = getGameWidth() / 2; 
+    int y1 = getGameHeight() / 2; 
+    
+    if (yy < 0) {
+      //too north
+      _mouse.drag(_tl.x + 5, y1, _tl.x + 5, y1 - yy + 20);
+    } else {
+      yy = _br.y - (area.y + area.height);
+      if (yy < 0)
+        //too south
+        _mouse.drag(_tl.x + 5, y1, _tl.x + 5, y1 + yy - 20);
+    }
+    
+    int xx = area.x - _tl.x;
+    
+    if (xx < 0) {
+      //too west
+      _mouse.drag(x1, _br.y - 5, x1 - xx + 20, _br.y - 5);
+    } else {
+      xx = _br.x - (area.x + area.width);
+      if (xx < 0)
+        //too east
+        _mouse.drag(x1, _br.y - 5, x1 + xx - 20, _br.y - 5);
+    }
+    return new Pixel(xx, yy);
+  }
+  
   public int getGameHeight() {
     if (isOptimized()) {
       return _br.y - _tl.y == 0 ? Toolkit.getDefaultToolkit().getScreenSize().height : _br.y - _tl.y;

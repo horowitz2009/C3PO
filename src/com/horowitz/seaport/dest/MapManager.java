@@ -24,7 +24,7 @@ public class MapManager {
   private List<Destination> _destinations;
   private List<Ship> _ships;
   private Pixel _marketPos = null;
-  private String _marketStrategy = "XP";
+  private String _marketStrategy = "COINS";
 
   public MapManager(ScreenScanner scanner) {
     super();
@@ -141,7 +141,7 @@ public class MapManager {
   public void ensureMap() throws AWTException, RobotInterruptedException {
     // MAP ZONE
     Destination _market = getMarket();
-
+    //_marketPos = null;
     if (_marketPos == null) {
       LOGGER.info("Looking for market for the first time");
 

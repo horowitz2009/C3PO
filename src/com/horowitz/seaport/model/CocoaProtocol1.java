@@ -3,7 +3,6 @@ package com.horowitz.seaport.model;
 import java.awt.AWTException;
 import java.awt.Rectangle;
 import java.io.IOException;
-import java.util.LinkedList;
 
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;

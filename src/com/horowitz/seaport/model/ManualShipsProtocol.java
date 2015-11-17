@@ -2,6 +2,7 @@ package com.horowitz.seaport.model;
 
 import java.awt.AWTException;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
@@ -30,7 +31,7 @@ public class ManualShipsProtocol extends ShipsProtocol {
       if (anchor != null) {
         // MAP IS OPEN
         _mapManager.ensureMap();
-        sendShip(_destChain);
+        sendShip(new LinkedList<Destination>(_destChain));
       }
     }
   }

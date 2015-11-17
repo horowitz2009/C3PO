@@ -68,7 +68,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static String APP_TITLE = "Seaport v0.21n";
+  private static String APP_TITLE = "Seaport v0.22ab";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -647,7 +647,7 @@ public class MainFrame extends JFrame {
           if (b) {
             _mouse.setDelayBetweenActions(500);
           } else {
-            _mouse.setDelayBetweenActions(0);
+            _mouse.setDelayBetweenActions(100);
           }
         }
       });
@@ -708,6 +708,7 @@ public class MainFrame extends JFrame {
     });
     bg.add(toggle);
     toolbar.add(toggle);
+    toggle.setSelected(true);
 
     int itemsPerRow = 3;
     int n = 0;
@@ -727,7 +728,7 @@ public class MainFrame extends JFrame {
       });
 
       bg.add(toggle);
-      toggle.setSelected(destination.getName().equals("Coastline"));
+      //toggle.setSelected(destination.getName().equals("Coastline"));
 
       n++;
       if (n > itemsPerRow) {

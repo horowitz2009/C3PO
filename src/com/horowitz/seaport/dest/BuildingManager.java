@@ -3,12 +3,10 @@ package com.horowitz.seaport.dest;
 import java.io.IOException;
 import java.util.List;
 
-import com.horowitz.commons.ImageData;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.storage.BuildingDeserializer;
-import com.horowitz.seaport.model.storage.GameUnitDeserializer;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class BuildingManager {

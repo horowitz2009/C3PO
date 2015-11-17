@@ -10,9 +10,7 @@ import org.apache.commons.io.FileUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.horowitz.commons.Pixel;
 import com.horowitz.seaport.model.Building;
-import com.horowitz.seaport.model.Building2;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.Ship;
 
