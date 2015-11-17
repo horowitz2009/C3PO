@@ -4,9 +4,9 @@ import com.horowitz.commons.RobotInterruptedException;
 
 public interface GameProtocol {
 
-  public abstract void update();
+  public void update();
 
-  public abstract void execute() throws RobotInterruptedException;
+  public void execute() throws RobotInterruptedException;
   
   
   

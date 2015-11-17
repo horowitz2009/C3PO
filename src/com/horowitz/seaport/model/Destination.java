@@ -40,4 +40,5 @@ public class Destination extends GameUnit {
   public void setRelativePosition(Pixel relativePosition) {
     _relativePosition = relativePosition;
   }
+
 }

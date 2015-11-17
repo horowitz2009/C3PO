@@ -48,7 +48,7 @@ public class ScreenScanner {
 
   private Pixel _br = null;
   private Pixel _tl = null;
-  private boolean _fullyOptimized = false;
+  private boolean _optimized = false;
   private boolean _debugMode = false;
 
   private ImageData _hooray = null;
@@ -120,7 +120,7 @@ public class ScreenScanner {
 
   private void setKeyAreas() throws IOException {
 
-    _fullyOptimized = true;
+    _optimized = true;
     Rectangle area;
     int xx;
     int yy;
@@ -300,7 +300,7 @@ public class ScreenScanner {
   }
 
   Pixel _rock = null;
-  
+
   public boolean checkAndAdjustRock() throws IOException, AWTException, RobotInterruptedException {
     boolean needRecalc = true;
     if (_rock == null) {
@@ -316,9 +316,9 @@ public class ScreenScanner {
         LOGGER.info("Skipping recalc...");
       }
     }
-    
+
     Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93, _tl.y + 254);
-    
+
     if (Math.abs(_rock.x - goodRock.x) > 5 && Math.abs(_rock.x - goodRock.y) > 5) {
       // need adjusting
       _mouse.drag(_rock.x, _rock.y, goodRock.x, goodRock.y);
@@ -326,11 +326,9 @@ public class ScreenScanner {
       _rock = findRockAgain(goodRock);
     }
 
-    
-    
     return needRecalc;
   }
-  
+
   public Pixel findRock() throws IOException, AWTException, RobotInterruptedException {
     Rectangle area = new Rectangle(_tl.x + 450, _tl.y + 43, 760, 450);
 
@@ -439,7 +437,7 @@ public class ScreenScanner {
   }
 
   public boolean isOptimized() {
-    return _fullyOptimized && _br != null && _tl != null;
+    return _optimized && _br != null && _tl != null;
   }
 
   private List<Pixel> findEdge(final BufferedImage targetImage, final BufferedImage area, ImageComparator comparator,
@@ -837,10 +835,13 @@ public class ScreenScanner {
         Pixel mp = scanOne(_mapButton, null, false);
         if (mp != null) {
           // we're home
-          for (int i = 0; i < 14; i++) {
-            _mouse.click(_zoomOut);
-            _mouse.delay(200);
-          }
+
+          _mouse.mouseMove(_zoomOut);
+          _mouse.hold(3000);
+          // for (int i = 0; i < 14; i++) {
+          // _mouse.click(_zoomOut);
+          // _mouse.delay(200);
+          // }
           _mouse.click(mp);
 
         }
@@ -850,10 +851,12 @@ public class ScreenScanner {
         Pixel ap = scanOne(_anchorButton, null, false);
         if (ap != null) {
           // map opened
-          for (int i = 0; i < 14; i++) {
-            _mouse.click(_zoomOut);
-            _mouse.delay(200);
-          }
+          _mouse.mouseMove(_zoomOut);
+          _mouse.hold(3000);
+          // for (int i = 0; i < 14; i++) {
+          // _mouse.click(_zoomOut);
+          // _mouse.delay(200);
+          // }
           _mouse.click(ap);
           _mouse.delay(250);
         }
@@ -870,6 +873,10 @@ public class ScreenScanner {
 
   public Pixel getRock() {
     return _rock;
+  }
+
+  public void setOptimized(boolean fullyOptimized) {
+    _optimized = fullyOptimized;
   }
 
 }

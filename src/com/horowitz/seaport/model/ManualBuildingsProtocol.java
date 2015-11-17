@@ -16,8 +16,6 @@ public class ManualBuildingsProtocol implements GameProtocol {
 
   public final static Logger LOGGER = Logger.getLogger(ManualBuildingsProtocol.class.getName());
 
-  private List<Pixel> _fishes;
-
   private ScreenScanner _scanner;
   private MouseRobot _mouse;
 

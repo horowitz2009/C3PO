@@ -52,6 +52,14 @@ public class MapManager {
     return _ships;
   }
 
+  public Ship getShip(String name) {
+    for (Ship ship : _ships) {
+      if (ship.getName().equals(name))
+        return ship;
+    }
+    return null;
+  }
+
   public void update() throws IOException, RobotInterruptedException {
     deserializeDestinations2();
     deserializeShips();
@@ -130,8 +138,6 @@ public class MapManager {
     return null;
   }
 
-
-
   public void ensureMap() throws AWTException, RobotInterruptedException {
     // MAP ZONE
     Destination _market = getMarket();
@@ -159,7 +165,6 @@ public class MapManager {
       if (newMarketPos == null)
         newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
 
-      
       if (_marketPos.equals(newMarketPos)) {
         LOGGER.info("Market found in the same place.");
       }

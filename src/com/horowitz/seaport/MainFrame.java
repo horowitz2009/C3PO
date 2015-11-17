@@ -54,10 +54,12 @@ import com.horowitz.commons.TemplateMatcher;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.Building;
+import com.horowitz.seaport.model.CocoaProtocol1;
+import com.horowitz.seaport.model.CocoaProtocol2;
 import com.horowitz.seaport.model.Destination;
-import com.horowitz.seaport.model.FirstShipsProtocol;
 import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
+import com.horowitz.seaport.model.ManualShipsProtocol;
 import com.horowitz.seaport.model.Task;
 
 public class MainFrame extends JFrame {
@@ -66,7 +68,7 @@ public class MainFrame extends JFrame {
 
   private final static Logger LOGGER = Logger.getLogger(MainFrame.class.getName());
 
-  private static String APP_TITLE = "Seaport v0.021";
+  private static String APP_TITLE = "Seaport v0.21n";
 
   private Settings _settings;
   private MouseRobot _mouse;
@@ -84,6 +86,10 @@ public class MainFrame extends JFrame {
 
   private MapManager _mapManager;
   private BuildingManager _buildingManager;
+
+  private CocoaProtocol1 _cocoaProtocol1;
+  private CocoaProtocol2 _cocoaProtocol2;
+  private ManualShipsProtocol _manualShipsProtocol;
 
   // private Pixel _rock;
   private Pixel _marketPos;
@@ -148,7 +154,6 @@ public class MainFrame extends JFrame {
       _mouse = _scanner.getMouse();
       _mapManager = new MapManager(_scanner);
       _mapManager.loadData();
-      _market = _mapManager.getMarket();
 
       _buildingManager = new BuildingManager(_scanner);
       _buildingManager.loadData();
@@ -168,8 +173,16 @@ public class MainFrame extends JFrame {
 
       // SHIPS TASK
       _shipsTask = new Task("Ships", 2);
-      FirstShipsProtocol shipsProtocol = new FirstShipsProtocol(_scanner, _mouse, _mapManager);
-      _shipsTask.setProtocol(shipsProtocol);
+      _cocoaProtocol1 = new CocoaProtocol1(_scanner, _mouse, _mapManager);// TODO
+                                                                          // make
+                                                                          // it
+                                                                          // real,
+                                                                          // dude
+      _cocoaProtocol2 = new CocoaProtocol2(_scanner, _mouse, _mapManager);
+      _manualShipsProtocol = new ManualShipsProtocol(_scanner, _mouse, _mapManager);
+      _manualShipsProtocol.setDestination(_mapManager.getDestination("Coastline"));
+
+      _shipsTask.setProtocol(_manualShipsProtocol);
       _tasks.add(_shipsTask);
 
       // BUILDING TASK
@@ -317,7 +330,7 @@ public class MainFrame extends JFrame {
     // TODO THIS IS UGLY
     FishingProtocol.LOGGER.addHandler(handler);
     ManualBuildingsProtocol.LOGGER.addHandler(handler);
-    FirstShipsProtocol.LOGGER.addHandler(handler);
+    CocoaProtocol2.LOGGER.addHandler(handler);
 
     return new JScrollPane(outputConsole);
   }
@@ -600,11 +613,28 @@ public class MainFrame extends JFrame {
 
     // SCAN
     {
+      // SHIPS
       _shipsToggle = new JToggleButton("Ships");
+      _shipsToggle.setSelected(true);
+      _shipsToggle.addItemListener(new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          boolean b = e.getStateChange() == ItemEvent.SELECTED;
+          _shipsTask.setEnabled(b);
+        }
+      });
       toolbar.add(_shipsToggle);
 
+      // BUILDINGS
       _industriesToggle = new JToggleButton("Industries");
       _industriesToggle.setSelected(true);
+      _industriesToggle.addItemListener(new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          boolean b = e.getStateChange() == ItemEvent.SELECTED;
+          _buildingsTask.setEnabled(b);
+        }
+      });
       toolbar.add(_industriesToggle);
 
       _slowToggle = new JToggleButton("Slow");
@@ -641,10 +671,6 @@ public class MainFrame extends JFrame {
     return toolbar;
   }
 
-  private Destination _dest = null;
-
-  private Destination _market;
-
   @SuppressWarnings("serial")
   private List<JToolBar> createToolbars3() {
     List<JToolBar> toolbars = new ArrayList<>();
@@ -653,19 +679,55 @@ public class MainFrame extends JFrame {
 
     // DESTINATIONS GO HERE
     ButtonGroup bg = new ButtonGroup();
+
+    JToggleButton toggle = new JToggleButton(new AbstractAction("Cocoa 1.0") {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        LOGGER.info("Cocoa Protocol 1.0: ");
+        LOGGER.info("Send all ships to Cocoa plant, then all to market");
+        LOGGER.info("Time: 2h 30m ");
+        _shipsTask.setProtocol(_cocoaProtocol1);
+        _shipsTask.getProtocol().update();
+      }
+    });
+    bg.add(toggle);
+    toolbar.add(toggle);
+
+    toggle = new JToggleButton(new AbstractAction("Cocoa 2.0") {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        LOGGER.info("Cocoa Protocol 2.0: ");
+        LOGGER.info("Send half ships to Cocoa plant");
+        LOGGER.info("One specific ship sells cocoa.");
+        LOGGER.info("The rest go to Gulf.");
+        LOGGER.info("Time: 2h");
+        _shipsTask.setProtocol(_cocoaProtocol2);
+        _shipsTask.getProtocol().update();
+
+      }
+    });
+    bg.add(toggle);
+    toolbar.add(toggle);
+
     int itemsPerRow = 3;
     int n = 0;
     for (final Destination destination : _mapManager.getDestinations()) {
 
-      JToggleButton toggle = new JToggleButton(new AbstractAction(destination.getName()) {
+      toggle = new JToggleButton(new AbstractAction(destination.getName()) {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-          LOGGER.info("Destination: " + destination.getName());
-          _dest = destination;
+          LOGGER.info("Simple protocol: ");
+          LOGGER.info("Send all ships to: " + destination.getName());
+          LOGGER.info("Time: " + destination.getTime());// TODO format time
+          _manualShipsProtocol.setDestination(destination);
+          _shipsTask.setProtocol(_manualShipsProtocol);
+          _shipsTask.getProtocol().update();
         }
       });
+
       bg.add(toggle);
+      toggle.setSelected(destination.getName().equals("Coastline"));
 
       n++;
       if (n > itemsPerRow) {
@@ -866,10 +928,6 @@ public class MainFrame extends JFrame {
 
   private void scan() throws RobotInterruptedException {
     try {
-      LOGGER.info("Loading data...");
-
-      // _buildingLocationsREF = new JsonStorage().loadBuildings();
-
       LOGGER.info("Scanning...");
       setTitle(APP_TITLE + " ...");
       boolean found = _scanner.locateGameArea(false);
@@ -996,7 +1054,8 @@ public class MainFrame extends JFrame {
         // long now = System.currentTimeMillis();
         // if (now - start > 11*60000) {
         for (Task task : _tasks) {
-          task.execute();
+          if (task.isEnabled())
+            task.execute();
         }
         // start = System.currentTimeMillis();
         // }
@@ -1051,7 +1110,18 @@ public class MainFrame extends JFrame {
           }
 
           LOGGER.info("Game crashed. Reloading...");
-          _mouse.delay(8000);
+          _mouse.delay(15000);
+          for (int i = 0; i < 15; i++) {
+            _scanner.setOptimized(false);
+            scan();
+            if (_scanner.isOptimized()) {
+              break;
+            }
+            _mouse.delay(3000);
+          }
+          LOGGER.info("===========================");
+          LOGGER.info("Game failed to recover!!!");
+          LOGGER.info("===========================");
           return;
         } else {
           _mouse.delay(150);

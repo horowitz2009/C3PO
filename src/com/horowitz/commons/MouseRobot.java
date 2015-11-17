@@ -212,4 +212,12 @@ public class MouseRobot {
   public void setDelayBetweenActions(int delayBetweenActions) {
     _delayBetweenActions = delayBetweenActions;
   }
+
+  public void hold(int msec) {
+    Robot robot = getInstance();
+    robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+    robot.delay(msec);
+    robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+    robot.delay(_delayBetweenActions);
+  }
 }

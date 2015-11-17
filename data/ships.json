@@ -9,6 +9,24 @@
     "_imageTitle": "ships/BerrioS.bmp"
   },
   {
+    "_name": "Trinidad",
+    "_crew": 50,
+    "_capacity": 14,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/TrinidadS.bmp"
+  },
+  {
+    "_name": "Golden Hind",
+    "_crew": 40,
+    "_capacity": 15,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/GoldenHindS.bmp"
+  },
+  {
     "_name": "Hulk Zigmund",
     "_crew": 50,
     "_capacity": 14,
@@ -27,11 +45,20 @@
     "_imageTitle": "ships/MaryRoseS.bmp"
   },
   {
+    "_name": "Adler Von Lubeck",
+    "_crew": 40,
+    "_capacity": 14,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/AdlerVonLubeckS.bmp"
+  },
+  {
     "_name": "Peter Von Danzig",
     "_crew": 50,
     "_capacity": 14,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/PeterVonDanzigS.bmp"
   },
@@ -40,7 +67,7 @@
     "_crew": 50,
     "_capacity": 14,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/RolandVonBremenS.bmp"
   },
@@ -76,7 +103,7 @@
     "_crew": 50,
     "_capacity": 14,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/VenetianS.bmp"
   }

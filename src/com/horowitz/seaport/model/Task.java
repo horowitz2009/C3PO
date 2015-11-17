@@ -6,16 +6,19 @@ import com.horowitz.commons.RobotInterruptedException;
 
 public class Task implements Cloneable, Serializable {
 
+  private static final long serialVersionUID = -7911501509255495065L;
   private String _name;
   private int _frequency;
   private boolean _active;
   private String _imageName;
   private GameProtocol _protocol;
+  private boolean _enabled;
 
   public Task(String name, int frequency) {
     super();
     _name = name;
     _frequency = frequency;
+    _enabled = true;
   }
 
   public String getName() {
@@ -67,6 +70,14 @@ public class Task implements Cloneable, Serializable {
     // TODO Auto-generated method stub
     if (_protocol != null)
       _protocol.execute();
+  }
+
+  public boolean isEnabled() {
+    return _enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    _enabled = enabled;
   }
 
 }
