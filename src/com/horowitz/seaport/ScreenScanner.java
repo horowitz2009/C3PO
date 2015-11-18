@@ -904,7 +904,7 @@ public class ScreenScanner {
 	public boolean isHome() throws AWTException, RobotInterruptedException {
 		return scanOne(_mapButton, null, false) != null;
 	}
-	
+
 	public boolean isMap() throws AWTException, RobotInterruptedException {
 		return scanOne(_anchorButton, null, false) != null;
 	}
@@ -916,24 +916,24 @@ public class ScreenScanner {
 		Pixel p = scanOneFast("greenX.bmp", null, true);
 		found = p != null;
 		if (!found) {
-			
-			//red x - wide popup
+
+			// red x - wide popup
 			xx = (getGameWidth() - 624) / 2;
 			area = new Rectangle(_tl.x + xx + 624 - 30, _tl.y + 71, 60, 42);
 			found = scanOneFast("redX.bmp", area, true) != null;
-			
-			//red x - tiny popup
+
+			// red x - tiny popup
 			xx = (getGameWidth() - 282) / 2;
 			area = new Rectangle(_tl.x + xx + 282, _tl.y + 71, 40, 40);
 			found = found || scanOneFast("redX.bmp", area, true) != null;
-			
+
 		}
 
 		return found;
 	}
-	
+
 	public void fixRock() {
-		
+
 	}
 
 	public boolean ensureHome() throws AWTException, IOException, RobotInterruptedException {
@@ -942,14 +942,17 @@ public class ScreenScanner {
 			home = locateGameArea(false);
 			// for sure we're home
 		} else {
-			if(handlePopups())
+			_mouse.click(getSafePoint());
+			_mouse.delay(300);
+
+			if (handlePopups())
 				_mouse.delay(500);
 			home = isHome();
 		}
 
 		if (!home) {
 			// try popups first
-			if(handlePopups()) {
+			if (handlePopups()) {
 				_mouse.delay(500);
 			} else {
 				if (isMap()) {
@@ -958,12 +961,12 @@ public class ScreenScanner {
 				}
 			}
 		}
-		
-		if(isHome()) {
-		  //fix zoom
+
+		if (isHome()) {
+			// fix zoom
 			zoomOut();
 			return checkAndAdjustRock();
-				
+
 		}
 
 		return false;

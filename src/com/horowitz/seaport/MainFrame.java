@@ -74,7 +74,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.23m";
+	private static String APP_TITLE = "Seaport v0.23p";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -744,6 +744,10 @@ public class MainFrame extends JFrame {
 		toolbar.add(toggle);
 		toggle.setSelected(true);
 
+		toolbars.add(toolbar);
+		toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+
 		int itemsPerRow = 3;
 		int n = 0;
 		for (final Destination destination : _mapManager.getDestinations()) {
@@ -1091,7 +1095,7 @@ public class MainFrame extends JFrame {
 
 			do {
 				// 1. SCAN
-				// handlePopups(false);
+				handlePopups(false);
 				// recalcPositions(false, 1);
 
 				// 2. DO TASKS
@@ -1130,7 +1134,10 @@ public class MainFrame extends JFrame {
 			LOGGER.info("Popups...");
 			boolean found = false;
 			Pixel p = null;
-
+			if (_scanner.isOptimized()) {
+				_mouse.click(_scanner.getSafePoint());
+				_mouse.delay(300);
+			}
 			found = _scanner.scanOneFast("anchor.bmp", null, true) != null;
 
 			if (found)

@@ -78,6 +78,15 @@ public class ManualBuildingsProtocol implements GameProtocol {
 			// check if popup is opened, else click again
 			Rectangle area = new Rectangle(p1.x - 80, p1.y + 41, 160, 75);
 			Pixel gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
+			if  (gears == null) {
+				_mouse.delay(100);
+				_mouse.mouseMove(_scanner.getParkingPoint());
+				_mouse.delay(800);
+				_mouse.click(p1);
+				_mouse.delay(800);
+				gears = _scanner.scanOneFast("buildings/gears2.bmp", area, true);
+			}
+
 			// if (gears == null) {
 			// LOGGER.info("click again...");
 			// _mouse.click(p1);
