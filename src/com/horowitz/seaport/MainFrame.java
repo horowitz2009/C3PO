@@ -74,7 +74,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.22neezle";
+	private static String APP_TITLE = "Seaport v0.23m";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -340,6 +340,13 @@ public class MainFrame extends JFrame {
 		return new JScrollPane(outputConsole);
 	}
 
+	/**
+	 * 
+	 * @param click
+	 * @param attempt
+	 * @throws RobotInterruptedException
+	 * @deprecated
+	 */
 	private void recalcPositions(boolean click, int attempt) throws RobotInterruptedException {
 		try {
 			if (!_scanner.isOptimized()) {
@@ -956,11 +963,12 @@ public class MainFrame extends JFrame {
 
 	private void scan() throws RobotInterruptedException {
 		try {
+			_mouse.savePosition();
 			LOGGER.info("Scanning...");
 			setTitle(APP_TITLE + " ...");
 			boolean found = _scanner.locateGameArea(false);
 			if (found) {
-
+				_scanner.checkAndAdjustRock();
 				_mapManager.update();
 				_buildingManager.update();
 				_marketPos = null;
@@ -971,6 +979,7 @@ public class MainFrame extends JFrame {
 
 				LOGGER.info("GAME FOUND! INSOMNIA READY!");
 				setTitle(APP_TITLE + " READY");
+				_mouse.restorePosition();
 			} else {
 				LOGGER.info("CAN'T FIND THE GAME!");
 				setTitle(APP_TITLE);
@@ -1073,17 +1082,32 @@ public class MainFrame extends JFrame {
 
 		try {
 			long start = System.currentTimeMillis();
+			// initial recalc
+			// recalcPositions(false, 2);
+			for (Task task : _tasks) {
+				if (task.isEnabled())
+					task.update();
+			}
+
 			do {
 				// 1. SCAN
-				handlePopups(false);
-				recalcPositions(false, 1);
+				// handlePopups(false);
+				// recalcPositions(false, 1);
 
 				// 2. DO TASKS
 				// long now = System.currentTimeMillis();
 				// if (now - start > 11*60000) {
 				for (Task task : _tasks) {
-					if (task.isEnabled())
-						task.execute();
+					if (task.isEnabled()) {
+						try {
+							task.preExecute();
+							task.execute();
+						} catch (AWTException e) {
+							LOGGER.info("FAILED TO execute task: " + task.getName());
+						} catch (IOException e) {
+							LOGGER.info("FAILED TO execute task: " + task.getName());
+						}
+					}
 				}
 				// start = System.currentTimeMillis();
 				// }
@@ -1139,20 +1163,22 @@ public class MainFrame extends JFrame {
 
 					LOGGER.info("Game crashed. Reloading...");
 					_mouse.delay(15000);
+					boolean recovered = false;
 					for (int i = 0; i < 15; i++) {
 						_scanner.setOptimized(false);
 						scan();
 						if (_scanner.isOptimized()) {
+							recovered = true;
 							break;
 						}
 						_mouse.delay(3000);
 					}
-					LOGGER.info("===========================");
-					LOGGER.info("Game failed to recover!!!");
-					LOGGER.info("===========================");
-					return;
-				} else {
-					_mouse.delay(150);
+					if (!recovered) {
+						LOGGER.info("===========================");
+						LOGGER.info("Game failed to recover!!!");
+						LOGGER.info("===========================");
+						return;
+					}
 				}
 			}
 

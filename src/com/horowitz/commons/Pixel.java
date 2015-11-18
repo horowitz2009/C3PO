@@ -65,6 +65,8 @@ public class Pixel implements Comparable<Pixel>, Cloneable, Serializable {
   }
 
   public boolean equals(final Object other) {
+  	if (other == null)
+  		return false;
     if (this == other) {
       return true;
     }

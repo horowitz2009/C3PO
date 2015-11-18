@@ -19,8 +19,8 @@ public class ManualShipsProtocol extends ShipsProtocol {
 	}
 
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
-
 		if (_dest != null) {
+
 			scanShipName(pin);
 
 			_mouse.click(pin);
@@ -32,6 +32,10 @@ public class ManualShipsProtocol extends ShipsProtocol {
 			if (anchor != null) {
 				// MAP IS OPEN
 				_mapManager.ensureMap();
+
+				_destChain.clear();
+				_destChain.add(_dest);
+
 				sendShip(new LinkedList<Destination>(_destChain));
 			}
 		}
@@ -43,12 +47,6 @@ public class ManualShipsProtocol extends ShipsProtocol {
 
 	public void setDestination(Destination dest) {
 		_dest = dest;
-		_destChain.clear();
-		_destChain.add(_dest);
 	}
 
-	@Override
-	public void update() {
-		super.update();
-	}
 }

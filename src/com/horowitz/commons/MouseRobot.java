@@ -60,7 +60,80 @@ public class MouseRobot {
     mouseMove(x, y);
     click();
   }
+  
+  public void drag2(int x1, int y1, int x2, int y2) throws RobotInterruptedException {
+    Robot robot = getInstance();
+    mouseMove(x1, y1);
+    saveCurrentPosition();
+    robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+    delay(400);
+    // checkUserMovement();
+    int x = x1;
+    int y = y1;
+    int maxStep = 10;
+    int step = maxStep;
 
+    if (x1 != x2) {// move horizontally with high precision
+      int a = x2 - x1;
+      int d = Math.abs(a);
+      step = d <= maxStep ? d : maxStep;
+      double turns = d / step;
+      // case 1 - a > 0 => moving east
+
+      x = x + (a > 0 ? 7 : -7);
+      mouseMove(x, y);
+      delay(200);
+
+      for (int i = 0; i < turns; i++) {
+        x = x + (a > 0 ? step : -step);
+        mouseMove(x, y);
+        delay(70);
+      }
+      int rest = d % step;
+      x = x + (a > 0 ? rest : -rest);
+      mouseMove(x, y);
+      delay(70);
+      
+      //move a bit farther and then back
+      x = x + (a > 0 ? 5 : -5);
+      mouseMove(x, y);
+      delay(470);
+      x = x - (a > 0 ? 5 : -5);
+      mouseMove(x, y);
+      delay(270);
+    }
+
+    if (y1 != y2) {// move vertically with high precision
+      int b = y2 - y1;
+      int d = Math.abs(b);
+      step = d <= maxStep ? d : maxStep;
+      double turns = d / step;
+      for (int i = 0; i < turns; i++) {
+        y = y + (b > 0 ? step : -step);
+        mouseMove(x, y);
+        delay(70);
+      }
+      int rest = d % step;
+      y = y + (b > 0 ? rest : -rest);
+      mouseMove(x, y);
+      delay(70);
+      
+      //move a bit farther and then back
+      y = y + (b > 0 ? 5 : -5);
+      mouseMove(x, y);
+      delay(470);
+      y = y - (b > 0 ? 5 : -5);
+      mouseMove(x, y);
+      delay(270);
+
+    }
+
+    
+    delay(200);
+    robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+    saveCurrentPosition();
+  }
+  
   public void drag(int x1, int y1, int x2, int y2) throws RobotInterruptedException {
     Robot robot = getInstance();
     mouseMove(x1, y1);
@@ -106,7 +179,7 @@ public class MouseRobot {
         // checkUserMovement();
       }
     }
-    delay(2000);
+    delay(200);
     robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
     saveCurrentPosition();
   }

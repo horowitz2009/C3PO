@@ -35,55 +35,67 @@ public class CocoaProtocol2 extends ShipsProtocol {
 		_sellingShip = "Sao Gabriel";
 	}
 
+	private boolean isCocoaShip(Ship whatShip) {
+		for (String name : _cocoaShips) {
+			if (whatShip.getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
 
 		Ship whatShip = scanShipName(pin);
 
-		Destination dest = null;
-		// Destination dest2 = null;
-		if (whatShip != null) {
-			if (whatShip.getName().equals(_sellingShip)) {
-				dest = _mapManager.getMarket();
+		_mouse.click(pin);
+		_mouse.delay(50);
+		_mouse.mouseMove(_scanner.getParkingPoint());
+		_mouse.delay(500);
 
+		Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
+		if (anchor != null) {
+			// MAP IS OPEN
+			_mapManager.ensureMap();
+
+			// load the chain
+			_destChain.clear();
+			// _destChain.add(_mapManager.getDestination("Cocoa Plant"));
+			// _destChain.add(_mapManager.getMarket());
+			// _destChain.add(_mapManager.getDestination("Gulf"));
+			// _destChain.add(_mapManager.getDestination("Coastline"));
+			// _destChain.add(_mapManager.getDestination("Small Town"));
+
+			Destination dest = null;
+
+			if (whatShip != null) {
+				if (whatShip.getName().equals(_sellingShip)) {
+					LOGGER.info("SELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+					_destChain.add(_mapManager.getMarket());
+					_destChain.add(_mapManager.getDestination("Coastline"));
+					_destChain.add(_mapManager.getDestination("Small Town"));
+				} else if (isCocoaShip(whatShip)) {
+					LOGGER.info("COCOCOCOCOCOCCOCOCOCCOCOCOCOCOCOAAAAAAA");
+					_destChain.add(_mapManager.getDestination("Cocoa Plant"));
+					_destChain.add(_mapManager.getDestination("Coastline"));
+
+				} else {
+					// other ships goes to Gulf
+					LOGGER.info("GULFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+					_destChain.add(_mapManager.getDestination("Gulf"));
+					_destChain.add(_mapManager.getDestination("Coastline"));
+				}
 			} else {
-				for (String name : _cocoaShips) {
-					if (whatShip.getName().equals(name)) {
-						dest = _mapManager.getDestination("Cocoa Plant");
-						break;
-					}
-				}
-				if (dest == null) {
-					for (String name : _otherShips) {
-						if (whatShip.getName().equals(name)) {
-							dest = _mapManager.getDestination("Coastline");
-							break;
-						}
-					}
-				}
-				if (dest == null) {
-					dest = _mapManager.getDestination("Gulf");
-				}
+				LOGGER.info("WARNING: This ship is uknown to me!");
+				LOGGER.info("WARNING: Applying default chain: ");
+				LOGGER.info("WARNING: Gulf->Coastline->Small Town ");
+
+				_destChain.add(_mapManager.getDestination("Gulf"));
+				_destChain.add(_mapManager.getDestination("Coastline"));
+				_destChain.add(_mapManager.getDestination("Small Town"));
 			}
-		}
 
-		if (dest == null) {
-			dest = _mapManager.getDestination("Gulf");
-		}
-
-		if (dest != null) {
-			_mouse.click(pin);
-			_mouse.delay(50);
-			_mouse.mouseMove(_scanner.getParkingPoint());
-			_mouse.delay(500);
-
-			Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
-			if (anchor != null) {
-				// MAP IS OPEN
-				_mapManager.ensureMap();
-
-				final LinkedList<Destination> chain = generatePartialChain(dest);
-				sendShip(chain);
-			}
+			sendShip(new LinkedList<Destination>(_destChain));
 		}
 
 	}
@@ -103,16 +115,5 @@ public class CocoaProtocol2 extends ShipsProtocol {
 		return res;
 	}
 
-	@Override
-	public void update() {
-		super.update();
-		// build the chain for this protocol
-		_destChain.clear();
-		_destChain.add(_mapManager.getDestination("Cocoa Plant"));
-		_destChain.add(_mapManager.getMarket());
-		_destChain.add(_mapManager.getDestination("Gulf"));
-		_destChain.add(_mapManager.getDestination("Coastline"));
-		_destChain.add(_mapManager.getDestination("Small Town"));
-	}
 
 }

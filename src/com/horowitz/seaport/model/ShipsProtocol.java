@@ -42,6 +42,21 @@ public abstract class ShipsProtocol implements GameProtocol {
 		_destChain = new LinkedList<Destination>();
 	}
 
+	public boolean preExecute() throws AWTException, IOException, RobotInterruptedException {
+		return _scanner.ensureHome();
+	}
+
+	public void update() {
+		_shipLocations = new ArrayList<>();
+		Pixel[] shipLocations = _scanner.getShipLocations();
+		Pixel r = _scanner.getRock();
+		if (r != null)
+			for (Pixel p : shipLocations) {
+				Pixel goodP = new Pixel(r.x + p.x, r.y + p.y);
+				_shipLocations.add(goodP);
+			}
+	}
+
 	public void execute() throws RobotInterruptedException {
 		if (_shipLocations != null && !_shipLocations.isEmpty()) {
 			for (Pixel pixel : _shipLocations) {
@@ -65,12 +80,6 @@ public abstract class ShipsProtocol implements GameProtocol {
 
 		}
 
-		List<Ship> ships = _mapManager.getShips();
-		for (Ship b : ships) {
-			if (b.isActive()) {
-				// TODO
-			}
-		}
 	}
 
 	abstract void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException;
@@ -168,17 +177,6 @@ public abstract class ShipsProtocol implements GameProtocol {
 				LOGGER.info("========");
 			}
 		}
-	}
-
-	public void update() {
-		_shipLocations = new ArrayList<>();
-		Pixel[] shipLocations = _scanner.getShipLocations();
-		Pixel r = _scanner.getRock();
-		if (r != null)
-			for (Pixel p : shipLocations) {
-				Pixel goodP = new Pixel(r.x + p.x, r.y + p.y);
-				_shipLocations.add(goodP);
-			}
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
