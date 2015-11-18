@@ -25,13 +25,13 @@ public class Stats {
 
 	public void registerShip(Ship ship) {
 		// TODO in future you can extract more data from that ship
-		register(ship.getName());
+		register(ship != null? ship.getName() : "unknown ship");
 		register("SHIPS");
 	}
 
 	public void registerDestination(Destination dest) {
 		// TODO in future you can extract more data from that dest
-		register(dest.getName());
+		register(dest != null? dest.getName():"unknown destination");
 		register("DESTINATIONS");
 	}
 
