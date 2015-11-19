@@ -194,7 +194,7 @@ public class ScreenScanner {
 		ImageData wa = getImageData("buildings/whiteArrow.bmp", _popupArea, 0, 0);
 		wa.setColorToBypass(Color.BLACK);
 
-		getImageData("buildings/produce.bmp", _popupAreaB, 0, 0);
+		getImageData("buildings/produce2.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/produceGray.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/x.bmp", _popupAreaX, 10, 10);
 		getImageData("greenX.bmp", new Rectangle(_br.x - 28, _tl.y + 57, 22, 20), 9, 9);

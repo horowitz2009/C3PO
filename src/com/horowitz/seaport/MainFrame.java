@@ -74,7 +74,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.23p4";
+	private static String APP_TITLE = "Seaport v0.23qb";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -242,7 +242,7 @@ public class MainFrame extends JFrame {
 		toolbars.add(mainToolbar4);
 		
 		
-		toolbars.add(createToolbar5());
+		//toolbars.add(createToolbar5());
 		
 
 		Box north = Box.createVerticalBox();
@@ -826,22 +826,6 @@ public class MainFrame extends JFrame {
 		toolbar.setFloatable(false);
 		
 		// Temp bar for custom protocol
-		
-		
-		for (final Building b : _buildingManager.getBuildings()) {
-			final JToggleButton toggle = new JToggleButton(b.getName());
-			toggle.addItemListener(new ItemListener() {
-				
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					b.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
-					LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
-				}
-			});
-			//
-			toggle.setSelected(b.isEnabled());
-			toolbar.add(toggle);
-		}
 		return toolbar;
 	}
 	
