@@ -10,7 +10,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public class CocoaProtocol1 extends ShipsProtocol {
+public class CocoaProtocol1 extends BaseShipProtocol {
 
 	private String _noCocoaShip;
 

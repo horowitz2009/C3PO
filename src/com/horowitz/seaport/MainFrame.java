@@ -64,7 +64,7 @@ import com.horowitz.seaport.model.CocoaProtocol2;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
-import com.horowitz.seaport.model.ManualShipsProtocol;
+import com.horowitz.seaport.model.ManualShipProtocol;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.Task;
 
@@ -74,7 +74,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.23p";
+	private static String APP_TITLE = "Seaport v0.23p4";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -96,7 +96,7 @@ public class MainFrame extends JFrame {
 
 	private CocoaProtocol1 _cocoaProtocol1;
 	private CocoaProtocol2 _cocoaProtocol2;
-	private ManualShipsProtocol _manualShipsProtocol;
+	private ManualShipProtocol _manualShipsProtocol;
 
 	// private Pixel _rock;
 	private Pixel _marketPos;
@@ -185,7 +185,7 @@ public class MainFrame extends JFrame {
 			_shipsTask = new Task("Ships", 2);
 			_cocoaProtocol1 = new CocoaProtocol1(_scanner, _mouse, _mapManager);
 			_cocoaProtocol2 = new CocoaProtocol2(_scanner, _mouse, _mapManager);
-			_manualShipsProtocol = new ManualShipsProtocol(_scanner, _mouse, _mapManager);
+			_manualShipsProtocol = new ManualShipProtocol(_scanner, _mouse, _mapManager);
 			_cocoaProtocol1.addPropertyChangeListener(new StatsListener());
 			_cocoaProtocol2.addPropertyChangeListener(new StatsListener());
 			_manualShipsProtocol.addPropertyChangeListener(new StatsListener());
@@ -240,6 +240,10 @@ public class MainFrame extends JFrame {
 			toolbars.add(jToolBar);
 		}
 		toolbars.add(mainToolbar4);
+		
+		
+		toolbars.add(createToolbar5());
+		
 
 		Box north = Box.createVerticalBox();
 		north.add(toolbars);
@@ -714,9 +718,14 @@ public class MainFrame extends JFrame {
 		// DESTINATIONS GO HERE
 		ButtonGroup bg = new ButtonGroup();
 
-		JToggleButton toggle = new JToggleButton(new AbstractAction("Cocoa 1.0") {
+		JToggleButton toggle;
+
+		// COCOA 1
+		toggle = new JToggleButton("Cocoa 1.0");
+		toggle.addItemListener(new ItemListener() {
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void itemStateChanged(ItemEvent e) {
 				LOGGER.info("Cocoa Protocol 1.0: ");
 				LOGGER.info("Send all ships to Cocoa plant, then all to market");
 				LOGGER.info("Time: 2h 30m ");
@@ -724,12 +733,17 @@ public class MainFrame extends JFrame {
 				_shipsTask.getProtocol().update();
 			}
 		});
+
 		bg.add(toggle);
 		toolbar.add(toggle);
 
-		toggle = new JToggleButton(new AbstractAction("Cocoa 2.0") {
+		// COCOA 2
+		toggle = new JToggleButton("Cocoa 2.0");
+		JToggleButton selected = toggle;
+		toggle.addItemListener(new ItemListener() {
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void itemStateChanged(ItemEvent e) {
 				LOGGER.info("Cocoa Protocol 2.0: ");
 				LOGGER.info("Send half ships to Cocoa plant");
 				LOGGER.info("One specific ship sells cocoa.");
@@ -737,13 +751,13 @@ public class MainFrame extends JFrame {
 				LOGGER.info("Time: 2h");
 				_shipsTask.setProtocol(_cocoaProtocol2);
 				_shipsTask.getProtocol().update();
-
 			}
 		});
+
 		bg.add(toggle);
 		toolbar.add(toggle);
-		toggle.setSelected(true);
 
+		// MANUAL SHIP PROTOCOL
 		toolbars.add(toolbar);
 		toolbar = new JToolBar();
 		toolbar.setFloatable(false);
@@ -752,10 +766,11 @@ public class MainFrame extends JFrame {
 		int n = 0;
 		for (final Destination destination : _mapManager.getDestinations()) {
 
-			toggle = new JToggleButton(new AbstractAction(destination.getName()) {
+			toggle = new JToggleButton(destination.getName());
+			toggle.addItemListener(new ItemListener() {
 
 				@Override
-				public void actionPerformed(ActionEvent e) {
+				public void itemStateChanged(ItemEvent e) {
 					LOGGER.info("Simple protocol: ");
 					LOGGER.info("Send all ships to: " + destination.getName());
 					LOGGER.info("Time: " + destination.getTime());// TODO format time
@@ -764,7 +779,6 @@ public class MainFrame extends JFrame {
 					_shipsTask.getProtocol().update();
 				}
 			});
-
 			bg.add(toggle);
 			// toggle.setSelected(destination.getName().equals("Coastline"));
 
@@ -778,6 +792,8 @@ public class MainFrame extends JFrame {
 			toolbar.add(toggle);
 
 		}
+
+		selected.setSelected(true);
 		return toolbars;
 	}
 
@@ -790,7 +806,6 @@ public class MainFrame extends JFrame {
 
 		for (final Building b : _buildingManager.getBuildings()) {
 			final JToggleButton toggle = new JToggleButton(b.getName());
-			toggle.setSelected(b.isEnabled());
 			toggle.addItemListener(new ItemListener() {
 
 				@Override
@@ -800,11 +815,36 @@ public class MainFrame extends JFrame {
 				}
 			});
 			//
+			toggle.setSelected(b.isEnabled());
 			toolbar.add(toggle);
 		}
 		return toolbar;
 	}
 
+	private JToolBar createToolbar5() {
+		JToolBar toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+		
+		// Temp bar for custom protocol
+		
+		
+		for (final Building b : _buildingManager.getBuildings()) {
+			final JToggleButton toggle = new JToggleButton(b.getName());
+			toggle.addItemListener(new ItemListener() {
+				
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					b.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
+				}
+			});
+			//
+			toggle.setSelected(b.isEnabled());
+			toolbar.add(toggle);
+		}
+		return toolbar;
+	}
+	
 	@SuppressWarnings("serial")
 	private JToolBar createTestToolbar() {
 		JToolBar toolbar = new JToolBar();

@@ -1,0 +1,33 @@
+[
+  {
+    "_name": "noname",
+    "_slot": -1,
+    "_enabled": false,
+    "_entries": [
+      {
+        "_shipName": "Golden Hind",
+        "_chainStr": "CP,MC"
+      },
+      {
+        "_shipName": "Adler Von Lubeck",
+        "_chainStr": "CP,MX"
+      },
+      {
+        "_shipName": "Trinidad",
+        "_chainStr": "C,S"
+      },
+      {
+        "_shipName": "Mary Rose",
+        "_chainStr": "G,C,S"
+      },
+      {
+        "_shipName": "\u003cRest\u003e",
+        "_chainStr": "G"
+      },
+      {
+        "_shipName": "\u003cUnknown\u003e",
+        "_chainStr": "C"
+      }
+    ]
+  }
+]

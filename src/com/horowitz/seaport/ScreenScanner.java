@@ -717,7 +717,7 @@ public class ScreenScanner {
 		if (pixel != null) {
 			pixel.x += (area.x + imageData.get_xOff());
 			pixel.y += (area.y + imageData.get_yOff());
-			LOGGER.info("found : " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
+			LOGGER.fine("found : " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
 			if (click) {
 				_mouse.click(pixel.x, pixel.y);
 			}
@@ -744,7 +744,7 @@ public class ScreenScanner {
 		if (pixel != null) {
 			pixel.x += (area.x + imageData.get_xOff());
 			pixel.y += (area.y + imageData.get_yOff());
-			LOGGER.info("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
+			LOGGER.fine("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
 			if (click) {
 				_mouse.click(pixel.x, pixel.y);
 				_mouse.delay(100);
@@ -767,7 +767,7 @@ public class ScreenScanner {
 		if (pixel != null) {
 			pixel.x += (area.x + imageData.get_xOff());
 			pixel.y += (area.y + imageData.get_yOff());
-			LOGGER.info("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
+			LOGGER.fine("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
 			if (click) {
 				_mouse.click(pixel.x, pixel.y);
 			}
@@ -792,7 +792,7 @@ public class ScreenScanner {
 		if (pixel != null) {
 			pixel.x += (area.x + imageData.get_xOff());
 			pixel.y += (area.y + imageData.get_yOff());
-			LOGGER.info("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
+			LOGGER.fine("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
 			if (click) {
 				_mouse.click(pixel.x, pixel.y);
 				_mouse.delay(100);

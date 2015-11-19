@@ -1,8 +1,8 @@
 [
   {
     "_name": "Berrio",
-    "_crew": 50,
-    "_capacity": 14,
+    "_crew": 70,
+    "_capacity": 16,
     "_favorite": true,
     "_active": true,
     
@@ -10,8 +10,8 @@
   },
   {
     "_name": "Trinidad",
-    "_crew": 50,
-    "_capacity": 14,
+    "_crew": 80,
+    "_capacity": 17,
     "_favorite": true,
     "_active": true,
     
@@ -19,8 +19,8 @@
   },
   {
     "_name": "Golden Hind",
-    "_crew": 40,
-    "_capacity": 15,
+    "_crew": 80,
+    "_capacity": 19,
     "_favorite": true,
     "_active": true,
     
@@ -28,8 +28,8 @@
   },
   {
     "_name": "Hulk Zigmund",
-    "_crew": 50,
-    "_capacity": 14,
+    "_crew": 40,
+    "_capacity": 10,
     "_favorite": true,
     "_active": true,
     
@@ -37,8 +37,8 @@
   },
   {
     "_name": "Mary Rose",
-    "_crew": 50,
-    "_capacity": 14,
+    "_crew": 80,
+    "_capacity": 17,
     "_favorite": true,
     "_active": true,
     
@@ -46,8 +46,8 @@
   },
   {
     "_name": "Adler Von Lubeck",
-    "_crew": 40,
-    "_capacity": 14,
+    "_crew": 80,
+    "_capacity": 19,
     "_favorite": true,
     "_active": true,
     
@@ -55,8 +55,8 @@
   },
   {
     "_name": "Peter Von Danzig",
-    "_crew": 50,
-    "_capacity": 14,
+    "_crew": 40,
+    "_capacity": 9,
     "_favorite": true,
     "_active": false,
     
@@ -64,8 +64,8 @@
   },
   {
     "_name": "Roland Von Bremen",
-    "_crew": 50,
-    "_capacity": 14,
+    "_crew": 40,
+    "_capacity": 6,
     "_favorite": true,
     "_active": false,
     
@@ -74,7 +74,7 @@
   {
     "_name": "Sao Gabriel",
     "_crew": 50,
-    "_capacity": 14,
+    "_capacity": 13,
     "_favorite": true,
     "_active": true,
     
@@ -83,7 +83,7 @@
   {
     "_name": "Sao Miguel",
     "_crew": 50,
-    "_capacity": 14,
+    "_capacity": 11,
     "_favorite": true,
     "_active": true,
     
@@ -92,7 +92,7 @@
   {
     "_name": "Sao Rafael",
     "_crew": 50,
-    "_capacity": 14,
+    "_capacity": 15,
     "_favorite": true,
     "_active": true,
     
@@ -100,8 +100,8 @@
   },
   {
     "_name": "Venetian",
-    "_crew": 50,
-    "_capacity": 14,
+    "_crew": 40,
+    "_capacity": 7,
     "_favorite": true,
     "_active": false,
     

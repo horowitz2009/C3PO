@@ -46,7 +46,7 @@ public class Ship extends GameUnit {
 
 	@Override
 	public String toString() {
-		return getName();
+		return getName() + (_capacity > 0 ? " " + _capacity: "");
 	}
 
 }

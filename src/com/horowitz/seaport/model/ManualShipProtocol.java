@@ -10,11 +10,11 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public class ManualShipsProtocol extends ShipsProtocol {
+public class ManualShipProtocol extends BaseShipProtocol {
 
 	private Destination _dest;
 
-	public ManualShipsProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public ManualShipProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
 		super(scanner, mouse, mapManager);
 	}
 

@@ -12,7 +12,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public class CocoaProtocol2 extends ShipsProtocol {
+public class CocoaProtocol2 extends BaseShipProtocol {
 
 	private List<String> _cocoaShips;
 	private List<String> _otherShips;
@@ -24,26 +24,39 @@ public class CocoaProtocol2 extends ShipsProtocol {
 
 		_cocoaShips = new ArrayList<>();
 		_cocoaShips.add("Mary Rose");
-		_cocoaShips.add("Berrio");
+		_cocoaShips.add("Golden Hind");
+		_cocoaShips.add("Adler Von Lubeck");
 		_cocoaShips.add("Hulk Zigmund");
-		_cocoaShips.add("Sao Miguel");
+		
+		//_cocoaShips.add("Berrio");
+		//_cocoaShips.add("Sao Miguel");
 		// _cocoaShips.add("Peter Von Danzig");
 
 		_otherShips = new ArrayList<>();
-		_otherShips.add("Sao Rafael");
+		_otherShips.add("Trinidad");
+		_otherShips.add("Berrio");
 
-		_sellingShip = "Sao Gabriel";
+		_sellingShip = "Sao Rafael";
 	}
 
 	private boolean isCocoaShip(Ship whatShip) {
 		for (String name : _cocoaShips) {
-			if (whatShip.getName().equals(name)) {
+			if (whatShip.getName().equalsIgnoreCase(name)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
+	private boolean isOthersShip(Ship whatShip) {
+		for (String name : _otherShips) {
+			if (whatShip.getName().equals(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
 
 		Ship whatShip = scanShipName(pin);
@@ -79,6 +92,10 @@ public class CocoaProtocol2 extends ShipsProtocol {
 					_destChain.add(_mapManager.getDestination("Cocoa Plant"));
 					_destChain.add(_mapManager.getDestination("Coastline"));
 
+				} else if (isOthersShip(whatShip)) {
+					LOGGER.info("COASTLINEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+					_destChain.add(_mapManager.getDestination("Coastline"));
+					
 				} else {
 					// other ships goes to Gulf
 					LOGGER.info("GULFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");

@@ -1,6 +1,7 @@
 [
   {
     "_name": "Small Town",
+    "_abbrs":"S,ST",
     "_time": 5,
     "_favorite": true,
     "_relativePosition": {
@@ -13,6 +14,7 @@
   },
   {
     "_name": "Coastline",
+    "_abbrs":"C,CL",
     "_time": 15,
     "_favorite": true,
     "_relativePosition": {
@@ -25,6 +27,7 @@
   },
   {
     "_name": "Gulf",
+    "_abbrs":"G,GF",
     "_time": 60,
     "_favorite": true,
     "_relativePosition": {
@@ -37,6 +40,7 @@
   },
   {
     "_name": "Cocoa Plant",
+    "_abbrs":"CP,CPL",
     "_time": 120,
     "_favorite": true,
     "_relativePosition": {
@@ -49,6 +53,20 @@
   },
   {
     "_name": "Market",
+    "_abbrs":"MC,MTC",
+    "_time": 30,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 0,
+      "y": 0
+    },
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
+    "_name": "Market",
+    "_abbrs":"MX,MTXP",
     "_time": 30,
     "_favorite": true,
     "_relativePosition": {
@@ -61,7 +79,8 @@
   },
   {
     "_name": "Bamboo",
-    "_time": 60,
+    "_abbrs":"B,BM",
+    "_time": 10,
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
@@ -73,7 +92,8 @@
   },
   {
     "_name": "Rubble",
-    "_time": 60,
+    "_abbrs":"R,RB",
+    "_time": 240,
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
@@ -85,7 +105,8 @@
   },
   {
     "_name": "Forest",
-    "_time": 60,
+    "_abbrs":"F,FR",
+    "_time": 480,
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
@@ -97,7 +118,8 @@
   },
   {
     "_name": "Neighborhood",
-    "_time": 60,
+    "_abbrs":"N,NH",
+    "_time": 240,
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,

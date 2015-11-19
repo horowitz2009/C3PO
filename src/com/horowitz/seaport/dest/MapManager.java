@@ -12,6 +12,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.Ship;
+import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.GameUnitDeserializer;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
@@ -23,6 +24,7 @@ public class MapManager {
 
 	private List<Destination> _destinations;
 	private List<Ship> _ships;
+	private List<ShipProtocol> _shipProtocols;
 	private Pixel _marketPos = null;
 	private String _marketStrategy = "COINS";
 
@@ -38,6 +40,9 @@ public class MapManager {
 
 	public void loadDestinations() throws IOException {
 		_destinations = new JsonStorage().loadDestinations();
+		for (Destination d : _destinations) {
+	    System.err.println(d.getAbbr());
+    }
 	}
 
 	public List<Destination> getDestinations() {
@@ -48,6 +53,10 @@ public class MapManager {
 		_ships = new JsonStorage().loadShips();
 	}
 
+	public void loadShipProtocols() throws IOException {
+		_shipProtocols = new JsonStorage().loadShipProtocols();
+	}
+	
 	public List<Ship> getShips() {
 		return _ships;
 	}

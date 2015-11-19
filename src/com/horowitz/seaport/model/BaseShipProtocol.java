@@ -16,7 +16,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public abstract class ShipsProtocol implements GameProtocol {
+public abstract class BaseShipProtocol implements GameProtocol {
 
 	protected final static Logger LOGGER = Logger.getLogger("MAIN");
 
@@ -29,11 +29,11 @@ public abstract class ShipsProtocol implements GameProtocol {
 	private PropertyChangeSupport _support;
 	protected Ship _lastShip;
 
-	public ShipsProtocol() {
+	public BaseShipProtocol() {
 		super();
 	}
 
-	public ShipsProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public BaseShipProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
 		_scanner = scanner;
 		_mouse = mouse;
 		_mapManager = mapManager;
@@ -158,11 +158,12 @@ public abstract class ShipsProtocol implements GameProtocol {
 
 						_mouse.click(destButton);
 						_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+						_mouse.delay(2000);
 					} else {
 						LOGGER.info(dest.getName() + " can't be done!");
 						boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
 						// if (found)
-						_mouse.delay(1800);
+						_mouse.delay(2000);
 						// chain.poll();
 						if (chain.isEmpty())
 							LOGGER.info("reached the end of chain");
