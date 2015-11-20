@@ -5,19 +5,23 @@ import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.ProtocolEntry;
@@ -26,7 +30,7 @@ import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class ProtocolManagerUI extends JPanel {
 
-	private JComboBox<ShipProtocol> _protocolsCB;
+	private JList<ShipProtocol> _protocolsCB;
 	private MapManager _mapManager;
 	private ProtocolEditor _editor;
 
@@ -38,16 +42,22 @@ public class ProtocolManagerUI extends JPanel {
 		reload();
 	}
 
+	class MyListModel extends DefaultListModel<ShipProtocol> {
+
+	}
+
 	private void initLayout() {
 		setLayout(new BorderLayout());
 		// Box box = Box.createHorizontalBox();
 		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 
-		// combobox
-
-		_protocolsCB = new JComboBox<ShipProtocol>();
-		toolbar.add(_protocolsCB);
+		// THE LIST
+		_model = new MyListModel();
+		_protocolsCB = new JList<ShipProtocol>(_model);
+		_protocolsCB.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		_protocolsCB.setVisibleRowCount(3);
+		toolbar.add(new JScrollPane(_protocolsCB));
 
 		{
 			JButton button = new JButton(new AbstractAction("New") {
@@ -57,8 +67,11 @@ public class ProtocolManagerUI extends JPanel {
 					ShipProtocol newProtocol = new ShipProtocol("protocol1");
 					newProtocol.setEntries(new ArrayList<ProtocolEntry>(2));
 					newProtocol.setSlot(-1);
-					_protocolsCB.addItem(newProtocol);
-					_protocolsCB.setSelectedItem(newProtocol);
+					_model.addElement(newProtocol);
+
+					// _protocolsCB.getSelectionModel().setSelectionInterval(_model.getSize() - 1, _model.getSize() - 1);
+					_protocolsCB.setSelectedValue(newProtocol, true);
+
 				}
 			});
 			shrinkFont(button, -1);
@@ -102,15 +115,20 @@ public class ProtocolManagerUI extends JPanel {
 		_editor = new ProtocolEditor(_mapManager);
 		add(_editor, BorderLayout.CENTER);
 
-		_protocolsCB.addItemListener(new ItemListener() {
+		_protocolsCB.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					ShipProtocol selectedProtocol = (ShipProtocol) e.getItem();
-					_editor.applyProtocol(selectedProtocol);
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					ShipProtocol p = _protocolsCB.getSelectedValue();
+					_editor.applyProtocol(p);
 					revalidate();
 				}
+				// TODO Auto-generated method stub
+				// if (e.getFirstIndex() == ItemEvent.SELECTED) {
+				// ShipProtocol selectedProtocol = (ShipProtocol) e.getItem();
+				// }
+
 			}
 		});
 
@@ -122,23 +140,24 @@ public class ProtocolManagerUI extends JPanel {
 		comp.setFont(comp.getFont().deriveFont(size));
 	}
 
+	private MyListModel _model;
+
 	private void reload() {
 		SwingUtilities.invokeLater(new Runnable() {
+
 			public void run() {
 				try {
 					JsonStorage js = new JsonStorage();
-					_shipProtocols = js.loadShipProtocols();
+					List<ShipProtocol> shipProtocols = js.loadShipProtocols();
+					_model.clear();
 
-					_protocolsCB.removeAllItems();
-					ShipProtocol chooseItem = new ShipProtocol("--select--");
-					_protocolsCB.addItem(chooseItem);
-					Object selected = _protocolsCB.getSelectedItem();
-					for (ShipProtocol shipProtocol : _shipProtocols) {
-						_protocolsCB.addItem(shipProtocol);
-						if (shipProtocol.equals(selected)) {
-							_protocolsCB.setSelectedItem(shipProtocol);
-
-						}
+					// Object selected = _protocolsCB.getSelectedItem();
+					for (ShipProtocol shipProtocol : shipProtocols) {
+						_model.addElement(shipProtocol);
+						// if (shipProtocol.equals(selected)) {
+						// _protocolsCB.setSelectedItem(shipProtocol);
+						//
+						// }
 					}
 
 					revalidate();
@@ -151,8 +170,6 @@ public class ProtocolManagerUI extends JPanel {
 
 	}
 
-	private List<ShipProtocol> _shipProtocols;
-
 	private void save() {
 		SwingUtilities.invokeLater(new Runnable() {
 
@@ -160,15 +177,22 @@ public class ProtocolManagerUI extends JPanel {
 				try {
 					JsonStorage js = new JsonStorage();
 					ShipProtocol editedProtocol = _editor.extractProtocol();
-					ShipProtocol originalProtocol = (ShipProtocol) _protocolsCB.getSelectedItem();
-					
+					ShipProtocol originalProtocol = (ShipProtocol) _protocolsCB.getSelectedValue();
+
 					originalProtocol.setName(editedProtocol.getName());
 					originalProtocol.setSlot(editedProtocol.getSlot());
 					originalProtocol.setEntries(editedProtocol.getEntries());
-					
-					js.saveShipProtocols(_shipProtocols);
-					_protocolsCB.setSelectedItem(null);
-					_protocolsCB.setSelectedItem(originalProtocol);
+
+					Enumeration<ShipProtocol> elements = _model.elements();
+					List<ShipProtocol> newList = new ArrayList<ShipProtocol>();
+					while (elements.hasMoreElements()) {
+						ShipProtocol shipProtocol = (ShipProtocol) elements.nextElement();
+						newList.add(shipProtocol);
+					}
+
+					js.saveShipProtocols(newList);
+					// _protocolsCB.setSelectedValue(null, false);
+					_protocolsCB.setSelectedValue(originalProtocol, true);
 					revalidate();
 
 				} catch (IOException e) {
@@ -195,4 +219,15 @@ public class ProtocolManagerUI extends JPanel {
 		}
 
 	}
+
+	public ShipProtocol getSelectedShipProtocol() {
+		return _protocolsCB.getSelectedValue();
+	}
+
+	public void addListSelectionListener(ListSelectionListener listener) {
+	  _protocolsCB.addListSelectionListener(listener);
+  }
+	
+	
+	
 }

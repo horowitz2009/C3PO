@@ -40,9 +40,6 @@ public class MapManager {
 
 	public void loadDestinations() throws IOException {
 		_destinations = new JsonStorage().loadDestinations();
-		for (Destination d : _destinations) {
-	    System.err.println(d.getAbbr());
-    }
 	}
 
 	public List<Destination> getDestinations() {
@@ -56,7 +53,7 @@ public class MapManager {
 	public void loadShipProtocols() throws IOException {
 		_shipProtocols = new JsonStorage().loadShipProtocols();
 	}
-	
+
 	public List<Ship> getShips() {
 		return _ships;
 	}
@@ -146,6 +143,18 @@ public class MapManager {
 		}
 		return null;
 	}
+	
+	public Destination getDestinationByAbbr(String abbr) {
+		for (Destination destination : _destinations) {
+			for (String  ds : destination.getAbbrs().split(",")) {
+				if (ds.equalsIgnoreCase(abbr)) {
+					return destination;
+				}
+      } 
+		}
+		return null;
+  }
+
 
 	public Pixel ensureMap() throws AWTException, RobotInterruptedException, IOException {
 		// MAP ZONE
@@ -180,15 +189,15 @@ public class MapManager {
 			}
 			_marketPos = newMarketPos;
 		}
-		
-	  Pixel idealP = new Pixel(_scanner.getTopLeft().x + _scanner.getGameWidth()/2, _scanner.getBottomRight().y - 164);
+
+		Pixel idealP = new Pixel(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2, _scanner.getBottomRight().y - 164);
 
 		if (Math.abs(_marketPos.x - idealP.x) > 5 && Math.abs(_marketPos.x - idealP.y) > 5) {
 			// need adjusting
-			_scanner.getMouse().drag2(_marketPos.x, _marketPos.y-50, idealP.x, idealP.y-50);
+			_scanner.getMouse().drag2(_marketPos.x, _marketPos.y - 50, idealP.x, idealP.y - 50);
 			_scanner.getMouse().delay(1200);
 
-			////
+			// //
 			Rectangle areaSpec = new Rectangle(_marketPos.x - 20, _marketPos.y - 20, _market.getImageData().getImage()
 			    .getWidth() + 40, _market.getImageData().getImage().getHeight() + 40);
 
@@ -200,10 +209,9 @@ public class MapManager {
 				LOGGER.info("Market found in the same place.");
 			}
 			_marketPos = newMarketPos;
-			////
+			// //
 		}
-		
-		
+
 		return _marketPos;
 	}
 
@@ -222,5 +230,6 @@ public class MapManager {
 	public void setMarketStrategy(String marketStrategy) {
 		_marketStrategy = marketStrategy;
 	}
+
 
 }

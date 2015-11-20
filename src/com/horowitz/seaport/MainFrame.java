@@ -3,7 +3,6 @@ package com.horowitz.seaport;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -43,12 +42,15 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.horowitz.commons.ImageData;
 import com.horowitz.commons.MouseRobot;
@@ -63,10 +65,12 @@ import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.CocoaProtocol1;
 import com.horowitz.seaport.model.CocoaProtocol2;
 import com.horowitz.seaport.model.Destination;
+import com.horowitz.seaport.model.ExtendedShipProtocol;
 import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
 import com.horowitz.seaport.model.ManualShipProtocol;
 import com.horowitz.seaport.model.Ship;
+import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
 
 public class MainFrame extends JFrame {
@@ -75,7 +79,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.23qb";
+	private static String APP_TITLE = "Seaport v0.24a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -123,6 +127,10 @@ public class MainFrame extends JFrame {
 
 	private JLabel _shipSentLabel;
 
+	private ProtocolManagerUI _protocolManagerUI;
+
+	private Task _newShipTask;
+
 	public static void main(String[] args) {
 
 		try {
@@ -139,7 +147,7 @@ public class MainFrame extends JFrame {
 			MainFrame frame = new MainFrame(isTestmode);
 			frame.pack();
 			frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
-			int w = 275;//frame.getSize().width;
+			int w = 275;// frame.getSize().width;
 			int h = frame.getSize().height;
 			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			int x = screenSize.width - w;
@@ -196,6 +204,12 @@ public class MainFrame extends JFrame {
 			_shipsTask.setProtocol(_manualShipsProtocol);
 			_tasks.add(_shipsTask);
 
+			// NEW SHIPS TASK
+			_newShipTask = new Task("SHIPS2", 1);
+			_extendedShipProtocol = new ExtendedShipProtocol(_scanner, _mouse, _mapManager);
+			_newShipTask.setProtocol(_extendedShipProtocol);
+			_tasks.add(_newShipTask);
+
 			// BUILDING TASK
 			_buildingsTask = new Task("Buildings", 1);
 			ManualBuildingsProtocol buildingsProtocol = new ManualBuildingsProtocol(_scanner, _mouse, _buildingManager);
@@ -241,10 +255,8 @@ public class MainFrame extends JFrame {
 			toolbars.add(jToolBar);
 		}
 		toolbars.add(mainToolbar4);
-		
-		
-		//toolbars.add(createToolbar5());
-		
+
+		// toolbars.add(createToolbar5());
 
 		Box north = Box.createVerticalBox();
 		north.add(toolbars);
@@ -313,10 +325,27 @@ public class MainFrame extends JFrame {
 		// MyKeyEventDispatcher());
 	}
 
+	private ShipProtocol _shipProtocol;
+	private ExtendedShipProtocol _extendedShipProtocol;
+
 	private JPanel createShipProtocolManagerPanel() {
-	  ProtocolManagerUI _protocolManagerUI = new ProtocolManagerUI(_mapManager);
-	  return _protocolManagerUI;
-  }
+		_protocolManagerUI = new ProtocolManagerUI(_mapManager);
+		_protocolManagerUI.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+
+				// TODO Auto-generated method stub
+				System.err.println("YEEEEEEEEEEEEEEAAAH");
+				if (!e.getValueIsAdjusting()) {
+					JList list = (JList) e.getSource();
+					_shipProtocol = (ShipProtocol) list.getSelectedValue();
+					_extendedShipProtocol.setShipProtocol(_shipProtocol);
+				}
+			}
+		});
+		return _protocolManagerUI;
+	}
 
 	private Container buildConsole() {
 		final JTextArea outputConsole = new JTextArea(8, 14);
@@ -831,11 +860,11 @@ public class MainFrame extends JFrame {
 	private JToolBar createToolbar5() {
 		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
-		
+
 		// Temp bar for custom protocol
 		return toolbar;
 	}
-	
+
 	@SuppressWarnings("serial")
 	private JToolBar createTestToolbar() {
 		JToolBar toolbar = new JToolBar();

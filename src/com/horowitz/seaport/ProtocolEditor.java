@@ -12,11 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.AbstractButton;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -28,7 +26,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
@@ -44,12 +41,8 @@ public class ProtocolEditor extends JPanel {
 
 	private static final long serialVersionUID = -7306243578379329501L;
 	private Box _box;
-	private JLabel _tl;
 	private MapManager _mapManager;
 	private JTextField _titleTF;
-	private JToggleButton[] _slots;
-	private ButtonGroup _slotGroup;
-	private JToggleButton _noneSlot;
 
 	public ProtocolEditor(MapManager mapManager) {
 		super(new BorderLayout());
@@ -69,70 +62,26 @@ public class ProtocolEditor extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.gridwidth = 4;
+		//gbc.gridwidth = 4;
 		gbc.insets = new Insets(3, 3, 2, 2);
 
 		headerPanel.add(_titleTF, gbc);
 
-		// SLOTS
-		gbc.insets = new Insets(2, 2, 2, 2);
-		gbc.gridx = 0;
+		//gbc.gridx++;
 		gbc.gridy = 1;
-		gbc.gridwidth = 1;
-
-		_slots = new JToggleButton[4];
-		_slotGroup = new NoneSelectedButtonGroup();
-		_noneSlot = new JToggleButton();
-		_noneSlot.setActionCommand("-1");
-		_slotGroup.add(_noneSlot);
-		for (int i = 0; i < _slots.length; i++) {
-			_slots[i] = new JToggleButton("Slot " + (i + 1));
-			_slots[i].setMargin(new Insets(2, 2, 2, 2));
-			_slots[i].setActionCommand("" + (i + 1));
-			// _slots[i].addChangeListener(new ChangeListener() {
-			//
-			// @Override
-			// public void stateChanged(ChangeEvent e) {
-			// // TODO Auto-generated method stub
-			// System.err.println(e.getSource());
-			// System.err.println(e.toString());
-			// }
-			// });
-			// _slots[i].addActionListener(new ActionListener() {
-			//
-			// @Override
-			// public void actionPerformed(ActionEvent e) {
-			// // TODO Auto-generated method stub
-			// JToggleButton tb = (JToggleButton) e.getSource();
-			// if (_slotGroup.isSelected(tb.getModel())) {
-			// // _slotGroup.setSelected(tb.getModel(), false);
-			// _slotGroup.setSelected(_noneSlot.getModel(), true);
-			// }
-			// // System.err.println(_slotGroup.getSelection().getActionCommand());
-			//
-			// }
-			// });
-			shrinkFont(_slots[i], 9f);
-			_slotGroup.add(_slots[i]);
-			headerPanel.add(_slots[i], gbc);
-			gbc.gridx++;
-		}
-
-		gbc.gridx++;
-		gbc.gridy = 0;
-		gbc.gridheight = 2;
-		gbc.gridwidth = 1;
+		//gbc.gridheight = 2;
+		//gbc.gridwidth = 1;
 		JLabel agenda = new JLabel(
-		    "<html>S - Small Town<br>C - Coastline<br>G - Gulf<br>CP - Cocoa Plant<br>MC - Market COINS<br>MX - Market COINS</html>");
+		    "<html>S - Small Town  C - Coastline   G - Gulf<br>CP - Cocoa Plant   MC - Market COINS   MX - Market COINS</html>");
 		agenda.setFont(agenda.getFont().deriveFont(9f));
 		headerPanel.add(agenda, gbc);
 
-		// fake label
-		gbc.gridy++;
-		gbc.gridx++;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		headerPanel.add(new JLabel(""), gbc);
+//		// fake label
+//		gbc.gridy++;
+//		gbc.gridx++;
+//		gbc.weightx = 1.0;
+//		gbc.weighty = 1.0;
+//		headerPanel.add(new JLabel(""), gbc);
 		mainRoot.add(headerPanel, BorderLayout.NORTH);
 
 		// //////////
@@ -173,8 +122,8 @@ public class ProtocolEditor extends JPanel {
 
 		shrinkFont(saveButton, 9f);
 		saveButton.setMargin(new Insets(2, 2, 2, 2));
-		tempBar.add(saveButton);
-		tempBar.add(Box.createHorizontalStrut(3));
+		// tempBar.add(saveButton);
+		// tempBar.add(Box.createHorizontalStrut(3));
 
 		JButton loadButton = new JButton(new AbstractAction("load") {
 
@@ -192,15 +141,11 @@ public class ProtocolEditor extends JPanel {
 		});
 		shrinkFont(loadButton, 9f);
 		loadButton.setMargin(new Insets(2, 2, 2, 2));
-		tempBar.add(loadButton);
+		// tempBar.add(loadButton);
 
 		root.add(tempBar, BorderLayout.SOUTH);
 
 		add(mainRoot, BorderLayout.NORTH);
-		JPanel testPanel = new JPanel();
-		_tl = new JLabel("TEST GOES HERE");
-		testPanel.add(_tl);
-		add(testPanel);
 
 		addRow();
 	}
@@ -219,10 +164,6 @@ public class ProtocolEditor extends JPanel {
 			entries.add(pe);
 		}
 		sp.setEntries(entries);
-		if (_slotGroup.getSelection() != null)
-			sp.setSlot(Integer.parseInt(_slotGroup.getSelection().getActionCommand()));
-		else
-			sp.setSlot(-1);
 		sp.setName(_titleTF.getText());
 		return sp;
 	}
@@ -232,23 +173,6 @@ public class ProtocolEditor extends JPanel {
 		if (sp != null && sp.getEntries() != null) {
 			setVisible(true);
 			_titleTF.setText(sp.getName());
-			int slot = sp.getSlot();
-			if (slot > 0) {
-				Enumeration<AbstractButton> elements = _slotGroup.getElements();
-				boolean found = false;
-				while (elements.hasMoreElements()) {
-					AbstractButton el = elements.nextElement();
-					if (el.getModel().getActionCommand().equals("" + slot)) {
-						_slotGroup.setSelected(el.getModel(), true);
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					_slotGroup.clearSelection();
-				}
-			} else
-				_slotGroup.clearSelection();
 			for (ProtocolEntry e : sp.getEntries()) {
 				ProtocolEntryView pev = new ProtocolEntryView();
 				ComboBoxModel<Ship> m = pev._shipFieldCB.getModel();

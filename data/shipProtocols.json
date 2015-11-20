@@ -1,6 +1,6 @@
 [
   {
-    "_name": "mmm324",
+    "_name": "mmm2",
     "_slot": 2,
     "_enabled": false,
     "_entries": [
@@ -23,6 +23,36 @@
       {
         "_shipName": "\u003cRest\u003e",
         "_chainStr": "G"
+      },
+      {
+        "_shipName": "\u003cUnknown\u003e",
+        "_chainStr": "C"
+      }
+    ]
+  },
+  {
+    "_name": "prot",
+    "_slot": 0,
+    "_enabled": false,
+    "_entries": [
+      {
+        "_shipName": "Golden Hind",
+        "_chainStr": "S"
+      },
+      {
+        "_shipName": "Mary Rose",
+        "_chainStr": "MC"
+      }
+    ]
+  },
+  {
+    "_name": "SIMPLE",
+    "_slot": 0,
+    "_enabled": false,
+    "_entries": [
+      {
+        "_shipName": "\u003cRest\u003e",
+        "_chainStr": "S"
       },
       {
         "_shipName": "\u003cUnknown\u003e",
