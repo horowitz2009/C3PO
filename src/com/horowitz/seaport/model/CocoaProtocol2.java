@@ -23,20 +23,21 @@ public class CocoaProtocol2 extends BaseShipProtocol {
 		super(scanner, mouse, mapManager);
 
 		_cocoaShips = new ArrayList<>();
-		_cocoaShips.add("Mary Rose");
 		_cocoaShips.add("Golden Hind");
+		_cocoaShips.add("Mary Rose");
+		_cocoaShips.add("Trinidad");
+		_cocoaShips.add("Sao Rafael");
 		_cocoaShips.add("Adler Von Lubeck");
-		_cocoaShips.add("Hulk Zigmund");
 		
 		//_cocoaShips.add("Berrio");
 		//_cocoaShips.add("Sao Miguel");
 		// _cocoaShips.add("Peter Von Danzig");
 
 		_otherShips = new ArrayList<>();
-		_otherShips.add("Trinidad");
-		_otherShips.add("Berrio");
+		//_otherShips.add("Trinidad");
+		//_otherShips.add("Berrio");
 
-		_sellingShip = "Sao Rafael";
+		_sellingShip = "Adler Von Lubeck";
 	}
 
 	private boolean isCocoaShip(Ship whatShip) {

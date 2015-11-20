@@ -3,6 +3,7 @@ package com.horowitz.seaport;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -138,7 +139,7 @@ public class MainFrame extends JFrame {
 			MainFrame frame = new MainFrame(isTestmode);
 			frame.pack();
 			frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
-			int w = frame.getSize().width;
+			int w = 275;//frame.getSize().width;
 			int h = frame.getSize().height;
 			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			int x = screenSize.width - w;
@@ -247,6 +248,7 @@ public class MainFrame extends JFrame {
 
 		Box north = Box.createVerticalBox();
 		north.add(toolbars);
+		north.add(createShipProtocolManagerPanel());
 
 		if (_testMode) {
 
@@ -310,6 +312,11 @@ public class MainFrame extends JFrame {
 		// //KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new
 		// MyKeyEventDispatcher());
 	}
+
+	private JPanel createShipProtocolManagerPanel() {
+	  ProtocolManagerUI _protocolManagerUI = new ProtocolManagerUI(_mapManager);
+	  return _protocolManagerUI;
+  }
 
 	private Container buildConsole() {
 		final JTextArea outputConsole = new JTextArea(8, 14);
