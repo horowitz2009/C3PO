@@ -713,6 +713,8 @@ public class ScreenScanner {
 		}
 		BufferedImage screen = new Robot().createScreenCapture(area);
 		Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, imageData.getColorToBypass());
+		LOGGER.fine("LOOKING FOR " + imageData.getName() + "  screen: " + area + " BYPASS: " + imageData.getColorToBypass());
+		
 		long start = System.currentTimeMillis();
 		if (pixel != null) {
 			pixel.x += (area.x + imageData.get_xOff());

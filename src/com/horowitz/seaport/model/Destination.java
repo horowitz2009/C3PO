@@ -6,6 +6,7 @@ public class Destination extends GameUnit {
 	private static final long serialVersionUID = -1237748489318461109L;
 	private String _abbrs;
 	private int _time;
+	private String _option;
 	private boolean _favorite;
 	private Pixel _relativePosition;
 
@@ -62,6 +63,14 @@ public class Destination extends GameUnit {
 			res = ss[0];
 		} 
 		return res;
+	}
+
+	public String getOption() {
+		return _option;
+	}
+
+	public void setOption(String option) {
+		_option = option;
 	}
 
 }

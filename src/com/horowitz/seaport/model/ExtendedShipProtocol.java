@@ -36,19 +36,20 @@ public class ExtendedShipProtocol extends BaseShipProtocol {
 			Ship ship = _lastShip;
 			List<ProtocolEntry> entries = _shipProtocol.getEntries();
 			for (ProtocolEntry protocolEntry : entries) {
-  			protocolEntry.deserialize(new ProtocolEntryDeserializer(_mapManager));
+				protocolEntry.deserialize(new ProtocolEntryDeserializer(_mapManager));
 			}
-			
+
 			if (ship != null) {
 				boolean found = false;
 				for (ProtocolEntry protocolEntry : entries) {
-					if (protocolEntry.getShip().getName().equals(ship.getName())) {
+					if (protocolEntry.getShip().getName().equals(ship.getName())
+					    || protocolEntry.getShip().getName().equals("<ALL>")) {
 						_destChain = protocolEntry.getChain();
 						found = true;
 					}
 				}
 				if (!found) {
-					//find rest
+					// find rest
 					for (ProtocolEntry protocolEntry : entries) {
 						if (protocolEntry.getShip().getName().equals("<Rest>")) {
 							_destChain = protocolEntry.getChain();
@@ -57,7 +58,7 @@ public class ExtendedShipProtocol extends BaseShipProtocol {
 				}
 				sendShip(new LinkedList<Destination>(_destChain));
 			} else {
-				//find unknown
+				// find unknown
 				for (ProtocolEntry protocolEntry : entries) {
 					if (protocolEntry.getShip().getName().equals("<Unknown>")) {
 						_destChain = protocolEntry.getChain();

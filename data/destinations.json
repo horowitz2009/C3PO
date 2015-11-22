@@ -53,7 +53,8 @@
   },
   {
     "_name": "Market",
-    "_abbrs":"MC,MTC",
+    "_abbrs": "MC,MTC",
+    "_option": "Cocoa-Coins",
     "_time": 30,
     "_favorite": true,
     "_relativePosition": {
@@ -65,8 +66,9 @@
     "_imageTitle": "dest/MarketTownTitle.bmp"
   },
   {
-    "_name": "Market",
+    "_name": "Market XP",
     "_abbrs":"MX,MTXP",
+    "_option": "Cocoa-XP",
     "_time": 30,
     "_favorite": true,
     "_relativePosition": {

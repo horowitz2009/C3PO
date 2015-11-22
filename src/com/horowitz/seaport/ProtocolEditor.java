@@ -224,10 +224,13 @@ public class ProtocolEditor extends JPanel {
 					return new CompareToBuilder().append(o2.getCapacity(), o1.getCapacity()).toComparison();
 				}
 			});
-			Ship select = new Ship("-- choose ship --");
+			//Ship select = new Ship("-- choose ship --");
+			Ship all = new Ship("<ALL>");
 			Ship rest = new Ship("<Rest>");
 			Ship unknown = new Ship("<Unknown>");
-			ships.add(0, select);
+			ships.add(0, all);
+			//ships.add(0, select);
+			
 			ships.add(rest);
 			ships.add(unknown);
 			_shipFieldCB = new JComboBox<Ship>(ships.toArray(new Ship[0]));

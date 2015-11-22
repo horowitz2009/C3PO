@@ -1,7 +1,7 @@
 [
   {
-    "_name": "mmm2",
-    "_slot": 2,
+    "_name": "Cocoa 3.0",
+    "_slot": 0,
     "_enabled": false,
     "_entries": [
       {
@@ -9,16 +9,16 @@
         "_chainStr": "CP,MC"
       },
       {
-        "_shipName": "Adler Von Lubeck",
-        "_chainStr": "CP,MX"
+        "_shipName": "Mary Rose",
+        "_chainStr": "CP,MC"
       },
       {
         "_shipName": "Trinidad",
-        "_chainStr": "C,S"
+        "_chainStr": "CP,MC"
       },
       {
-        "_shipName": "Mary Rose",
-        "_chainStr": "G,C,S"
+        "_shipName": "Sao Rafael",
+        "_chainStr": "CP,MC"
       },
       {
         "_shipName": "\u003cRest\u003e",
@@ -26,7 +26,11 @@
       },
       {
         "_shipName": "\u003cUnknown\u003e",
-        "_chainStr": "C"
+        "_chainStr": "G"
+      },
+      {
+        "_shipName": "Adler Von Lubeck",
+        "_chainStr": "MC"
       }
     ]
   },

@@ -62,13 +62,10 @@ import com.horowitz.commons.TemplateMatcher;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.Building;
-import com.horowitz.seaport.model.CocoaProtocol1;
-import com.horowitz.seaport.model.CocoaProtocol2;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.ExtendedShipProtocol;
 import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
-import com.horowitz.seaport.model.ManualShipProtocol;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
@@ -79,7 +76,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.24a";
+	private static String APP_TITLE = "Seaport v0.24i";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -99,21 +96,13 @@ public class MainFrame extends JFrame {
 	private MapManager _mapManager;
 	private BuildingManager _buildingManager;
 
-	private CocoaProtocol1 _cocoaProtocol1;
-	private CocoaProtocol2 _cocoaProtocol2;
-	private ManualShipProtocol _manualShipsProtocol;
-
-	// private Pixel _rock;
-	private Pixel _marketPos;
-
+	private JToggleButton _fishToggle;
 	private JToggleButton _shipsToggle;
 
 	private JToggleButton _industriesToggle;
-	private JToggleButton _xpToggle;
+	// private JToggleButton _xpToggle;
 
 	private List<Task> _tasks;
-
-	private Task _scanTask;
 
 	private Task _fishTask;
 
@@ -128,8 +117,6 @@ public class MainFrame extends JFrame {
 	private JLabel _shipSentLabel;
 
 	private ProtocolManagerUI _protocolManagerUI;
-
-	private Task _newShipTask;
 
 	public static void main(String[] args) {
 
@@ -148,8 +135,8 @@ public class MainFrame extends JFrame {
 			frame.pack();
 			frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
 			int w = 275;// frame.getSize().width;
-			int h = frame.getSize().height;
 			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			int h = (int) (screenSize.height * 0.75);
 			int x = screenSize.width - w;
 			int y = (screenSize.height - h) / 2;
 			frame.setBounds(x, y, w, h);
@@ -192,23 +179,10 @@ public class MainFrame extends JFrame {
 
 			// SHIPS TASK
 			_shipsTask = new Task("Ships", 2);
-			_cocoaProtocol1 = new CocoaProtocol1(_scanner, _mouse, _mapManager);
-			_cocoaProtocol2 = new CocoaProtocol2(_scanner, _mouse, _mapManager);
-			_manualShipsProtocol = new ManualShipProtocol(_scanner, _mouse, _mapManager);
-			_cocoaProtocol1.addPropertyChangeListener(new StatsListener());
-			_cocoaProtocol2.addPropertyChangeListener(new StatsListener());
-			_manualShipsProtocol.addPropertyChangeListener(new StatsListener());
-
-			_manualShipsProtocol.setDestination(_mapManager.getDestination("Coastline"));
-
-			_shipsTask.setProtocol(_manualShipsProtocol);
-			_tasks.add(_shipsTask);
-
-			// NEW SHIPS TASK
-			_newShipTask = new Task("SHIPS2", 1);
 			_extendedShipProtocol = new ExtendedShipProtocol(_scanner, _mouse, _mapManager);
-			_newShipTask.setProtocol(_extendedShipProtocol);
-			_tasks.add(_newShipTask);
+			_extendedShipProtocol.addPropertyChangeListener(new StatsListener());
+			_shipsTask.setProtocol(_extendedShipProtocol);
+			_tasks.add(_shipsTask);
 
 			// BUILDING TASK
 			_buildingsTask = new Task("Buildings", 1);
@@ -245,15 +219,15 @@ public class MainFrame extends JFrame {
 		// TOOLBARS
 		JToolBar mainToolbar1 = createToolbar1();
 		JToolBar mainToolbar2 = createToolbar2();
-		List<JToolBar> mainToolbars3 = createToolbars3();
+		// List<JToolBar> mainToolbars3 = createToolbars3();
 		JToolBar mainToolbar4 = createToolbar4();
 
 		JPanel toolbars = new JPanel(new GridLayout(0, 1));
 		toolbars.add(mainToolbar1);
 		toolbars.add(mainToolbar2);
-		for (JToolBar jToolBar : mainToolbars3) {
-			toolbars.add(jToolBar);
-		}
+		// for (JToolBar jToolBar : mainToolbars3) {
+		// toolbars.add(jToolBar);
+		// }
 		toolbars.add(mainToolbar4);
 
 		// toolbars.add(createToolbar5());
@@ -688,6 +662,18 @@ public class MainFrame extends JFrame {
 		// SCAN
 		{
 			// SHIPS
+			_fishToggle = new JToggleButton("Fish");
+			_fishToggle.setSelected(true);
+			_fishToggle.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					_fishTask.setEnabled(b);
+				}
+			});
+			toolbar.add(_fishToggle);
+
+			// SHIPS
 			_shipsToggle = new JToggleButton("Ships");
 			_shipsToggle.setSelected(true);
 			_shipsToggle.addItemListener(new ItemListener() {
@@ -725,21 +711,22 @@ public class MainFrame extends JFrame {
 					}
 				}
 			});
+			_slowToggle.setSelected(true);
 			toolbar.add(_slowToggle);
 
-			_xpToggle = new JToggleButton("XP");
-			_xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
-			_xpToggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					String strategy = b ? "XP" : "COINS";
-					LOGGER.info("MARKET STRATEGY: " + strategy);
-					_mapManager.setMarketStrategy(strategy);
-				}
-			});
-			toolbar.add(_xpToggle);
+			// _xpToggle = new JToggleButton("XP");
+			// _xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
+			// _xpToggle.addItemListener(new ItemListener() {
+			//
+			// @Override
+			// public void itemStateChanged(ItemEvent e) {
+			// boolean b = e.getStateChange() == ItemEvent.SELECTED;
+			// String strategy = b ? "XP" : "COINS";
+			// LOGGER.info("MARKET STRATEGY: " + strategy);
+			// _mapManager.setMarketStrategy(strategy);
+			// }
+			// });
+			// toolbar.add(_xpToggle);
 
 		}
 		return toolbar;
@@ -756,80 +743,80 @@ public class MainFrame extends JFrame {
 
 		JToggleButton toggle;
 
-		// COCOA 1
-		toggle = new JToggleButton("Cocoa 1.0");
-		toggle.addItemListener(new ItemListener() {
+		// // COCOA 1
+		// toggle = new JToggleButton("Cocoa 1.0");
+		// toggle.addItemListener(new ItemListener() {
+		//
+		// @Override
+		// public void itemStateChanged(ItemEvent e) {
+		// LOGGER.info("Cocoa Protocol 1.0: ");
+		// LOGGER.info("Send all ships to Cocoa plant, then all to market");
+		// LOGGER.info("Time: 2h 30m ");
+		// _shipsTask.setProtocol(_cocoaProtocol1);
+		// _shipsTask.getProtocol().update();
+		// }
+		// });
+		//
+		// bg.add(toggle);
+		// toolbar.add(toggle);
 
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				LOGGER.info("Cocoa Protocol 1.0: ");
-				LOGGER.info("Send all ships to Cocoa plant, then all to market");
-				LOGGER.info("Time: 2h 30m ");
-				_shipsTask.setProtocol(_cocoaProtocol1);
-				_shipsTask.getProtocol().update();
-			}
-		});
+		// // COCOA 2
+		// toggle = new JToggleButton("Cocoa 2.0");
+		// JToggleButton selected = toggle;
+		// toggle.addItemListener(new ItemListener() {
+		//
+		// @Override
+		// public void itemStateChanged(ItemEvent e) {
+		// LOGGER.info("Cocoa Protocol 2.0: ");
+		// LOGGER.info("Send half ships to Cocoa plant");
+		// LOGGER.info("One specific ship sells cocoa.");
+		// LOGGER.info("The rest go to Gulf.");
+		// LOGGER.info("Time: 2h");
+		// _shipsTask.setProtocol(_cocoaProtocol2);
+		// _shipsTask.getProtocol().update();
+		// }
+		// });
+		//
+		// bg.add(toggle);
+		// toolbar.add(toggle);
 
-		bg.add(toggle);
-		toolbar.add(toggle);
-
-		// COCOA 2
-		toggle = new JToggleButton("Cocoa 2.0");
-		JToggleButton selected = toggle;
-		toggle.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				LOGGER.info("Cocoa Protocol 2.0: ");
-				LOGGER.info("Send half ships to Cocoa plant");
-				LOGGER.info("One specific ship sells cocoa.");
-				LOGGER.info("The rest go to Gulf.");
-				LOGGER.info("Time: 2h");
-				_shipsTask.setProtocol(_cocoaProtocol2);
-				_shipsTask.getProtocol().update();
-			}
-		});
-
-		bg.add(toggle);
-		toolbar.add(toggle);
-
-		// MANUAL SHIP PROTOCOL
-		toolbars.add(toolbar);
-		toolbar = new JToolBar();
-		toolbar.setFloatable(false);
-
-		int itemsPerRow = 3;
-		int n = 0;
-		for (final Destination destination : _mapManager.getDestinations()) {
-
-			toggle = new JToggleButton(destination.getName());
-			toggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					LOGGER.info("Simple protocol: ");
-					LOGGER.info("Send all ships to: " + destination.getName());
-					LOGGER.info("Time: " + destination.getTime());// TODO format time
-					_manualShipsProtocol.setDestination(destination);
-					_shipsTask.setProtocol(_manualShipsProtocol);
-					_shipsTask.getProtocol().update();
-				}
-			});
-			bg.add(toggle);
-			// toggle.setSelected(destination.getName().equals("Coastline"));
-
-			n++;
-			if (n > itemsPerRow) {
-				toolbars.add(toolbar);
-				toolbar = new JToolBar();
-				toolbar.setFloatable(false);
-				n = 0;
-			}
-			toolbar.add(toggle);
-
-		}
-
-		selected.setSelected(true);
+		// // MANUAL SHIP PROTOCOL
+		// toolbars.add(toolbar);
+		// toolbar = new JToolBar();
+		// toolbar.setFloatable(false);
+		//
+		// int itemsPerRow = 3;
+		// int n = 0;
+		// for (final Destination destination : _mapManager.getDestinations()) {
+		//
+		// toggle = new JToggleButton(destination.getName());
+		// toggle.addItemListener(new ItemListener() {
+		//
+		// @Override
+		// public void itemStateChanged(ItemEvent e) {
+		// LOGGER.info("Simple protocol: ");
+		// LOGGER.info("Send all ships to: " + destination.getName());
+		// LOGGER.info("Time: " + destination.getTime());// TODO format time
+		// _manualShipsProtocol.setDestination(destination);
+		// _shipsTask.setProtocol(_manualShipsProtocol);
+		// _shipsTask.getProtocol().update();
+		// }
+		// });
+		// bg.add(toggle);
+		// // toggle.setSelected(destination.getName().equals("Coastline"));
+		//
+		// n++;
+		// if (n > itemsPerRow) {
+		// toolbars.add(toolbar);
+		// toolbar = new JToolBar();
+		// toolbar.setFloatable(false);
+		// n = 0;
+		// }
+		// toolbar.add(toggle);
+		//
+		// }
+		//
+		// selected.setSelected(true);
 		return toolbars;
 	}
 
@@ -1035,7 +1022,6 @@ public class MainFrame extends JFrame {
 				_scanner.checkAndAdjustRock();
 				_mapManager.update();
 				_buildingManager.update();
-				_marketPos = null;
 
 				LOGGER.info("Coordinates: " + _scanner.getTopLeft() + " - " + _scanner.getBottomRight());
 
@@ -1081,7 +1067,7 @@ public class MainFrame extends JFrame {
 				Destination market = null;
 				Pixel marketPos = null;
 				for (Destination destination : _mapManager.getDestinations()) {
-					if (destination.getName().equals("Market"))
+					if (destination.getName().startsWith("Market"))
 						market = destination;
 
 					ImageData id = destination.getImageData();
@@ -1100,7 +1086,7 @@ public class MainFrame extends JFrame {
 					if (market != null) {
 						Pixel pm = market.getRelativePosition();
 						for (Destination destination : _mapManager.getDestinations()) {
-							if (!destination.getName().equals("Market")) {
+							if (!destination.getName().startsWith("Market")) {
 								Pixel pp = destination.getRelativePosition();
 								pp.x = -pm.x + pp.x;
 								pp.y = -pm.y + pp.y;

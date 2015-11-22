@@ -12,7 +12,6 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.Ship;
-import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.GameUnitDeserializer;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
@@ -24,9 +23,7 @@ public class MapManager {
 
 	private List<Destination> _destinations;
 	private List<Ship> _ships;
-	private List<ShipProtocol> _shipProtocols;
 	private Pixel _marketPos = null;
-	private String _marketStrategy = "COINS";
 
 	public MapManager(ScreenScanner scanner) {
 		super();
@@ -51,7 +48,7 @@ public class MapManager {
 	}
 
 	public void loadShipProtocols() throws IOException {
-		_shipProtocols = new JsonStorage().loadShipProtocols();
+		new JsonStorage().loadShipProtocols();
 	}
 
 	public List<Ship> getShips() {
@@ -143,18 +140,17 @@ public class MapManager {
 		}
 		return null;
 	}
-	
+
 	public Destination getDestinationByAbbr(String abbr) {
 		for (Destination destination : _destinations) {
-			for (String  ds : destination.getAbbrs().split(",")) {
+			for (String ds : destination.getAbbrs().split(",")) {
 				if (ds.equalsIgnoreCase(abbr)) {
 					return destination;
 				}
-      } 
+			}
 		}
 		return null;
-  }
-
+	}
 
 	public Pixel ensureMap() throws AWTException, RobotInterruptedException, IOException {
 		// MAP ZONE
@@ -222,14 +218,5 @@ public class MapManager {
 	public void setMarketPos(Pixel marketPos) {
 		_marketPos = marketPos;
 	}
-
-	public String getMarketStrategy() {
-		return _marketStrategy;
-	}
-
-	public void setMarketStrategy(String marketStrategy) {
-		_marketStrategy = marketStrategy;
-	}
-
 
 }

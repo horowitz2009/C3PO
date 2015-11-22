@@ -92,11 +92,15 @@ public abstract class BaseShipProtocol implements GameProtocol {
 		for (Ship ship : ships) {
 			if (ship.isActive()) {
 				if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false) != null) {
+					LOGGER.info("SHIP: " + ship.getName());
 					_lastShip = ship;
 					break;
 				}
 				;
 			}
+		}
+		if (_lastShip == null) {
+			LOGGER.info("SHIP: " + "UNKNOWN!!!");
 		}
 		return _lastShip;
 	}
@@ -112,7 +116,7 @@ public abstract class BaseShipProtocol implements GameProtocol {
 			Destination _market = _mapManager.getMarket();
 
 			Pixel destP = marketPos;
-			if (!dest.getName().equals("Market")) {
+			if (!dest.getName().startsWith("Market")) {
 				int x = marketPos.x + dest.getRelativePosition().x - _market.getImageData().get_xOff() - 35;
 				int y = marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 35;
 				Rectangle destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
@@ -123,7 +127,7 @@ public abstract class BaseShipProtocol implements GameProtocol {
 					y = marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 35;
 					destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
 				}
-				LOGGER.info("Using custom area for " + dest.getImage());
+				LOGGER.fine("Using custom area for " + dest.getImage());
 				destP = _scanner.scanOneFast(dest.getImageData(), destArea, false);
 			}
 
@@ -136,19 +140,19 @@ public abstract class BaseShipProtocol implements GameProtocol {
 				Pixel destTitle = _scanner.scanOneFast(dest.getImageDataTitle(), null, false);
 
 				if (destTitle != null) {
-					LOGGER.info("SEND POPUP OPEN...");
+					LOGGER.fine("SEND POPUP OPEN...");
+					LOGGER.info("OPTION: " + dest.getOption());
 					_mouse.mouseMove(_scanner.getParkingPoint());
 					_mouse.delay(100);
 
 					Pixel destButton = _scanner.scanOneFast("dest/setSail.bmp", null, false);
 					if (destButton != null) {
 						// nice. we can continue
-						if (dest.getName().equals("Market")) {
-							LOGGER.info("Market! I choose " + _mapManager.getMarketStrategy());
-							if (_mapManager.getMarketStrategy().equals("XP")) {
-								// do XP
-							} else {
-								// do money
+						if (dest.getName().startsWith("Market")) {
+							if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
+								//XP
+							} else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
+								//coins
 								Pixel coins = new Pixel(destTitle);
 								coins.y += 228;
 								_mouse.click(coins);

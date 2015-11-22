@@ -58,7 +58,7 @@
     "_crew": 40,
     "_capacity": 9,
     "_favorite": true,
-    "_active": false,
+    "_active": true,
     
     "_imageTitle": "ships/PeterVonDanzigS.bmp"
   },
@@ -103,7 +103,7 @@
     "_crew": 40,
     "_capacity": 7,
     "_favorite": true,
-    "_active": false,
+    "_active": true,
     
     "_imageTitle": "ships/VenetianS.bmp"
   }
