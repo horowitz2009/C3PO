@@ -3,6 +3,7 @@ package com.horowitz.seaport.model;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.horowitz.commons.Deserializable;
 import com.horowitz.seaport.model.storage.Deserializer;
@@ -14,6 +15,7 @@ public class ProtocolEntry implements Serializable, Cloneable, Deserializable {
 	private String _chainStr;
 	private transient Ship _ship;
 	private transient LinkedList<Destination> _chain;
+	private transient List<DispatchEntry> _dispatchEntries;
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
@@ -58,13 +60,17 @@ public class ProtocolEntry implements Serializable, Cloneable, Deserializable {
 	public void setChain(LinkedList<Destination> chain) {
 		_chain = chain;
 		/*
-		String s = "";
-		for (Destination d : chain) {
-	    s += d.getAbbr() + ",";
-    }
-		if (s.length() > 0)
-			s = s.substring(0, s.length() - 2);
-		_chainStr = s;
-		*/
+		 * String s = ""; for (Destination d : chain) { s += d.getAbbr() + ","; } if (s.length() > 0) s = s.substring(0, s.length() - 2); _chainStr = s;
+		 */
+	}
+
+	public void setDispatchEntries(List<DispatchEntry> des) {
+
+		_dispatchEntries = des;
+
+	}
+
+	public List<DispatchEntry> getDispatchEntries() {
+		return _dispatchEntries;
 	}
 }

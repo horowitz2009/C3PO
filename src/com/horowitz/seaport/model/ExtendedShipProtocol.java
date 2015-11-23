@@ -10,6 +10,7 @@ import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
+import com.horowitz.seaport.model.storage.ProtocolEntryDeserializer;
 
 public class ExtendedShipProtocol extends BaseShipProtocol {
 

@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
+import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 
@@ -30,7 +31,7 @@ public class JsonStorage {
 
 		String json = _gson.toJson(buildings);
 
-		FileUtils.writeStringToFile(new File("data/buildings.json"), json);
+		FileUtils.writeStringToFile(new File("data/Building.json"), json);
 	}
 
 	public List<Destination> loadDestinations() throws IOException {
@@ -64,18 +65,33 @@ public class JsonStorage {
 	}
 
 	public void saveShipProtocols(List<ShipProtocol> shipProtocols) throws IOException {
-		
+
 		String json = _gson.toJson(shipProtocols);
-		
+
 		FileUtils.writeStringToFile(new File("data/shipProtocols.json"), json);
 	}
-	
+
 	public List<ShipProtocol> loadShipProtocols() throws IOException {
 		String json = FileUtils.readFileToString(new File("data/shipProtocols.json"));
 
 		ShipProtocol[] array = _gson.fromJson(json, ShipProtocol[].class);
 
 		return new ArrayList<ShipProtocol>(Arrays.asList(array));
+	}
+
+	public List<DispatchEntry> loadDispatchEntries() throws IOException {
+		String json = FileUtils.readFileToString(new File("data/dispatchEntries.json"));
+
+		DispatchEntry[] dispatchEntries = _gson.fromJson(json, DispatchEntry[].class);
+
+		return new ArrayList<DispatchEntry>(Arrays.asList(dispatchEntries));
+	}
+
+	public void saveDispatchLog(List<DispatchEntry> dispatchEntries) throws IOException {
+
+		String json = _gson.toJson(dispatchEntries);
+
+		FileUtils.writeStringToFile(new File("data/dispatchEntries.json"), json);
 	}
 
 }
