@@ -76,7 +76,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.24i";
+	private static String APP_TITLE = "Seaport v0.24k";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -116,7 +116,7 @@ public class MainFrame extends JFrame {
 
 	private JLabel _shipSentLabel;
 
-	private ProtocolManagerUI _protocolManagerUI;
+	private ShipProtocolManagerUI _shipProtocolManagerUI;
 
 	public static void main(String[] args) {
 
@@ -303,14 +303,12 @@ public class MainFrame extends JFrame {
 	private ExtendedShipProtocol _extendedShipProtocol;
 
 	private JPanel createShipProtocolManagerPanel() {
-		_protocolManagerUI = new ProtocolManagerUI(_mapManager);
-		_protocolManagerUI.addListSelectionListener(new ListSelectionListener() {
+		_shipProtocolManagerUI = new ShipProtocolManagerUI(_mapManager);
+		_shipProtocolManagerUI.addListSelectionListener(new ListSelectionListener() {
 
-			@Override
+			@SuppressWarnings("rawtypes")
+      @Override
 			public void valueChanged(ListSelectionEvent e) {
-
-				// TODO Auto-generated method stub
-				System.err.println("YEEEEEEEEEEEEEEAAAH");
 				if (!e.getValueIsAdjusting()) {
 					JList list = (JList) e.getSource();
 					_shipProtocol = (ShipProtocol) list.getSelectedValue();
@@ -318,7 +316,7 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		return _protocolManagerUI;
+		return _shipProtocolManagerUI;
 	}
 
 	private Container buildConsole() {
@@ -1015,6 +1013,7 @@ public class MainFrame extends JFrame {
 	private void scan() throws RobotInterruptedException {
 		try {
 			_mouse.savePosition();
+			_scanner.reset();
 			LOGGER.info("Scanning...");
 			setTitle(APP_TITLE + " ...");
 			boolean found = _scanner.locateGameArea(false);
@@ -1218,7 +1217,6 @@ public class MainFrame extends JFrame {
 					_mouse.delay(15000);
 					boolean recovered = false;
 					for (int i = 0; i < 15; i++) {
-						_scanner.setOptimized(false);
 						scan();
 						if (_scanner.isOptimized()) {
 							recovered = true;

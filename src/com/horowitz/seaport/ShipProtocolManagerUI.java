@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,13 +29,13 @@ import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
-public class ProtocolManagerUI extends JPanel {
+public class ShipProtocolManagerUI extends JPanel {
 
 	private JList<ShipProtocol> _protocolsCB;
 	private MapManager _mapManager;
 	private ProtocolEditor _editor;
 
-	public ProtocolManagerUI(MapManager mapManager) {
+	public ShipProtocolManagerUI(MapManager mapManager) {
 		super();
 		_mapManager = mapManager;
 		initLayout();
@@ -44,12 +45,20 @@ public class ProtocolManagerUI extends JPanel {
 
 	class MyListModel extends DefaultListModel<ShipProtocol> {
 
+		@Override
+		public ShipProtocol remove(int index) {
+			// TODO Auto-generated method stub
+			return super.remove(index);
+		}
 	}
 
 	private void initLayout() {
 		setLayout(new BorderLayout());
-		// Box box = Box.createHorizontalBox();
+		Box box = Box.createVerticalBox();
+		JPanel headerPanel = new JPanel(new BorderLayout());
 		JToolBar toolbar = new JToolBar();
+		box.add(toolbar);
+		headerPanel.add(box, BorderLayout.EAST);
 		toolbar.setFloatable(false);
 
 		// THE LIST
@@ -57,8 +66,8 @@ public class ProtocolManagerUI extends JPanel {
 		_protocolsCB = new JList<ShipProtocol>(_model);
 		_protocolsCB.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		_protocolsCB.setVisibleRowCount(3);
-		toolbar.add(new JScrollPane(_protocolsCB));
-
+		// toolbar.add(new JScrollPane(_protocolsCB));
+		headerPanel.add(new JScrollPane(_protocolsCB), BorderLayout.CENTER);
 		{
 			JButton button = new JButton(new AbstractAction("New") {
 
@@ -80,12 +89,28 @@ public class ProtocolManagerUI extends JPanel {
 			toolbar.add(button);
 		}
 		{
+			JButton button = new JButton(new AbstractAction("Delete") {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					delete();
+				}
+			});
+			shrinkFont(button, -1);
+			button.setMargin(new Insets(2, 2, 2, 2));
+
+			toolbar.add(button);
+		}
+
+		toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+		box.add(toolbar);
+
+		{
 			JButton button = new JButton(new AbstractAction("Save") {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
-
 					save();
 				}
 			});
@@ -96,7 +121,7 @@ public class ProtocolManagerUI extends JPanel {
 		}
 		{
 			JButton button = new JButton(new AbstractAction("Reload") {
-
+				
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					reload();
@@ -104,11 +129,11 @@ public class ProtocolManagerUI extends JPanel {
 			});
 			shrinkFont(button, -1);
 			button.setMargin(new Insets(2, 2, 2, 2));
-
+			
 			toolbar.add(button);
 		}
 
-		add(toolbar, BorderLayout.NORTH);
+		add(headerPanel, BorderLayout.NORTH);
 	}
 
 	private void initLayout2() {
@@ -203,12 +228,41 @@ public class ProtocolManagerUI extends JPanel {
 
 	}
 
+	private void delete() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
+				try {
+					JsonStorage js = new JsonStorage();
+					int index = _protocolsCB.getSelectedIndex();
+					_model.remove(index);
+
+					Enumeration<ShipProtocol> elements = _model.elements();
+					List<ShipProtocol> newList = new ArrayList<ShipProtocol>();
+					while (elements.hasMoreElements()) {
+						ShipProtocol shipProtocol = (ShipProtocol) elements.nextElement();
+						newList.add(shipProtocol);
+					}
+
+					js.saveShipProtocols(newList);
+					// _protocolsCB.setSelectedValue(null, false);
+					// _protocolsCB.setSelectedValue(originalProtocol, true);
+					revalidate();
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
+
 	public static void main(String[] args) {
 		try {
 			JFrame frame = new JFrame("TEST");
 			MapManager mapManager = new MapManager(new ScreenScanner(null));
 			mapManager.loadData();
-			ProtocolManagerUI panel = new ProtocolManagerUI(mapManager);
+			ShipProtocolManagerUI panel = new ShipProtocolManagerUI(mapManager);
 			frame.getContentPane().add(panel);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setBounds(400, 200, 400, 600);
@@ -225,9 +279,7 @@ public class ProtocolManagerUI extends JPanel {
 	}
 
 	public void addListSelectionListener(ListSelectionListener listener) {
-	  _protocolsCB.addListSelectionListener(listener);
-  }
-	
-	
-	
+		_protocolsCB.addListSelectionListener(listener);
+	}
+
 }

@@ -293,6 +293,13 @@ public class ScreenScanner {
 
 	private Pixel _rock = null;
 
+	public void reset() {
+		_rock = null;
+		_optimized = false;
+		_tl = null;
+	  _br = null;
+	}
+	
 	public boolean checkAndAdjustRock() throws IOException, AWTException, RobotInterruptedException {
 		boolean needRecalc = true;
 		if (_rock == null) {
@@ -311,7 +318,7 @@ public class ScreenScanner {
 
 		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93, _tl.y + 254);
 
-		if (Math.abs(_rock.x - goodRock.x) > 5 && Math.abs(_rock.x - goodRock.y) > 5) {
+		if (Math.abs(_rock.x - goodRock.x) > 5 && Math.abs(_rock.x - goodRock.y) > 2) {
 			// need adjusting
 			_mouse.drag2(_rock.x, _rock.y, goodRock.x, goodRock.y);
 			_mouse.delay(1200);
