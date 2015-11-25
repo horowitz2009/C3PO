@@ -12,11 +12,11 @@ import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.storage.ProtocolEntryDeserializer;
 
-public class ExtendedShipProtocol extends BaseShipProtocol {
+public class ExtendedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 	private ShipProtocol _shipProtocol;
 
-	public ExtendedShipProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public ExtendedShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
 		super(scanner, mouse, mapManager);
 	}
 

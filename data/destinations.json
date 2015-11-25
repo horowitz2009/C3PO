@@ -39,6 +39,19 @@
     "_imageTitle": "dest/GulfTitle.bmp"
   },
   {
+    "_name": "Blacksmith",
+    "_abbrs":"B,BS",
+    "_time": 60,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 121,
+      "y": 94
+    },
+    "_image": "dest/Blacksmith.bmp",
+    "_imageTitle": "dest/BlacksmithTitle.bmp"
+  },
+  {
     "_name": "Cocoa Plant",
     "_abbrs":"CP,CPL",
     "_time": 120,

@@ -10,11 +10,11 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public class CocoaProtocol1 extends BaseShipProtocol {
+public class CocoaProtocol1Executor extends BaseShipProtocolExecutor {
 
 	private String _noCocoaShip;
 
-	public CocoaProtocol1(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public CocoaProtocol1Executor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
 		super(scanner, mouse, mapManager);
 		_noCocoaShip = "Mary Rose";
 

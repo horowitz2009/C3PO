@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="create_run_jar" name="Create Runnable Jar for Project Mickey2">
-	<!--<taskdef resource="net/sf/antcontrib/antcontrib.properties" />-->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
 
-	<property name="versionNumber" value="024k" />
+	<property name="versionNumber" value="026" />
 
 	<property name="jarname" value="Seaport${versionNumber}.jar" description="" />
 	<property name="dropboxjarname" value="DropboxRemote${versionNumber}.jar" description="" />
@@ -19,36 +19,16 @@
 			<fileset dir="bin" />
 		</jar>
 
-        <property name="subfolder" value="office" />
-	  
-		<property name="home_subfolder" value="home" />
-		<property name="home_subfolder2" value="home2" />
-		<property name="office_subfolder" value="office" />
-		<property name="office2_subfolder" value="office2" />
-		<property name="programs_subfolder" value="programs" />
 
-		<!--<foreach list="${office_subfolder}" param="subfolder" target="copy" />-->
+		<property name="subfolder" value="office" />
+	  
+		<property name="office_subfolder" value="office" />
+		<property name="spZhivko_subfolder" value="SeaportZHIVKO" />
+
+		<foreach list="${office_subfolder},${spZhivko_subfolder}" param="subfolder" target="copy" />
+		
 		<!-- from list => ,${office2_subfolder},${programs_subfolder} -->
 	  
-		<mkdir dir="${dropbox}/${subfolder}" />
-		<copy todir="${dropbox}/${subfolder}" file="${jarname}" />
-		<mkdir dir="${dropbox}/${subfolder}/lib" />
-		<copy file="lib/commons-lang-2.1.jar" todir="${dropbox}/${subfolder}/lib" />
-		<copy file="lib/json-simple-1.1.1.jar" todir="${dropbox}/${subfolder}/lib" />
-		<copy file="lib/gson-2.3.jar" todir="${dropbox}/${subfolder}/lib" />
-		<copy file="lib/commons-io-2.4.jar" todir="${dropbox}/${subfolder}/lib" />
-		<copy file="data/destinations.json" todir="${dropbox}/${subfolder}/data" />
-		<copy file="data/buildings.json" todir="${dropbox}/${subfolder}/data" />
-		<copy file="data/buildings2.json" todir="${dropbox}/${subfolder}/data" />
-		<copy file="data/ships.json" todir="${dropbox}/${subfolder}/data" />
-
-		
-		<copy todir="${dropbox}/${subfolder}/lib">
-			<fileset dir="lib" includes="**" />
-			
-		</copy>
-
-
 	</target>
 
 	<target name="create_dropbox_remote_jar">
@@ -125,6 +105,13 @@
 			<fileset dir="lib" includes="**" />
 			
 		</copy>
+		
+		
+    <copy file="data/destinations.json" todir="${dropbox}/${subfolder}/data" />
+    <copy file="data/buildings.json" todir="${dropbox}/${subfolder}/data" />
+    <copy file="data/buildings2.json" todir="${dropbox}/${subfolder}/data" />
+    <copy file="data/ships.json" todir="${dropbox}/${subfolder}/data" />
+
 
 	</target>
 	

@@ -16,7 +16,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public abstract class BaseShipProtocol implements GameProtocol {
+public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 	protected final static Logger LOGGER = Logger.getLogger("MAIN");
 
@@ -29,11 +29,11 @@ public abstract class BaseShipProtocol implements GameProtocol {
 	private PropertyChangeSupport _support;
 	protected Ship _lastShip;
 
-	public BaseShipProtocol() {
+	public BaseShipProtocolExecutor() {
 		super();
 	}
 
-	public BaseShipProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public BaseShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
 		_scanner = scanner;
 		_mouse = mouse;
 		_mapManager = mapManager;

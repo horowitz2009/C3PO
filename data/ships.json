@@ -1,5 +1,32 @@
 [
   {
+    "_name": "Margaret",
+    "_crew": 70,
+    "_capacity": 18,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/MargaretS.bmp"
+  },
+  {
+    "_name": "Halygast",
+    "_crew": 70,
+    "_capacity": 16,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/HalygastS.bmp"
+  },
+  {
+    "_name": "Ark Royal",
+    "_crew": 70,
+    "_capacity": 17,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/ArkRoyalS.bmp"
+  },
+  {
     "_name": "Berrio",
     "_crew": 70,
     "_capacity": 16,

@@ -61,9 +61,9 @@ import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
+import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
-import com.horowitz.seaport.model.ExtendedShipProtocol;
 import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
 import com.horowitz.seaport.model.Ship;
@@ -76,7 +76,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.24k";
+	private static String APP_TITLE = "Seaport v0.26";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -179,9 +179,9 @@ public class MainFrame extends JFrame {
 
 			// SHIPS TASK
 			_shipsTask = new Task("Ships", 2);
-			_extendedShipProtocol = new ExtendedShipProtocol(_scanner, _mouse, _mapManager);
-			_extendedShipProtocol.addPropertyChangeListener(new StatsListener());
-			_shipsTask.setProtocol(_extendedShipProtocol);
+			_shipProtocolExecutor = new BalancedShipProtocolExecutor(_scanner, _mouse, _mapManager);
+			_shipProtocolExecutor.addPropertyChangeListener(new StatsListener());
+			_shipsTask.setProtocol(_shipProtocolExecutor);
 			_tasks.add(_shipsTask);
 
 			// BUILDING TASK
@@ -300,19 +300,19 @@ public class MainFrame extends JFrame {
 	}
 
 	private ShipProtocol _shipProtocol;
-	private ExtendedShipProtocol _extendedShipProtocol;
+	private BalancedShipProtocolExecutor _shipProtocolExecutor;
 
 	private JPanel createShipProtocolManagerPanel() {
 		_shipProtocolManagerUI = new ShipProtocolManagerUI(_mapManager);
 		_shipProtocolManagerUI.addListSelectionListener(new ListSelectionListener() {
 
 			@SuppressWarnings("rawtypes")
-      @Override
+			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
 					JList list = (JList) e.getSource();
 					_shipProtocol = (ShipProtocol) list.getSelectedValue();
-					_extendedShipProtocol.setShipProtocol(_shipProtocol);
+					_shipProtocolExecutor.setShipProtocol(_shipProtocol);
 				}
 			}
 		});
@@ -1192,13 +1192,13 @@ public class MainFrame extends JFrame {
 			long now, t1 = 0, t2 = 0, t3, t4;
 			if (!fast) {
 				Rectangle area = _scanner.generateWindowedArea(412, 550);
-				p = _scanner.scanOneFast("reload.bmp", area, true);
+				p = _scanner.scanOneFast("reload.bmp", area, false);
 				now = System.currentTimeMillis();
 
 				t1 = now - start;
 				t2 = now;
 				if (p == null) {
-					p = _scanner.scanOneFast("reload2.bmp", area, true);
+					p = _scanner.scanOneFast("reload2.bmp", area, false);
 					now = System.currentTimeMillis();
 					t2 = now - t2;
 				}
@@ -1206,11 +1206,13 @@ public class MainFrame extends JFrame {
 				found = p != null;
 				if (found) {
 					// check is this 'logged twice' message
-					p = _scanner.scanOneFast("accountLoggedTwice.bmp", area, false);
-					if (p != null) {
+					Pixel pp = _scanner.scanOneFast("accountLoggedTwice.bmp", area, false);
+					if (pp != null) {
 						LOGGER.info("Logged somewhere else. I'm done here!");
 						_stopAllThreads = true;
 						throw new RobotInterruptedException();
+					} else {
+						_mouse.click(p);
 					}
 
 					LOGGER.info("Game crashed. Reloading...");

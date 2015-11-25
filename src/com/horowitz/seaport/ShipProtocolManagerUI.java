@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -31,9 +32,13 @@ import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class ShipProtocolManagerUI extends JPanel {
 
+	private static final long serialVersionUID = -7071726658090210055L;
+
+	private final static Logger LOGGER = Logger.getLogger("MAIN");
+
 	private JList<ShipProtocol> _protocolsCB;
 	private MapManager _mapManager;
-	private ProtocolEditor _editor;
+	private ShipProtocolEditor _editor;
 
 	public ShipProtocolManagerUI(MapManager mapManager) {
 		super();
@@ -44,6 +49,8 @@ public class ShipProtocolManagerUI extends JPanel {
 	}
 
 	class MyListModel extends DefaultListModel<ShipProtocol> {
+
+		private static final long serialVersionUID = 69819251586227856L;
 
 		@Override
 		public ShipProtocol remove(int index) {
@@ -71,6 +78,8 @@ public class ShipProtocolManagerUI extends JPanel {
 		{
 			JButton button = new JButton(new AbstractAction("New") {
 
+				private static final long serialVersionUID = -5425554498351718634L;
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					ShipProtocol newProtocol = new ShipProtocol("protocol1");
@@ -91,6 +100,8 @@ public class ShipProtocolManagerUI extends JPanel {
 		{
 			JButton button = new JButton(new AbstractAction("Delete") {
 
+				private static final long serialVersionUID = -1222153976393040354L;
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					delete();
@@ -109,6 +120,8 @@ public class ShipProtocolManagerUI extends JPanel {
 		{
 			JButton button = new JButton(new AbstractAction("Save") {
 
+				private static final long serialVersionUID = 5948927888679182764L;
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					save();
@@ -121,7 +134,9 @@ public class ShipProtocolManagerUI extends JPanel {
 		}
 		{
 			JButton button = new JButton(new AbstractAction("Reload") {
-				
+
+				private static final long serialVersionUID = 416742172579291138L;
+
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					reload();
@@ -129,7 +144,31 @@ public class ShipProtocolManagerUI extends JPanel {
 			});
 			shrinkFont(button, -1);
 			button.setMargin(new Insets(2, 2, 2, 2));
-			
+
+			toolbar.add(button);
+		}
+
+		toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+		box.add(toolbar);
+
+		{
+			JButton button = new JButton(new AbstractAction("Reset") {
+
+				private static final long serialVersionUID = -3713150472570464769L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						_mapManager.resetDispatchEntries();
+					} catch (IOException e1) {
+						LOGGER.info("Failed to reset entries!");
+					}
+				}
+			});
+			shrinkFont(button, -1);
+			button.setMargin(new Insets(2, 2, 2, 2));
+
 			toolbar.add(button);
 		}
 
@@ -137,7 +176,7 @@ public class ShipProtocolManagerUI extends JPanel {
 	}
 
 	private void initLayout2() {
-		_editor = new ProtocolEditor(_mapManager);
+		_editor = new ShipProtocolEditor(_mapManager);
 		add(_editor, BorderLayout.CENTER);
 
 		_protocolsCB.addListSelectionListener(new ListSelectionListener() {

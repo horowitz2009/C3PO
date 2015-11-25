@@ -1,9 +1,15 @@
 package com.horowitz.seaport.model;
 
 import java.awt.AWTException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.lang.builder.CompareToBuilder;
 
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
@@ -13,12 +19,32 @@ import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.storage.BalancedProtocolEntryDeserializer;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
-public class BalancedShipProtocol extends BaseShipProtocol {
+public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 	private ShipProtocol _shipProtocol;
 
-	public BalancedShipProtocol(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public BalancedShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager)
+	    throws IOException {
 		super(scanner, mouse, mapManager);
+
+		addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				// TODO Auto-generated method stub
+				// _support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+				if (evt.getPropertyName().equals("SHIP_SENT")) {
+					Destination dest = (Destination) evt.getOldValue();
+					Ship ship = (Ship) evt.getNewValue();
+					try {
+						_mapManager.registerTrip(ship, dest);
+					} catch (IOException e) {
+						LOGGER.info("Failed to save dispatch entries");
+					}
+				}
+
+			}
+		});
 	}
 
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
@@ -64,10 +90,27 @@ public class BalancedShipProtocol extends BaseShipProtocol {
 					}
 				}
 
-				/*
-				 * 
-				 */
-				sendShip(new LinkedList<Destination>(_destChain));
+				// now that we have Z and times/ let's calculate the coef
+				for (DispatchEntry de : des) {
+					de.setCoef(de.getTimes() * z / de.getGoal());
+				}
+
+				// next sort by this coef
+				Collections.sort(des, new Comparator<DispatchEntry>() {
+					@Override
+					public int compare(DispatchEntry o1, DispatchEntry o2) {
+						return new CompareToBuilder().append(o1.getCoef(), o2.getCoef()).toComparison();
+					}
+				});
+
+				// finally extract the result in form of dest chain
+				LinkedList<Destination> chainList = new LinkedList<Destination>();
+				for (DispatchEntry de : des) {
+					chainList.add(_mapManager.getDestinationByAbbr(de.getDest()));
+				}
+
+				// use this chain
+				sendShip(new LinkedList<Destination>(chainList));
 
 			} else {
 				LOGGER.info("ERROR: BADLY DEFINED PROTOCOL!");

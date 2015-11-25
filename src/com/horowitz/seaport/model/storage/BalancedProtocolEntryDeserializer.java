@@ -43,7 +43,6 @@ public class BalancedProtocolEntryDeserializer implements Deserializer {
 				}
 			}
 			de.setGoal(goal);
-			de.setDest(ds);
 			de.setShip(entry.getShipName());
 
 			des.add(de);

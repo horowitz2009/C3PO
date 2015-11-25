@@ -3,6 +3,7 @@ package com.horowitz.seaport.dest;
 import java.awt.AWTException;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.Destination;
+import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.storage.GameUnitDeserializer;
 import com.horowitz.seaport.model.storage.JsonStorage;
@@ -217,6 +219,33 @@ public class MapManager {
 
 	public void setMarketPos(Pixel marketPos) {
 		_marketPos = marketPos;
+	}
+
+	public void resetDispatchEntries() throws IOException {
+		JsonStorage jsonStorage = new JsonStorage();
+		jsonStorage.saveDispatchEntries(new ArrayList<DispatchEntry>());
+	}
+
+	public void registerTrip(Ship ship, Destination dest) throws IOException {
+		JsonStorage jsonStorage = new JsonStorage();
+		List<DispatchEntry> des = jsonStorage.loadDispatchEntries();
+		boolean found = false;
+		for (DispatchEntry de : des) {
+			if (de.getShip().equals(ship.getName()) && de.getDest().equals(dest.getAbbr())) {
+				de.setTimes(de.getTimes() + 1);
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			DispatchEntry newDE = new DispatchEntry();
+			newDE.setShip(ship.getName());
+			newDE.setDest(dest.getAbbr());
+			newDE.setTimes(1);
+			des.add(newDE);
+		}
+		jsonStorage.saveDispatchEntries(des);
+
 	}
 
 }

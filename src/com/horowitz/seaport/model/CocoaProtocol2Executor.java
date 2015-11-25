@@ -12,14 +12,14 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public class CocoaProtocol2 extends BaseShipProtocol {
+public class CocoaProtocol2Executor extends BaseShipProtocolExecutor {
 
 	private List<String> _cocoaShips;
 	private List<String> _otherShips;
 
 	private String _sellingShip;
 
-	public CocoaProtocol2(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public CocoaProtocol2Executor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
 		super(scanner, mouse, mapManager);
 
 		_cocoaShips = new ArrayList<>();

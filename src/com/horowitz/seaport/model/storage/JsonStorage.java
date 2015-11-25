@@ -80,14 +80,17 @@ public class JsonStorage {
 	}
 
 	public List<DispatchEntry> loadDispatchEntries() throws IOException {
-		String json = FileUtils.readFileToString(new File("data/dispatchEntries.json"));
+		File f = new File("data/dispatchEntries.json");
+		if (!f.exists())
+			saveDispatchEntries(new ArrayList<DispatchEntry>());
+		String json = FileUtils.readFileToString(f);
 
 		DispatchEntry[] dispatchEntries = _gson.fromJson(json, DispatchEntry[].class);
 
 		return new ArrayList<DispatchEntry>(Arrays.asList(dispatchEntries));
 	}
 
-	public void saveDispatchLog(List<DispatchEntry> dispatchEntries) throws IOException {
+	public void saveDispatchEntries(List<DispatchEntry> dispatchEntries) throws IOException {
 
 		String json = _gson.toJson(dispatchEntries);
 

@@ -10,6 +10,7 @@ public class DispatchEntry implements Serializable {
 	private String _dest;
 	private int _times;
 	private transient float _goal;
+	private transient float _coef;
 
 	public String getShip() {
 		return _ship;
@@ -41,6 +42,14 @@ public class DispatchEntry implements Serializable {
 
 	public void setGoal(float goal) {
 		_goal = goal;
+	}
+
+	public float getCoef() {
+		return _coef;
+	}
+
+	public void setCoef(float coef) {
+		_coef = coef;
 	}
 
 }

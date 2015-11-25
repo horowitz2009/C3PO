@@ -37,14 +37,14 @@ import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
-public class ProtocolEditor extends JPanel {
+public class ShipProtocolEditor extends JPanel {
 
 	private static final long serialVersionUID = -7306243578379329501L;
 	private Box _box;
 	private MapManager _mapManager;
 	private JTextField _titleTF;
 
-	public ProtocolEditor(MapManager mapManager) {
+	public ShipProtocolEditor(MapManager mapManager) {
 		super(new BorderLayout());
 		_mapManager = mapManager;
 		initLayout();
@@ -311,7 +311,7 @@ public class ProtocolEditor extends JPanel {
 			JFrame frame = new JFrame("TEST");
 			MapManager mapManager = new MapManager(new ScreenScanner(null));
 			mapManager.loadData();
-			ProtocolEditor panel = new ProtocolEditor(mapManager);
+			ShipProtocolEditor panel = new ShipProtocolEditor(mapManager);
 			frame.getContentPane().add(panel);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			frame.setBounds(400, 200, 500, 600);
