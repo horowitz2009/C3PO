@@ -99,7 +99,9 @@ public class ManualBuildingsProtocol implements GameProtocol {
 				_mouse.mouseMove(_scanner.getParkingPoint());
 				_mouse.delay(1000);
 
-				Pixel produceButton = _scanner.scanOneFast("buildings/produce2.bmp", null, true);
+				Pixel produceButton = _scanner.scanOneFast("buildings/produce.bmp", null, true);
+				if (produceButton == null)
+				  produceButton = _scanner.scanOneFast("buildings/produce2.bmp", null, true);
 				if (produceButton != null) {
 					_mouse.delay(2000);
 				} else {

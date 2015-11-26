@@ -156,7 +156,7 @@ public class ScreenScanner {
 		_safePoint = new Pixel(_br.x - 15, _br.y - 15);
 		_parkingPoint = new Pixel(_br);
 
-		getImageData("rockEdge.bmp", _scanArea, -45, 26);
+		getImageData("ROCK.bmp", _scanArea, 10, 44);
 		getImageData("pin.bmp", _scanArea, 6, 6);
 
 		area = new Rectangle(_br.x - 110, _br.y - 75, 60, 40);
@@ -194,6 +194,7 @@ public class ScreenScanner {
 		ImageData wa = getImageData("buildings/whiteArrow.bmp", _popupArea, 0, 0);
 		wa.setColorToBypass(Color.BLACK);
 
+		getImageData("buildings/produce.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/produce2.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/produceGray.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/x.bmp", _popupAreaX, 10, 10);
@@ -332,25 +333,25 @@ public class ScreenScanner {
 	public Pixel findRock() throws IOException, AWTException, RobotInterruptedException {
 		Rectangle area = new Rectangle(_tl.x + 450, _tl.y + 43, 760, 450);
 
-		Pixel p = scanOne("rockEdge.bmp", area, false);
+		Pixel p = scanOne("ROCK.bmp", area, false);
 		// writeImage(area, "admArea1.png");
 		if (p == null) {
 			LOGGER.info("Rock try 2 ...");
-			p = scanOne("rockEdge.bmp", getScanArea(), false);
+			p = scanOne("ROCK.bmp", getScanArea(), false);
 		}
 		_rock = p;
 		return p;
 	}
 
 	public Pixel findRockAgain(Pixel oldRock) throws IOException, AWTException, RobotInterruptedException {
-		ImageData rockData = getImageData("rockEdge.bmp");
+		ImageData rockData = getImageData("ROCK.bmp");
 		Rectangle area = rockData.getDefaultArea();
 		if (oldRock != null) {
 			int x = oldRock.x - rockData.get_xOff();
 			int y = oldRock.y - rockData.get_yOff();
-			area = new Rectangle(x - 20, y - 20, 55 + 40, 18 + 40);
+			area = new Rectangle(x - 20, y - 20, 31 + 40, 28 + 40);
 		}
-		Pixel p = scanOne("rockEdge.bmp", area, false);
+		Pixel p = scanOne("ROCK.bmp", area, false);
 		if (p == null) {
 			LOGGER.info("Rock not found in the same place.");
 			LOGGER.info("Looking again for the rock...");

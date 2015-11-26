@@ -61,10 +61,10 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			// MAP IS OPEN
 			_mapManager.ensureMap();
 
-			Ship ship = _lastShip;
-			if (ship == null) {
-				ship = new Ship("<Unknown>");
+			if (_lastShip == null) {
+				_lastShip = new Ship("<Unknown>");
 			}
+			Ship ship = _lastShip;
 			List<ProtocolEntry> entries = _shipProtocol.getEntries();
 
 			ProtocolEntry pe = findSuitableProtocolEntry(ship, entries);
