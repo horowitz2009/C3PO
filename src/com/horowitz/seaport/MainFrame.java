@@ -3,11 +3,15 @@ package com.horowitz.seaport;
 import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.Insets;
 import java.awt.KeyEventDispatcher;
 import java.awt.MouseInfo;
 import java.awt.Point;
@@ -27,8 +31,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -64,11 +71,13 @@ import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
+import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
+import com.horowitz.seaport.model.storage.JsonStorage;
 
 public class MainFrame extends JFrame {
 
@@ -76,7 +85,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.27";
+	private static String APP_TITLE = "Seaport v0.27b";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -181,6 +190,19 @@ public class MainFrame extends JFrame {
 			_shipsTask = new Task("Ships", 2);
 			_shipProtocolExecutor = new BalancedShipProtocolExecutor(_scanner, _mouse, _mapManager);
 			_shipProtocolExecutor.addPropertyChangeListener(new StatsListener());
+			_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					DispatchEntry de = (DispatchEntry) evt.getNewValue();
+					JLabel l = _labels.get(de.getDest());
+					if (l != null) {
+						l.setText("" + de.getTimes());
+					}
+
+				}
+			});
+
 			_shipsTask.setProtocol(_shipProtocolExecutor);
 			_tasks.add(_shipsTask);
 
@@ -199,6 +221,7 @@ public class MainFrame extends JFrame {
 		}
 
 		initLayout();
+		loadStats();
 
 	}
 
@@ -234,6 +257,7 @@ public class MainFrame extends JFrame {
 
 		Box north = Box.createVerticalBox();
 		north.add(toolbars);
+		north.add(createStatsPanel());
 		north.add(createShipProtocolManagerPanel());
 
 		if (_testMode) {
@@ -297,6 +321,101 @@ public class MainFrame extends JFrame {
 
 		// //KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new
 		// MyKeyEventDispatcher());
+	}
+
+	private Map<String, JLabel> _labels = new HashMap<String, JLabel>();
+
+	private Component createStatsPanel() {
+		JPanel panel = new JPanel(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		GridBagConstraints gbc2 = new GridBagConstraints();
+		JLabel l;
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		gbc2.gridx = 2;
+		gbc2.gridy = 1;
+
+		gbc.insets = new Insets(2, 2, 2, 2);
+		gbc.anchor = GridBagConstraints.WEST;
+		gbc2.insets = new Insets(2, 4, 2, 2);
+		gbc2.anchor = GridBagConstraints.EAST;
+
+		// S
+		panel.add(new JLabel("S:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("S", l);
+		panel.add(l, gbc2);
+
+		// G
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("G:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("G", l);
+		panel.add(l, gbc2);
+
+		// CP
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("CP:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("CP", l);
+		panel.add(l, gbc2);
+
+		// MC
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("MC:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("MC", l);
+		panel.add(l, gbc2);
+
+		gbc.insets = new Insets(2, 12, 2, 2);
+		gbc.gridx = 3;
+		gbc2.gridx = 4;
+		gbc.gridy = 0;
+		gbc2.gridy = 0;
+
+		// BM
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("BM:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("BM", l);
+		panel.add(l, gbc2);
+
+		// BS
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("BS:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("BS", l);
+		panel.add(l, gbc2);
+
+		// RB
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("RB:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("RB", l);
+		panel.add(l, gbc2);
+
+		// NH
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("NH:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("NH", l);
+		panel.add(l, gbc2);
+
+		// FAKE
+		gbc2.gridx++;
+		gbc2.gridy++;
+		gbc2.weightx = 1.0f;
+		gbc2.weighty = 1.0f;
+		panel.add(new JLabel(""), gbc2);
+
+		return panel;
 	}
 
 	private ShipProtocol _shipProtocol;
@@ -1028,6 +1147,8 @@ public class MainFrame extends JFrame {
 
 				LOGGER.info("GAME FOUND! INSOMNIA READY!");
 				setTitle(APP_TITLE + " READY");
+				
+				loadStats();
 				_mouse.restorePosition();
 			} else {
 				LOGGER.info("CAN'T FIND THE GAME!");
@@ -1039,6 +1160,22 @@ public class MainFrame extends JFrame {
 		}
 
 	}
+
+	private void loadStats() {
+	  try {
+	    List<DispatchEntry> des = new JsonStorage().loadDispatchEntries();
+	    for (DispatchEntry de : des) {
+				JLabel l = _labels.get(de.getDest());
+				if (l != null) {
+					l.setText("" + de.getTimes());
+				}
+
+      }
+    } catch (IOException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+    }
+  }
 
 	private Rectangle generateMiniArea(Pixel p) {
 		return new Rectangle(p.x - 2 - 18, p.y - 50 + 35, 44, 60);

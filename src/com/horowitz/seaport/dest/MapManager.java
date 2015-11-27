@@ -2,6 +2,8 @@ package com.horowitz.seaport.dest;
 
 import java.awt.AWTException;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,27 +227,42 @@ public class MapManager {
 		JsonStorage jsonStorage = new JsonStorage();
 		jsonStorage.saveDispatchEntries(new ArrayList<DispatchEntry>());
 	}
+	
+	PropertyChangeSupport _support = new PropertyChangeSupport(this); 
 
 	public void registerTrip(Ship ship, Destination dest) throws IOException {
 		JsonStorage jsonStorage = new JsonStorage();
 		List<DispatchEntry> des = jsonStorage.loadDispatchEntries();
 		boolean found = false;
+		DispatchEntry theDE = null;
 		for (DispatchEntry de : des) {
 			if (de.getShip().equals(ship.getName()) && de.getDest().equals(dest.getAbbr())) {
 				de.setTimes(de.getTimes() + 1);
+				theDE = de;
 				found = true;
 				break;
 			}
 		}
 		if (!found) {
-			DispatchEntry newDE = new DispatchEntry();
-			newDE.setShip(ship.getName());
-			newDE.setDest(dest.getAbbr());
-			newDE.setTimes(1);
-			des.add(newDE);
+			theDE = new DispatchEntry();
+			theDE.setShip(ship.getName());
+			theDE.setDest(dest.getAbbr());
+			theDE.setTimes(1);
+			des.add(theDE);
 		}
+		assert theDE != null;
+		
 		jsonStorage.saveDispatchEntries(des);
+		_support.firePropertyChange("TRIP_REGISTERED", null, theDE);
 
 	}
+
+	public void addPropertyChangeListener(PropertyChangeListener listener) {
+	  _support.addPropertyChangeListener(listener);
+  }
+
+	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+	  _support.addPropertyChangeListener(propertyName, listener);
+  }
 
 }
