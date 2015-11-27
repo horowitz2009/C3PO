@@ -90,19 +90,21 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 					}
 				}
 
-				// now that we have Z and times/ let's calculate the coef
-				for (DispatchEntry de : des) {
-					de.setCoef(de.getTimes() * z / de.getGoal());
-				}
+				if (Math.abs(1 - z) > 0.0000001) {// z > 1
 
-				// next sort by this coef
-				Collections.sort(des, new Comparator<DispatchEntry>() {
-					@Override
-					public int compare(DispatchEntry o1, DispatchEntry o2) {
-						return new CompareToBuilder().append(o1.getCoef(), o2.getCoef()).toComparison();
+					// now that we have Z and times/ let's calculate the coef
+					for (DispatchEntry de : des) {
+						de.setCoef(de.getTimes() * z / de.getGoal());
 					}
-				});
 
+					// next sort by this coef
+					Collections.sort(des, new Comparator<DispatchEntry>() {
+						@Override
+						public int compare(DispatchEntry o1, DispatchEntry o2) {
+							return new CompareToBuilder().append(o1.getCoef(), o2.getCoef()).toComparison();
+						}
+					});
+				}
 				// finally extract the result in form of dest chain
 				LinkedList<Destination> chainList = new LinkedList<Destination>();
 				for (DispatchEntry de : des) {
