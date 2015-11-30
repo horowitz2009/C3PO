@@ -2,6 +2,7 @@ package com.horowitz.seaport;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -177,6 +178,9 @@ public class ShipProtocolManagerUI extends JPanel {
 
 	private void initLayout2() {
 		_editor = new ShipProtocolEditor(_mapManager);
+		//_editor.setMinimumSize(new Dimension(300, 300));
+		//_editor.setPreferredSize(new Dimension(260, 300));
+		//add(new JScrollPane(_editor), BorderLayout.CENTER);
 		add(_editor, BorderLayout.CENTER);
 
 		_protocolsCB.addListSelectionListener(new ListSelectionListener() {

@@ -85,7 +85,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.27e";
+	private static String APP_TITLE = "Seaport v0.28";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -145,7 +145,7 @@ public class MainFrame extends JFrame {
 			frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
 			int w = 275;// frame.getSize().width;
 			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			int h = (int) (screenSize.height * 0.75);
+			int h = (int) (screenSize.height * 0.9);
 			int x = screenSize.width - w;
 			int y = (screenSize.height - h) / 2;
 			frame.setBounds(x, y, w, h);
@@ -321,6 +321,33 @@ public class MainFrame extends JFrame {
 		north.add(_mouseInfoLabel);
 		rootPanel.add(north, BorderLayout.NORTH);
 
+		
+		final JTextArea shipLog = new JTextArea(5,10);
+		rootPanel.add(new JScrollPane(shipLog), BorderLayout.SOUTH);
+		
+		_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String text = shipLog.getText();
+				if (text.length() > 3000) {
+					int ind = text.indexOf("\n", 2000);
+					if (ind <= 0)
+						ind = 2000;
+					text = text.substring(ind);
+					shipLog.setText(text);
+				}
+				
+				DispatchEntry de = (DispatchEntry) evt.getNewValue();
+				Calendar now = Calendar.getInstance();
+				SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+				shipLog.append(sdf.format(now.getTime()) + "  " + de.getDest() + "  " + de.getShip() + "\n");
+				shipLog.setCaretPosition(shipLog.getDocument().getLength());
+				
+			}
+		});
+
+		
 		// //KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new
 		// MyKeyEventDispatcher());
 	}
@@ -449,7 +476,11 @@ public class MainFrame extends JFrame {
 			public void publish(LogRecord record) {
 				String text = outputConsole.getText();
 				if (text.length() > 3000) {
-					outputConsole.setText("");
+					int ind = text.indexOf("\n", 2000);
+					if (ind <= 0)
+						ind = 2000;
+					text = text.substring(ind);
+					outputConsole.setText(text);
 				}
 				outputConsole.append(record.getMessage());
 				outputConsole.append("\n");
