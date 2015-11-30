@@ -85,7 +85,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.27b";
+	private static String APP_TITLE = "Seaport v0.27d";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -194,12 +194,14 @@ public class MainFrame extends JFrame {
 
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
-					DispatchEntry de = (DispatchEntry) evt.getNewValue();
-					JLabel l = _labels.get(de.getDest());
-					if (l != null) {
-						l.setText("" + de.getTimes());
-					}
-
+					loadStats();
+//					DispatchEntry de = (DispatchEntry) evt.getNewValue();
+//					JLabel l = _labels.get(de.getDest());
+//					if (l != null) {
+//						//l.setText("" + de.getTimes());
+//						//l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+//					}
+//
 				}
 			});
 
@@ -397,7 +399,7 @@ public class MainFrame extends JFrame {
 		gbc2.gridy++;
 		panel.add(new JLabel("RB:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("RB", l);
+		_labels.put("R", l);
 		panel.add(l, gbc2);
 
 		// NH
@@ -405,7 +407,7 @@ public class MainFrame extends JFrame {
 		gbc2.gridy++;
 		panel.add(new JLabel("NH:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("NH", l);
+		_labels.put("N", l);
 		panel.add(l, gbc2);
 
 		// FAKE
@@ -1147,7 +1149,7 @@ public class MainFrame extends JFrame {
 
 				LOGGER.info("GAME FOUND! INSOMNIA READY!");
 				setTitle(APP_TITLE + " READY");
-				
+
 				loadStats();
 				_mouse.restorePosition();
 			} else {
@@ -1162,20 +1164,27 @@ public class MainFrame extends JFrame {
 	}
 
 	private void loadStats() {
-	  try {
-	    List<DispatchEntry> des = new JsonStorage().loadDispatchEntries();
-	    for (DispatchEntry de : des) {
+		try {
+
+			Iterator<String> i = _labels.keySet().iterator();
+			while (i.hasNext()) {
+				String key = (String) i.next();
+				_labels.get(key).setText("" + 0);
+			}
+
+			List<DispatchEntry> des = new JsonStorage().loadDispatchEntries();
+			for (DispatchEntry de : des) {
 				JLabel l = _labels.get(de.getDest());
 				if (l != null) {
-					l.setText("" + de.getTimes());
+					l.setText("" + (Integer.parseInt(l.getText()) + de.getTimes()));
 				}
 
-      }
-    } catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-    }
-  }
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private Rectangle generateMiniArea(Pixel p) {
 		return new Rectangle(p.x - 2 - 18, p.y - 50 + 35, 44, 60);
