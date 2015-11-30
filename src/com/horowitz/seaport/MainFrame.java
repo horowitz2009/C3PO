@@ -85,7 +85,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.27d";
+	private static String APP_TITLE = "Seaport v0.27e";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -381,9 +381,9 @@ public class MainFrame extends JFrame {
 		// BM
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("BM:"), gbc);
+		panel.add(new JLabel("BB:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("BM", l);
+		_labels.put("BB", l);
 		panel.add(l, gbc2);
 
 		// BS
@@ -397,7 +397,7 @@ public class MainFrame extends JFrame {
 		// RB
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("RB:"), gbc);
+		panel.add(new JLabel("R:"), gbc);
 		l = new JLabel(" ");
 		_labels.put("R", l);
 		panel.add(l, gbc2);
@@ -405,7 +405,7 @@ public class MainFrame extends JFrame {
 		// NH
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("NH:"), gbc);
+		panel.add(new JLabel("N:"), gbc);
 		l = new JLabel(" ");
 		_labels.put("N", l);
 		panel.add(l, gbc2);

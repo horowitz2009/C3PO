@@ -40,7 +40,7 @@
   },
   {
     "_name": "Blacksmith",
-    "_abbrs":"B,BS",
+    "_abbrs":"BS",
     "_time": 60,
     "_favorite": true,
     "_relativePosition": {
@@ -94,7 +94,7 @@
   },
   {
     "_name": "Bamboo",
-    "_abbrs":"B,BM",
+    "_abbrs":"BB,BM",
     "_time": 10,
     "_favorite": false,
     "_relativePosition": {
