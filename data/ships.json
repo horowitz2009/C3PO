@@ -1,5 +1,32 @@
 [
   {
+    "_name": "Gerome",
+    "_crew": 50,
+    "_capacity": 19,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/GeromeS.bmp"
+  },
+  {
+    "_name": "Godisgrace",
+    "_crew": 50,
+    "_capacity": 19,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/GodisgraceS.bmp"
+  },
+  {
+    "_name": "Henry",
+    "_crew": 50,
+    "_capacity": 19,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/HenryS.bmp"
+  },
+  {
     "_name": "Margaret",
     "_crew": 70,
     "_capacity": 22,
@@ -103,7 +130,7 @@
     "_crew": 50,
     "_capacity": 13,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/SaoGabrielS.bmp"
   },
@@ -112,7 +139,7 @@
     "_crew": 50,
     "_capacity": 11,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/SaoMiguelS.bmp"
   },

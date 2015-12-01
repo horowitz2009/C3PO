@@ -331,7 +331,7 @@ public class ScreenScanner {
 	}
 
 	public Pixel findRock() throws IOException, AWTException, RobotInterruptedException {
-		Rectangle area = new Rectangle(_tl.x + 450, _tl.y + 43, 760, 450);
+		Rectangle area = new Rectangle(_tl.x + 350, _tl.y + 43, 860, getGameHeight() - 43);
 
 		Pixel p = scanOne("ROCK.bmp", area, false);
 		// writeImage(area, "admArea1.png");
