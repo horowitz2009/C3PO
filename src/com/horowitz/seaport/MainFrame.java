@@ -16,6 +16,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -24,15 +25,16 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -59,11 +61,14 @@ import javax.swing.JToolBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import com.horowitz.commons.DateUtils;
 import com.horowitz.commons.ImageData;
 import com.horowitz.commons.MouseRobot;
+import com.horowitz.commons.MyImageIO;
 import com.horowitz.commons.MyLogger;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Service;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
 import com.horowitz.seaport.dest.BuildingManager;
@@ -85,7 +90,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.29b";
+	private static String APP_TITLE = "Seaport v0.30";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -195,13 +200,13 @@ public class MainFrame extends JFrame {
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
-//					DispatchEntry de = (DispatchEntry) evt.getNewValue();
-//					JLabel l = _labels.get(de.getDest());
-//					if (l != null) {
-//						//l.setText("" + de.getTimes());
-//						//l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-//					}
-//
+					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
+					// JLabel l = _labels.get(de.getDest());
+					// if (l != null) {
+					// //l.setText("" + de.getTimes());
+					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+					// }
+					//
 				}
 			});
 
@@ -224,6 +229,8 @@ public class MainFrame extends JFrame {
 
 		initLayout();
 		loadStats();
+
+		runSettingsListener();
 
 	}
 
@@ -321,12 +328,11 @@ public class MainFrame extends JFrame {
 		north.add(_mouseInfoLabel);
 		rootPanel.add(north, BorderLayout.NORTH);
 
-		
-		final JTextArea shipLog = new JTextArea(5,10);
+		final JTextArea shipLog = new JTextArea(5, 10);
 		rootPanel.add(new JScrollPane(shipLog), BorderLayout.SOUTH);
-		
+
 		_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
-			
+
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				String text = shipLog.getText();
@@ -337,17 +343,16 @@ public class MainFrame extends JFrame {
 					text = text.substring(ind);
 					shipLog.setText(text);
 				}
-				
+
 				DispatchEntry de = (DispatchEntry) evt.getNewValue();
 				Calendar now = Calendar.getInstance();
 				SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
 				shipLog.append(sdf.format(now.getTime()) + "  " + de.getDest() + "  " + de.getShip() + "\n");
 				shipLog.setCaretPosition(shipLog.getDocument().getLength());
-				
+
 			}
 		});
 
-		
 		// //KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new
 		// MyKeyEventDispatcher());
 	}
@@ -1433,9 +1438,101 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private void rescan() {
-		// TODO Auto-generated method stub
+	private void processRequests() {
+		Service service = new Service();
 
+		String[] requests = service.getActiveRequests();
+		for (String r : requests) {
+
+			if (r.startsWith("refresh") || r.startsWith("r")) {
+				service.inProgress(r);
+				String[] ss = r.split("_");
+				Boolean bookmark = ss.length > 1 ? Boolean.parseBoolean(ss[1]) : false;
+				// try {
+				// stopMagic();
+				// refresh(bookmark);
+				// runMagic();
+				// } catch (RobotInterruptedException e) {
+				// }
+			} else if (r.startsWith("stop") || r.startsWith("r")) {
+				service.inProgress(r);
+				// reload(r);
+				_stopAllThreads = true;
+				LOGGER.info("INSOMNIA STOPPING...");
+				captureScreen();
+
+			} else if (r.startsWith("start")) {
+				service.inProgress(r);
+				// _stats.reset();
+				// updateLabels();
+				Thread doMagicThread = new Thread(new Runnable() {
+					public void run() {
+
+						doMagic();
+					}
+				}, "DO_MAGIC");
+				doMagicThread.start();
+			}
+		}
+
+		service.purgeOld(1000 * 60 * 60);// 1 hour old
+	}
+
+	private void runSettingsListener() {
+		Thread requestsThread = new Thread(new Runnable() {
+			public void run() {
+				// new Service().purgeAll();
+				boolean stop = false;
+				do {
+					LOGGER.info("......");
+					try {
+						processRequests();
+					} catch (Throwable t) {
+						// hmm
+						t.printStackTrace();
+					}
+					try {
+						Thread.sleep(20000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+
+				} while (!stop);
+			}
+		}, "REQUESTS");
+
+		requestsThread.start();
+
+	}
+
+	private void captureScreen() {
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		writeImage(new Rectangle(0, 0, screenSize.width, screenSize.height),
+		    "ping " + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".png");
+	}
+
+	public void writeImage(Rectangle rect, String filename) {
+		try {
+			writeImage(new Robot().createScreenCapture(rect), filename);
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void writeImage(BufferedImage image, String filename) {
+
+		try {
+			int ind = filename.lastIndexOf("/");
+			if (ind > 0) {
+				String path = filename.substring(0, ind);
+				File f = new File(path);
+				f.mkdirs();
+			}
+			File file = new File(filename);
+			MyImageIO.write(image, filename.substring(filename.length() - 3).toUpperCase(), file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
