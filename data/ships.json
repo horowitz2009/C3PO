@@ -1,8 +1,17 @@
 [
   {
+    "_name": "Vasco da Gama",
+    "_crew": 60,
+    "_capacity": 16,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/VascoDaGamaS.bmp"
+  },
+  {
     "_name": "Gerome",
-    "_crew": 50,
-    "_capacity": 19,
+    "_crew": 90,
+    "_capacity": 20,
     "_favorite": true,
     "_active": true,
     
@@ -10,8 +19,8 @@
   },
   {
     "_name": "Godisgrace",
-    "_crew": 50,
-    "_capacity": 19,
+    "_crew": 90,
+    "_capacity": 21,
     "_favorite": true,
     "_active": true,
     
@@ -19,8 +28,8 @@
   },
   {
     "_name": "Henry",
-    "_crew": 50,
-    "_capacity": 19,
+    "_crew": 90,
+    "_capacity": 20,
     "_favorite": true,
     "_active": true,
     
@@ -28,7 +37,7 @@
   },
   {
     "_name": "Margaret",
-    "_crew": 70,
+    "_crew": 80,
     "_capacity": 22,
     "_favorite": true,
     "_active": true,
@@ -37,7 +46,7 @@
   },
   {
     "_name": "Halygast",
-    "_crew": 70,
+    "_crew": 80,
     "_capacity": 20,
     "_favorite": true,
     "_active": true,
@@ -46,7 +55,7 @@
   },
   {
     "_name": "Ark Royal",
-    "_crew": 70,
+    "_crew": 80,
     "_capacity": 21,
     "_favorite": true,
     "_active": true,
@@ -91,7 +100,7 @@
   },
   {
     "_name": "Mary Rose",
-    "_crew": 80,
+    "_crew": 70,
     "_capacity": 17,
     "_favorite": true,
     "_active": true,
