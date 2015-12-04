@@ -17,8 +17,6 @@ import Catalano.Imaging.Filters.ReplaceColor;
 import Catalano.Imaging.Filters.Xor;
 import Catalano.Imaging.Tools.Blob;
 
-import com.horowitz.commons.ImageManager;
-
 public class OCRC {
 
 	public List<Blob> detect(BufferedImage image1, BufferedImage image2) {
@@ -33,7 +31,7 @@ public class OCRC {
 		try {
 			for (int j = 1; j <= 5; j++) {
 
-				BufferedImage image = ImageIO.read(ImageManager.getImageURL("r" + j + ".bmp"));
+				BufferedImage image = ImageIO.read(new File("ocr/r" + j + ".bmp"));
 				FastBitmap fb = new FastBitmap(image);
 				// fb.toGrayscale();
 
@@ -64,20 +62,20 @@ public class OCRC {
 
 	private static FastBitmap processDigitAND(int digit, int numImages) {
 		try {
-			BufferedImage image = ImageIO.read(ImageManager.getImageURL("ocr/" + digit + 1 + ".bmp"));
+			BufferedImage image = ImageIO.read(new File("ocr/" + digit + 1 + ".bmp"));
 			FastBitmap fb1 = new FastBitmap(image);
 
 			fb1.toGrayscale();
 			for (int i = 2; i <= numImages; i++) {
 
-				image = ImageIO.read(ImageManager.getImageURL("ocr/" + digit + i + ".bmp"));
+				image = ImageIO.read(new File("ocr/" + digit + i + ".bmp"));
 				FastBitmap fb = new FastBitmap(image);
 				fb.toGrayscale();
 
 				And xor = new And(fb);
 				xor.applyInPlace(fb1);
 			}
-			ImageIO.write(fb1.toBufferedImage(), "BMP", new File("images/ocr/digitAND" + digit + ".bmp"));
+			ImageIO.write(fb1.toBufferedImage(), "BMP", new File("ocr/digitAND" + digit + ".bmp"));
 			System.out.println("Done.");
 			return fb1;
 		} catch (IOException e) {
@@ -88,20 +86,20 @@ public class OCRC {
 
 	private static FastBitmap processDigitOR(int digit, int numImages) {
 		try {
-			BufferedImage image = ImageIO.read(ImageManager.getImageURL("ocr/" + digit + 1 + ".bmp"));
+			BufferedImage image = ImageIO.read(new File("ocr/" + digit + 1 + ".bmp"));
 			FastBitmap fb1 = new FastBitmap(image);
 
 			fb1.toGrayscale();
 			for (int i = 2; i <= numImages; i++) {
 
-				image = ImageIO.read(ImageManager.getImageURL("ocr/" + digit + i + ".bmp"));
+				image = ImageIO.read(new File("ocr/" + digit + i + ".bmp"));
 				FastBitmap fb = new FastBitmap(image);
 				fb.toGrayscale();
 
 				Or xor = new Or(fb);
 				xor.applyInPlace(fb1);
 			}
-			ImageIO.write(fb1.toBufferedImage(), "BMP", new File("images/ocr/digitOR" + digit + ".bmp"));
+			ImageIO.write(fb1.toBufferedImage(), "BMP", new File("ocr/digitOR" + digit + ".bmp"));
 			System.out.println("Done.");
 			
 			
@@ -118,6 +116,7 @@ public class OCRC {
 
 	public static void main(String[] args) {
 		// processResources();
+		doDigit(0, 3);
 		doDigit(1, 3);
 		doDigit(2, 4);
 		doDigit(3, 3);
@@ -126,6 +125,7 @@ public class OCRC {
 		doDigit(6, 4);
 		doDigit(7, 4);
 		doDigit(8, 4);
+		doDigit(9, 3);
 
 	}
 
@@ -137,7 +137,7 @@ public class OCRC {
 		xor.applyInPlace(fbXOR);
 		try {
 			//This is the final result
-	    ImageIO.write(fbXOR.toBufferedImage(), "BMP", new File("images/ocr/digitXOR" + digit + ".bmp"));
+	    ImageIO.write(fbXOR.toBufferedImage(), "BMP", new File("ocr/digitXOR" + digit + ".bmp"));
     } catch (IOException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
@@ -152,7 +152,7 @@ public class OCRC {
 		add.applyInPlace(fbXOR);
 		try {
 			//This is the final result
-	    ImageIO.write(fbXOR.toBufferedImage(), "BMP", new File("images/ocr/digitADD" + digit + ".bmp"));
+	    ImageIO.write(fbXOR.toBufferedImage(), "BMP", new File("ocr/digitADD" + digit + ".bmp"));
     } catch (IOException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
