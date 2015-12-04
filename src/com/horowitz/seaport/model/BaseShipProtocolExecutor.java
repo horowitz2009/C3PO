@@ -62,7 +62,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 			for (Pixel pixel : _shipLocations) {
 				try {
 					_mouse.click(pixel);
-					_mouse.delay(250);
+					_mouse.delay(750);
 
 					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 65, 44, 44);
 					Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
@@ -105,7 +105,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		return _lastShip;
 	}
 
-	protected void sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException {
+	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException {
 		LOGGER.info("CHAIN: " + chain);
 		Destination dest = chain.poll();
 		if (dest != null) {
@@ -135,7 +135,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				LOGGER.info("Sending to " + dest.getName() + "...");
 				_mouse.click(destP);
 				_mouse.mouseMove(_scanner.getParkingPoint());
-				_mouse.delay(400);
+				_mouse.delay(800);
 
 				Pixel destTitle = _scanner.scanOneFast(dest.getImageDataTitle(), null, false);
 
@@ -143,7 +143,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					LOGGER.fine("SEND POPUP OPEN...");
 					LOGGER.info("OPTION: " + dest.getOption());
 					_mouse.mouseMove(_scanner.getParkingPoint());
-					_mouse.delay(100);
+					_mouse.delay(300);
 
 					Pixel destButton = _scanner.scanOneFast("dest/setSail.bmp", null, false);
 					if (destButton != null) {
@@ -156,23 +156,27 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 								Pixel coins = new Pixel(destTitle);
 								coins.y += 228;
 								_mouse.click(coins);
-								_mouse.delay(250);
+								_mouse.delay(650);
 							}
 						}
 
 						_mouse.click(destButton);
 						_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
-						_mouse.delay(2000);
+						_mouse.delay(1500);
+						return true;
 					} else {
 						LOGGER.info(dest.getName() + " can't be done!");
 						boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
 						// if (found)
-						_mouse.delay(2000);
+						_mouse.delay(1500);
 						// chain.poll();
-						if (chain.isEmpty())
+						if (chain.isEmpty()) {
 							LOGGER.info("reached the end of chain");
+							//TODO close the map and move on
+							return false;
+						}
 						else
-							sendShip(chain);
+							return sendShip(chain);
 					}
 
 				}
@@ -180,8 +184,11 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				LOGGER.info("========");
 				LOGGER.info("Can't locate destination: " + dest.getName());
 				LOGGER.info("========");
+				//TODO close the map and move on
+				return false;
 			}
 		}
+		return false;
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {

@@ -48,7 +48,7 @@ public class FishingProtocol implements GameProtocol {
 			for (Pixel pixel : _fishes) {
 
 				_mouse.click(pixel);
-				_mouse.delay(200);
+				//_mouse.delay(200);
 			}
 		} else {
 			LOGGER.info("Fishes empty! Why?");

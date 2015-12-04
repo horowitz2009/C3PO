@@ -90,7 +90,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.30a";
+	private static String APP_TITLE = "Seaport v0.31";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -862,11 +862,11 @@ public class MainFrame extends JFrame {
 					if (b) {
 						_mouse.setDelayBetweenActions(500);
 					} else {
-						_mouse.setDelayBetweenActions(100);
+						_mouse.setDelayBetweenActions(50);
 					}
 				}
 			});
-			_slowToggle.setSelected(true);
+			_slowToggle.setSelected(false);
 			toolbar.add(_slowToggle);
 
 			// _xpToggle = new JToggleButton("XP");

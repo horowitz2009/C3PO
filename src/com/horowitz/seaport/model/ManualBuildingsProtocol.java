@@ -124,10 +124,10 @@ public class ManualBuildingsProtocol implements GameProtocol {
 
 			}
 
+			_mouse.delay(100);
+			_mouse.click(_scanner.getSafePoint());
+			_mouse.delay(400);
 		}
 
-		_mouse.delay(1000);// reduce later
-		_mouse.click(_scanner.getSafePoint());
-		_mouse.delay(1000);
 	}
 }

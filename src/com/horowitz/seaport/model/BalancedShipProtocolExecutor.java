@@ -52,9 +52,9 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		scanShipName(pin);
 
 		_mouse.click(pin);
-		_mouse.delay(50);
+		_mouse.delay(550);
 		_mouse.mouseMove(_scanner.getParkingPoint());
-		_mouse.delay(500);
+		_mouse.delay(100);
 
 		Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
 		if (anchor != null) {
@@ -112,11 +112,16 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 				}
 
 				// use this chain
-				sendShip(new LinkedList<Destination>(chainList));
+				boolean sent = sendShip(new LinkedList<Destination>(chainList));
+				if (!sent) {
+					_scanner.scanOneFast("anchor.bmp", null, true);
+				}
 
 			} else {
 				LOGGER.info("ERROR: BADLY DEFINED PROTOCOL!");
 				LOGGER.info("COUNDN'T FIND WHERE TO SEND THE SHIP!");
+				_mouse.click(anchor);
+				_mouse.delay(1000);
 			}
 		}
 	}
