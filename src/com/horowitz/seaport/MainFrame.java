@@ -61,6 +61,10 @@ import javax.swing.JToolBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import Catalano.Core.IntRange;
+import Catalano.Imaging.FastBitmap;
+import Catalano.Imaging.Filters.ColorFiltering;
+
 import com.horowitz.commons.DateUtils;
 import com.horowitz.commons.ImageData;
 import com.horowitz.commons.MouseRobot;
@@ -71,6 +75,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Service;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
+import com.horowitz.mickey.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
@@ -90,7 +95,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.31a";
+	private static String APP_TITLE = "Seaport v0.32a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -131,6 +136,8 @@ public class MainFrame extends JFrame {
 	private JLabel _shipSentLabel;
 
 	private ShipProtocolManagerUI _shipProtocolManagerUI;
+	
+	private OCRB _ocr;
 
 	public static void main(String[] args) {
 
@@ -163,9 +170,14 @@ public class MainFrame extends JFrame {
 
 	@SuppressWarnings("serial")
 	private void init() throws AWTException {
+		
+		try {
+
+			_ocr = new OCRB("ocr/digit");
+		  _ocr.setErrors(1);
+
 
 		// LOADING DATA
-		try {
 			_settings = Settings.createSettings("seaport.properties");
 			_stats = new Stats();
 			_scanner = new ScreenScanner(_settings);
@@ -1323,6 +1335,8 @@ public class MainFrame extends JFrame {
 			do {
 				// 1. SCAN
 				handlePopups(false);
+				
+				scanSailors();
 				// recalcPositions(false, 1);
 
 				// 2. DO TASKS
@@ -1355,6 +1369,31 @@ public class MainFrame extends JFrame {
 			// e.printStackTrace();
 		}
 	}
+
+	private void scanSailors() {
+		Pixel sailorsPos = _scanner.getSailorsPos();
+	  if (sailorsPos != null) {
+	  	
+	  	try {
+	      Rectangle miniArea = new Rectangle(sailorsPos.x+20, sailorsPos.y+4, 76, 15);
+	      BufferedImage image = new Robot().createScreenCapture(miniArea);
+	      
+	  		FastBitmap fb = new FastBitmap(image);
+	  		// COLOR FILTERING
+	  		ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255), new IntRange(
+	  		    255, 255));
+	  		colorFiltering.applyInPlace(fb);
+
+	      String sailorsStr = _ocr.scanImage(fb.toBufferedImage());
+	      LOGGER.info("sailors:" + sailorsStr);
+      } catch (AWTException e) {
+	      // TODO Auto-generated catch block
+	      e.printStackTrace();
+      }
+	  	
+	  	
+	  }
+  }
 
 	private void handlePopups(boolean fast) throws RobotInterruptedException {
 		try {
@@ -1461,6 +1500,12 @@ public class MainFrame extends JFrame {
 				LOGGER.info("INSOMNIA STOPPING...");
 				captureScreen();
 
+			} else if (r.startsWith("ping") || r.startsWith("p")) {
+				service.inProgress(r);
+				LOGGER.info("Ping...");
+				captureScreen();
+				service.done(r);
+				
 			} else if (r.startsWith("start")) {
 				service.inProgress(r);
 				// _stats.reset();

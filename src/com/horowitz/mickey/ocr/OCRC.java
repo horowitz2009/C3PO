@@ -116,11 +116,11 @@ public class OCRC {
 
 	public static void main(String[] args) {
 		// processResources();
-		doDigit(0, 3);
+		doDigit(0, 4);
 		doDigit(1, 3);
 		doDigit(2, 4);
-		doDigit(3, 3);
-		doDigit(4, 4);
+		doDigit(3, 4);
+		doDigit(4, 3);
 		doDigit(5, 3);
 		doDigit(6, 4);
 		doDigit(7, 4);
@@ -152,7 +152,7 @@ public class OCRC {
 		add.applyInPlace(fbXOR);
 		try {
 			//This is the final result
-	    ImageIO.write(fbXOR.toBufferedImage(), "BMP", new File("ocr/digitADD" + digit + ".bmp"));
+	    ImageIO.write(fbXOR.toBufferedImage(), "BMP", new File("ocr/digit" + digit + ".bmp"));
     } catch (IOException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();

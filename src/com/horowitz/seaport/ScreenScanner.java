@@ -80,6 +80,12 @@ public class ScreenScanner {
 	private ImageData _mapButton;
 	private ImageData _anchorButton;
 
+	private Rectangle _leftNumbersArea;
+
+	private Rectangle _rightNumbersArea;
+
+	private Pixel _sailorsPos;
+
 	public Pixel[] getShipLocations() {
 		return _shipLocations;
 	}
@@ -117,7 +123,7 @@ public class ScreenScanner {
 		return new Rectangle(_tl.x + xx, _tl.y + yy, width, height);
 	}
 
-	private void setKeyAreas() throws IOException {
+	private void setKeyAreas() throws IOException, AWTException, RobotInterruptedException {
 
 		_optimized = true;
 
@@ -126,6 +132,13 @@ public class ScreenScanner {
 		int yy;
 
 		_scanArea = new Rectangle(_tl.x, _tl.y + 40, getGameWidth() - 28, getGameHeight() - 40);
+
+		int xxx = (getGameWidth() - 137) / 2;
+		_leftNumbersArea = new Rectangle(_tl.x, _tl.y, xxx, 72);
+		_rightNumbersArea = new Rectangle(_br.x - xxx, _tl.y, xxx, 72);
+		
+		_sailorsPos = scanOne("sailors.bmp", _rightNumbersArea, false);
+		
 
 		_fishes = new Pixel[] { new Pixel(-94, 14), new Pixel(-169, -13), new Pixel(-223, -49), new Pixel(-282, -89),
 		    new Pixel(-354, -120) };
@@ -980,6 +993,18 @@ public class ScreenScanner {
 		}
 
 		return false;
+	}
+
+	public Rectangle getLeftNumbersArea() {
+		return _leftNumbersArea;
+	}
+
+	public Rectangle getRightNumbersArea() {
+		return _rightNumbersArea;
+	}
+
+	public Pixel getSailorsPos() {
+		return _sailorsPos;
 	}
 
 }
