@@ -64,7 +64,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					_mouse.click(pixel);
 					_mouse.delay(750);
 
-					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 65, 44, 44);
+					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
+					//_scanner.writeImage(miniArea, "pin.bmp");
 					Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
 					if (pin != null) {
 						doShip(pin);

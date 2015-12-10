@@ -154,6 +154,20 @@ public class ShipProtocolManagerUI extends JPanel {
 		box.add(toolbar);
 
 		{
+			JButton button = new JButton(new AbstractAction("Dup") {
+				private static final long serialVersionUID = 416742172579291138L;
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					duplicate();
+				}
+			});
+			shrinkFont(button, -1);
+			button.setMargin(new Insets(2, 2, 2, 2));
+
+			toolbar.add(button);
+		}
+		{
 			JButton button = new JButton(new AbstractAction("Reset") {
 
 				private static final long serialVersionUID = -3713150472570464769L;
@@ -178,9 +192,9 @@ public class ShipProtocolManagerUI extends JPanel {
 
 	private void initLayout2() {
 		_editor = new ShipProtocolEditor(_mapManager);
-		//_editor.setMinimumSize(new Dimension(300, 300));
-		//_editor.setPreferredSize(new Dimension(260, 300));
-		//add(new JScrollPane(_editor), BorderLayout.CENTER);
+		// _editor.setMinimumSize(new Dimension(300, 300));
+		// _editor.setPreferredSize(new Dimension(260, 300));
+		// add(new JScrollPane(_editor), BorderLayout.CENTER);
 		add(_editor, BorderLayout.CENTER);
 
 		_protocolsCB.addListSelectionListener(new ListSelectionListener() {
@@ -233,6 +247,29 @@ public class ShipProtocolManagerUI extends JPanel {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+			}
+		});
+
+	}
+
+	private void duplicate() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			public void run() {
+				ShipProtocol newProtocol = _protocolsCB.getSelectedValue();
+				if (newProtocol != null) {
+					try {
+	          newProtocol = (ShipProtocol) newProtocol.clone();
+	          newProtocol.setName(newProtocol.getName() + " COPY");
+	          _model.addElement(newProtocol);
+	          _protocolsCB.setSelectedValue(newProtocol, true);
+          } catch (CloneNotSupportedException e) {
+	          e.printStackTrace();
+          }
+
+				}
+				revalidate();
+
 			}
 		});
 
@@ -323,6 +360,21 @@ public class ShipProtocolManagerUI extends JPanel {
 
 	public void addListSelectionListener(ListSelectionListener listener) {
 		_protocolsCB.addListSelectionListener(listener);
+	}
+
+	public void setShipProtocol(String protocolName) {
+		if (protocolName == null)
+			protocolName = "DEFAULT";
+		int index = -1;
+		for (int i = 0; i < _protocolsCB.getModel().getSize(); i++) {
+			ShipProtocol sp = _protocolsCB.getModel().getElementAt(i);
+			if (sp.getName().equals(protocolName)) {
+				index = i;
+				_protocolsCB.setSelectedIndex(index);
+				break;
+			}
+		}
+
 	}
 
 }

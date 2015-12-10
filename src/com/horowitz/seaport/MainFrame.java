@@ -34,6 +34,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -95,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.32a";
+	private static String APP_TITLE = "Seaport v0.35b";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -136,7 +138,7 @@ public class MainFrame extends JFrame {
 	private JLabel _shipSentLabel;
 
 	private ShipProtocolManagerUI _shipProtocolManagerUI;
-	
+
 	private OCRB _ocr;
 
 	public static void main(String[] args) {
@@ -170,15 +172,18 @@ public class MainFrame extends JFrame {
 
 	@SuppressWarnings("serial")
 	private void init() throws AWTException {
-		
+
 		try {
 
 			_ocr = new OCRB("ocr/digit");
-		  _ocr.setErrors(1);
+			_ocr.setErrors(1);
 
-
-		// LOADING DATA
+			// LOADING DATA
 			_settings = Settings.createSettings("seaport.properties");
+			if (!_settings.containsKey("fish")) {
+				setDefaultSettings();
+			}
+
 			_stats = new Stats();
 			_scanner = new ScreenScanner(_settings);
 			_scanner.setDebugMode(_testMode);
@@ -242,8 +247,28 @@ public class MainFrame extends JFrame {
 		initLayout();
 		loadStats();
 
+		reapplySettings();
+
 		runSettingsListener();
 
+	}
+
+	private void setDefaultSettings() {
+		_settings.setProperty("fish", "true");
+		_settings.setProperty("ships", "true");
+		_settings.setProperty("industries", "true");
+		_settings.setProperty("slow", "false");
+		_settings.setProperty("autoSailors", "false");
+		_settings.setProperty("Buildings.SawMill1", "false");
+		_settings.setProperty("Buildings.SawMill2", "true");
+		_settings.setProperty("Buildings.Quarry", "true");
+		_settings.setProperty("Buildings.Foundry", "true");
+		_settings.setProperty("ShipProtocol", "SINGLE");
+		_settings.setProperty("autoSailors.speedProtocol", "SINGLE");
+		_settings.setProperty("autoSailors.defaultProtocol", "DEFAULT");
+		_settings.setProperty("autoSailors.upperThreshold", "1000");
+		_settings.setProperty("autoSailors.lowerThreshold", "600");
+		_settings.saveSettingsSorted();
 	}
 
 	private void initLayout() {
@@ -465,7 +490,14 @@ public class MainFrame extends JFrame {
 	}
 
 	private ShipProtocol _shipProtocol;
+	private String _lastProtocolName;
 	private BalancedShipProtocolExecutor _shipProtocolExecutor;
+
+	private JToggleButton _autoSailorsToggle;
+
+	private JToolBar _buildingsToolbar;
+
+	private JToggleButton _pingToggle;
 
 	private JPanel createShipProtocolManagerPanel() {
 		_shipProtocolManagerUI = new ShipProtocolManagerUI(_mapManager);
@@ -478,6 +510,10 @@ public class MainFrame extends JFrame {
 					JList list = (JList) e.getSource();
 					_shipProtocol = (ShipProtocol) list.getSelectedValue();
 					_shipProtocolExecutor.setShipProtocol(_shipProtocol);
+					if (_shipProtocol != null) {
+						_settings.setProperty("ShipProtocol", _shipProtocol.getName());
+						_settings.saveSettingsSorted();
+					}
 				}
 			}
 		});
@@ -830,36 +866,43 @@ public class MainFrame extends JFrame {
 		{
 			// SHIPS
 			_fishToggle = new JToggleButton("Fish");
-			_fishToggle.setSelected(true);
+			//_fishToggle.setSelected(true);
 			_fishToggle.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					_fishTask.setEnabled(b);
+					_settings.setProperty("fish", "" + b);
+					_settings.saveSettingsSorted();
 				}
 			});
 			toolbar.add(_fishToggle);
 
 			// SHIPS
 			_shipsToggle = new JToggleButton("Ships");
-			_shipsToggle.setSelected(true);
+			//_shipsToggle.setSelected(true);
 			_shipsToggle.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					_shipsTask.setEnabled(b);
+					_settings.setProperty("ships", "" + b);
+					_settings.saveSettingsSorted();
 				}
 			});
 			toolbar.add(_shipsToggle);
 
 			// BUILDINGS
 			_industriesToggle = new JToggleButton("Industries");
-			_industriesToggle.setSelected(true);
+			//_industriesToggle.setSelected(true);
 			_industriesToggle.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					_buildingsTask.setEnabled(b);
+					_settings.setProperty("industries", "" + b);
+					_settings.saveSettingsSorted();
+
 				}
 			});
 			toolbar.add(_industriesToggle);
@@ -876,11 +919,46 @@ public class MainFrame extends JFrame {
 					} else {
 						_mouse.setDelayBetweenActions(50);
 					}
+					_settings.setProperty("slow", "" + b);
+					_settings.saveSettingsSorted();
+
 				}
 			});
-			_slowToggle.setSelected(false);
+			//_slowToggle.setSelected(false);
 			toolbar.add(_slowToggle);
 
+			_autoSailorsToggle = new JToggleButton("AS");
+			//_autoSailorsToggle.setSelected(false);
+			_autoSailorsToggle.addItemListener(new ItemListener() {
+
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					LOGGER.info("AutoSailors mode: " + (b ? "on" : "off"));
+					_settings.setProperty("autoSailors", "" + b);
+					_settings.saveSettingsSorted();
+
+				}
+			});
+
+			toolbar.add(_autoSailorsToggle);
+
+			_pingToggle = new JToggleButton("Ping");
+			//_autoSailorsToggle.setSelected(false);
+			_pingToggle.addItemListener(new ItemListener() {
+				
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					LOGGER.info("Ping: " + (b ? "on" : "off"));
+					_settings.setProperty("ping", "" + b);
+					_settings.saveSettingsSorted();
+					
+				}
+			});
+			
+			toolbar.add(_pingToggle);
+			
 			// _xpToggle = new JToggleButton("XP");
 			// _xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
 			// _xpToggle.addItemListener(new ItemListener() {
@@ -989,26 +1067,34 @@ public class MainFrame extends JFrame {
 
 	@SuppressWarnings("serial")
 	private JToolBar createToolbar4() {
-		JToolBar toolbar = new JToolBar();
-		toolbar.setFloatable(false);
+		_buildingsToolbar = new JToolBar();
+		_buildingsToolbar.setFloatable(false);
 
 		// BUILDINGS GO HERE
 
 		for (final Building b : _buildingManager.getBuildings()) {
 			final JToggleButton toggle = new JToggleButton(b.getName());
+			toggle.setActionCommand(b.getName().replace(" ", ""));
+			
 			toggle.addItemListener(new ItemListener() {
 
 				@Override
 				public void itemStateChanged(ItemEvent e) {
-					b.setEnabled(e.getStateChange() == ItemEvent.SELECTED);
+					
+					boolean val = e.getStateChange() == ItemEvent.SELECTED;
+					b.setEnabled(val);
 					LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
+					
+					_settings.setProperty("Buildings." + toggle.getActionCommand(), "" + val);
+					_settings.saveSettingsSorted();
+
 				}
 			});
 			//
-			toggle.setSelected(b.isEnabled());
-			toolbar.add(toggle);
+			//toggle.setSelected(b.isEnabled());
+			_buildingsToolbar.add(toggle);
 		}
-		return toolbar;
+		return _buildingsToolbar;
 	}
 
 	private JToolBar createToolbar5() {
@@ -1335,8 +1421,12 @@ public class MainFrame extends JFrame {
 			do {
 				// 1. SCAN
 				handlePopups(false);
-				
-				scanSailors();
+
+				if (_pingToggle.isSelected()) {
+					ping();
+				}
+				if (_autoSailorsToggle.isSelected())
+					scanSailors();
 				// recalcPositions(false, 1);
 
 				// 2. DO TASKS
@@ -1369,31 +1459,57 @@ public class MainFrame extends JFrame {
 			// e.printStackTrace();
 		}
 	}
-
+	private Long _lastPing = System.currentTimeMillis();
+	private void ping() {
+		if (System.currentTimeMillis() - _lastPing > _settings.getInt("ping.time", 120) * 1000) {
+			captureScreen();
+			_lastPing = System.currentTimeMillis();
+		}
+		
+	}
+	
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
-	  if (sailorsPos != null) {
-	  	
-	  	try {
-	      Rectangle miniArea = new Rectangle(sailorsPos.x+20, sailorsPos.y+4, 76, 15);
-	      BufferedImage image = new Robot().createScreenCapture(miniArea);
-	      
-	  		FastBitmap fb = new FastBitmap(image);
-	  		// COLOR FILTERING
-	  		ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255), new IntRange(
-	  		    255, 255));
-	  		colorFiltering.applyInPlace(fb);
+		if (sailorsPos != null) {
 
-	      String sailorsStr = _ocr.scanImage(fb.toBufferedImage());
-	      LOGGER.info("sailors:" + sailorsStr);
-      } catch (AWTException e) {
-	      // TODO Auto-generated catch block
-	      e.printStackTrace();
-      }
-	  	
-	  	
-	  }
-  }
+			try {
+				Rectangle miniArea = new Rectangle(sailorsPos.x + 20, sailorsPos.y + 4, 76, 15);
+				BufferedImage image = new Robot().createScreenCapture(miniArea);
+
+				FastBitmap fb = new FastBitmap(image);
+				// COLOR FILTERING
+				ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255),
+				    new IntRange(255, 255));
+				colorFiltering.applyInPlace(fb);
+
+				String sailorsStr = _ocr.scanImage(fb.toBufferedImage());
+				LOGGER.info("sailors:" + sailorsStr);
+				try {
+					int sailors = Integer.parseInt(sailorsStr);
+					if (sailors > 1000) {
+						String newProtocolName = _shipProtocol != null ? _shipProtocol.getName() : "DEFAULT";
+						if (!newProtocolName.equals("SINGLE")) {
+							_lastProtocolName = newProtocolName;
+							setProtocol("SINGLE");
+						}
+					} else if (sailors < 500) {
+						setProtocol(_lastProtocolName);
+					} else {
+						_lastProtocolName = null;
+					}
+				} catch (NumberFormatException e) {
+				}
+			} catch (AWTException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	private void setProtocol(String shipProtocolName) {
+		_shipProtocolManagerUI.setShipProtocol(shipProtocolName);
+	}
 
 	private void handlePopups(boolean fast) throws RobotInterruptedException {
 		try {
@@ -1477,6 +1593,65 @@ public class MainFrame extends JFrame {
 
 	}
 
+	private void reapplySettings() {
+
+		// toggles
+
+		boolean fish = "true".equalsIgnoreCase(_settings.getProperty("fish"));
+		if (fish != _fishToggle.isSelected()) {
+			_fishToggle.setSelected(fish);
+		}
+
+		boolean ships = "true".equalsIgnoreCase(_settings.getProperty("ships"));
+		if (ships != _shipsToggle.isSelected()) {
+			_shipsToggle.setSelected(ships);
+		}
+
+		boolean industries = "true".equalsIgnoreCase(_settings.getProperty("industries"));
+		if (industries != _industriesToggle.isSelected()) {
+			_industriesToggle.setSelected(industries);
+		}
+
+		boolean slow = "true".equalsIgnoreCase(_settings.getProperty("slow"));
+		if (slow != _slowToggle.isSelected()) {
+			_slowToggle.setSelected(slow);
+		}
+
+		boolean autoSailors = "true".equalsIgnoreCase(_settings.getProperty("autoSailors"));
+		if (autoSailors != _autoSailorsToggle.isSelected()) {
+			_autoSailorsToggle.setSelected(autoSailors);
+		}
+
+		boolean ping = "true".equalsIgnoreCase(_settings.getProperty("ping"));
+		if (ping != _pingToggle.isSelected()) {
+			_pingToggle.setSelected(ping);
+		}
+
+
+		// buildings
+
+		for (int i = 0; i < _buildingsToolbar.getComponentCount(); i++) {
+			if (_buildingsToolbar.getComponent(i) instanceof JToggleButton) {
+				JToggleButton toggle = (JToggleButton) _buildingsToolbar.getComponent(i);
+				String ac = toggle.getActionCommand();
+				if (_settings.containsKey("Buildings." + ac)) {
+					boolean v = "true".equalsIgnoreCase(_settings.getProperty("Buildings." + ac));
+					if (v != toggle.isSelected()) {
+						toggle.setSelected(v);
+					}
+
+				}
+			}
+		}
+
+		// ship protocol
+		String sp = _settings.getProperty("ShipProtocol", "DEFAULT");
+		if (!sp.equals(_shipProtocol != null ? _shipProtocol.getName() : "")) {
+			setProtocol(sp);
+		}
+
+	}
+
 	private void processRequests() {
 		Service service = new Service();
 
@@ -1505,7 +1680,7 @@ public class MainFrame extends JFrame {
 				LOGGER.info("Ping...");
 				captureScreen();
 				service.done(r);
-				
+
 			} else if (r.startsWith("start")) {
 				service.inProgress(r);
 				// _stats.reset();
@@ -1531,6 +1706,8 @@ public class MainFrame extends JFrame {
 				do {
 					LOGGER.info("......");
 					try {
+						_settings.loadSettings();
+						reapplySettings();
 						processRequests();
 					} catch (Throwable t) {
 						// hmm
@@ -1544,16 +1721,49 @@ public class MainFrame extends JFrame {
 
 				} while (!stop);
 			}
+
 		}, "REQUESTS");
 
 		requestsThread.start();
 
 	}
+  private void deleteOlder(String prefix, int amountFiles) {
+    File f = new File(".");
+    File[] files = f.listFiles();
+    List<File> targetFiles = new ArrayList<File>(6);
+    int cnt = 0;
+    for (File file : files) {
+      if (!file.isDirectory() && file.getName().startsWith(prefix)) {
+        targetFiles.add(file);
+        cnt++;
+      }
+    }
+
+    if (cnt > amountFiles) {
+      // delete some files
+      Collections.sort(targetFiles, new Comparator<File>() {
+        public int compare(File o1, File o2) {
+          if (o1.lastModified() > o2.lastModified())
+            return 1;
+          else if (o1.lastModified() < o2.lastModified())
+            return -1;
+          return 0;
+        };
+      });
+
+      int c = cnt - 5;
+      for (int i = 0; i < c; i++) {
+        File fd = targetFiles.get(i);
+        fd.delete();
+      }
+    }
+  }
 
 	private void captureScreen() {
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		writeImage(new Rectangle(0, 0, screenSize.width, screenSize.height),
-		    "ping " + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".png");
+		    "ping " + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".jpg");
+		deleteOlder("ping", 8);
 	}
 
 	public void writeImage(Rectangle rect, String filename) {

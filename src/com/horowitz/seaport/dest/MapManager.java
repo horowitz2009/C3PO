@@ -16,6 +16,7 @@ import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.Ship;
+import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.GameUnitDeserializer;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
@@ -51,8 +52,8 @@ public class MapManager {
 		_ships = new JsonStorage().loadShips();
 	}
 
-	public void loadShipProtocols() throws IOException {
-		new JsonStorage().loadShipProtocols();
+	public List<ShipProtocol> loadShipProtocols() throws IOException {
+		return new JsonStorage().loadShipProtocols();
 	}
 
 	public List<Ship> getShips() {
@@ -190,9 +191,9 @@ public class MapManager {
 			_marketPos = newMarketPos;
 		}
 
-		Pixel idealP = new Pixel(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2, _scanner.getBottomRight().y - 164);
+		Pixel idealP = new Pixel(_scanner.getTopLeft().x + 120 + _scanner.getGameWidth() / 2, _scanner.getBottomRight().y - 155);
 
-		if (Math.abs(_marketPos.x - idealP.x) > 5 && Math.abs(_marketPos.x - idealP.y) > 5) {
+		if (Math.abs(_marketPos.x - idealP.x) > 10 && Math.abs(_marketPos.x - idealP.y) > 10) {
 			// need adjusting
 			_scanner.getMouse().drag2(_marketPos.x, _marketPos.y - 50, idealP.x, idealP.y - 50);
 			_scanner.getMouse().delay(1200);
@@ -263,6 +264,19 @@ public class MapManager {
 
 	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 	  _support.addPropertyChangeListener(propertyName, listener);
+  }
+
+	public ShipProtocol getSingleProtocol() {
+	  try {
+	    List<ShipProtocol> shipProtocols = loadShipProtocols();
+	    for (ShipProtocol shipProtocol : shipProtocols) {
+	      if (shipProtocol.getName().equals("SINGLE"))
+	      	return shipProtocol;
+      }
+    } catch (IOException e) {
+	    e.printStackTrace();
+    }
+	  return null;
   }
 
 }

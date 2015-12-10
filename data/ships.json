@@ -1,17 +1,44 @@
 [
   {
+    "_name": "Horse",
+    "_crew": 60,
+    "_capacity": 20,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/HorseS.bmp"
+  },
+  {
+    "_name": "Cristofur",
+    "_crew": 60,
+    "_capacity": 20,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/CristofurS.bmp"
+  },
+  {
+    "_name": "Barlamew",
+    "_crew": 50,
+    "_capacity": 19,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/BarlamewS.bmp"
+  },
+  {
     "_name": "Vasco da Gama",
     "_crew": 60,
     "_capacity": 16,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/VascoDaGamaS.bmp"
   },
   {
     "_name": "Gerome",
-    "_crew": 90,
-    "_capacity": 20,
+    "_crew": 80,
+    "_capacity": 22,
     "_favorite": true,
     "_active": true,
     
@@ -20,7 +47,7 @@
   {
     "_name": "Godisgrace",
     "_crew": 90,
-    "_capacity": 21,
+    "_capacity": 23,
     "_favorite": true,
     "_active": true,
     
@@ -29,7 +56,7 @@
   {
     "_name": "Henry",
     "_crew": 90,
-    "_capacity": 20,
+    "_capacity": 24,
     "_favorite": true,
     "_active": true,
     
@@ -67,7 +94,7 @@
     "_crew": 70,
     "_capacity": 16,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/BerrioS.bmp"
   },

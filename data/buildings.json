@@ -26,7 +26,7 @@
   {
     "_name": "Quarry",
     "_time": 5,
-    "_enabled": true,
+    "_enabled": false,
     "_relativePosition": {
       "weight": 0,
       "x": 156,
@@ -38,7 +38,7 @@
   {
     "_name": "Foundry",
     "_time": 5,
-    "_enabled": true,
+    "_enabled": false,
     "_relativePosition": {
       "weight": 0,
       "x": 243,

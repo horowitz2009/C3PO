@@ -143,5 +143,18 @@
     },
     "_image": "dest/Neighborhood.bmp",
     "_imageTitle": "dest/NeighborhoodTitle.bmp"
+  },
+  {
+    "_name": "Explore",
+    "_abbrs":"E,EX",
+    "_time": 240,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -320,
+      "y": -339
+    },
+    "_image": "dest/Explore.bmp",
+    "_imageTitle": "dest/ExploreTitle.bmp"
   }
 ]
