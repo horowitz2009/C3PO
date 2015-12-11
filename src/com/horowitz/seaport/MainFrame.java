@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.35b";
+	private static String APP_TITLE = "Seaport v0.36a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -750,29 +750,9 @@ public class MainFrame extends JFrame {
 		{
 			AbstractAction action = new AbstractAction("Run") {
 				public void actionPerformed(ActionEvent e) {
-					Thread myThread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							LOGGER.info("Let's get rolling...");
-							if (!_scanner.isOptimized()) {
-								try {
-									scan();
-								} catch (RobotInterruptedException e) {
-									e.printStackTrace();
-								}
-							}
-
-							if (_scanner.isOptimized()) {
-								// DO THE JOB
-								doMagic();
-							} else {
-								LOGGER.info("I need to know where the game is!");
-							}
-						}
-					});
-
-					myThread.start();
+					runMagic();
 				}
+
 			};
 			mainToolbar1.add(action);
 		}
@@ -866,7 +846,7 @@ public class MainFrame extends JFrame {
 		{
 			// SHIPS
 			_fishToggle = new JToggleButton("Fish");
-			//_fishToggle.setSelected(true);
+			// _fishToggle.setSelected(true);
 			_fishToggle.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
@@ -880,7 +860,7 @@ public class MainFrame extends JFrame {
 
 			// SHIPS
 			_shipsToggle = new JToggleButton("Ships");
-			//_shipsToggle.setSelected(true);
+			// _shipsToggle.setSelected(true);
 			_shipsToggle.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
@@ -894,7 +874,7 @@ public class MainFrame extends JFrame {
 
 			// BUILDINGS
 			_industriesToggle = new JToggleButton("Industries");
-			//_industriesToggle.setSelected(true);
+			// _industriesToggle.setSelected(true);
 			_industriesToggle.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
@@ -924,11 +904,11 @@ public class MainFrame extends JFrame {
 
 				}
 			});
-			//_slowToggle.setSelected(false);
+			// _slowToggle.setSelected(false);
 			toolbar.add(_slowToggle);
 
 			_autoSailorsToggle = new JToggleButton("AS");
-			//_autoSailorsToggle.setSelected(false);
+			// _autoSailorsToggle.setSelected(false);
 			_autoSailorsToggle.addItemListener(new ItemListener() {
 
 				@Override
@@ -944,21 +924,21 @@ public class MainFrame extends JFrame {
 			toolbar.add(_autoSailorsToggle);
 
 			_pingToggle = new JToggleButton("Ping");
-			//_autoSailorsToggle.setSelected(false);
+			// _autoSailorsToggle.setSelected(false);
 			_pingToggle.addItemListener(new ItemListener() {
-				
+
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					LOGGER.info("Ping: " + (b ? "on" : "off"));
 					_settings.setProperty("ping", "" + b);
 					_settings.saveSettingsSorted();
-					
+
 				}
 			});
-			
+
 			toolbar.add(_pingToggle);
-			
+
 			// _xpToggle = new JToggleButton("XP");
 			// _xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
 			// _xpToggle.addItemListener(new ItemListener() {
@@ -1075,23 +1055,23 @@ public class MainFrame extends JFrame {
 		for (final Building b : _buildingManager.getBuildings()) {
 			final JToggleButton toggle = new JToggleButton(b.getName());
 			toggle.setActionCommand(b.getName().replace(" ", ""));
-			
+
 			toggle.addItemListener(new ItemListener() {
 
 				@Override
 				public void itemStateChanged(ItemEvent e) {
-					
+
 					boolean val = e.getStateChange() == ItemEvent.SELECTED;
 					b.setEnabled(val);
 					LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
-					
+
 					_settings.setProperty("Buildings." + toggle.getActionCommand(), "" + val);
 					_settings.saveSettingsSorted();
 
 				}
 			});
 			//
-			//toggle.setSelected(b.isEnabled());
+			// toggle.setSelected(b.isEnabled());
 			_buildingsToolbar.add(toggle);
 		}
 		return _buildingsToolbar;
@@ -1459,15 +1439,17 @@ public class MainFrame extends JFrame {
 			// e.printStackTrace();
 		}
 	}
+
 	private Long _lastPing = System.currentTimeMillis();
+
 	private void ping() {
 		if (System.currentTimeMillis() - _lastPing > _settings.getInt("ping.time", 120) * 1000) {
 			captureScreen();
 			_lastPing = System.currentTimeMillis();
 		}
-		
+
 	}
-	
+
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
 		if (sailorsPos != null) {
@@ -1627,7 +1609,6 @@ public class MainFrame extends JFrame {
 			_pingToggle.setSelected(ping);
 		}
 
-
 		// buildings
 
 		for (int i = 0; i < _buildingsToolbar.getComponentCount(); i++) {
@@ -1658,21 +1639,40 @@ public class MainFrame extends JFrame {
 		String[] requests = service.getActiveRequests();
 		for (String r : requests) {
 
-			if (r.startsWith("refresh") || r.startsWith("r")) {
-				service.inProgress(r);
-				String[] ss = r.split("_");
-				Boolean bookmark = ss.length > 1 ? Boolean.parseBoolean(ss[1]) : false;
-				// try {
-				// stopMagic();
-				// refresh(bookmark);
-				// runMagic();
-				// } catch (RobotInterruptedException e) {
-				// }
-			} else if (r.startsWith("stop") || r.startsWith("r")) {
+			if (r.startsWith("stop") || r.startsWith("s")) {
 				service.inProgress(r);
 				// reload(r);
 				_stopAllThreads = true;
 				LOGGER.info("INSOMNIA STOPPING...");
+				captureScreen();
+
+			} else if (r.startsWith("run") || r.startsWith("start")) {
+				service.inProgress(r);
+				runMagic();
+				captureScreen();
+
+			} else if (r.startsWith("refresh") || r.startsWith("r")) {
+				service.inProgress(r);
+				Pixel p;
+				if (_scanner.isOptimized()) {
+					p = _scanner.getBottomRight();
+					p.y = _scanner.getTopLeft().y + 100;
+					p.x = _scanner.getBottomRight().x + 4;
+				} else {
+					p = new Pixel(0, 110);
+				}
+				_mouse.click(p.x, p.y);
+				try {
+					Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_F5);
+					robot.keyRelease(KeyEvent.VK_F5);
+				} catch (AWTException e) {
+				}
+				try {
+					Thread.sleep(15000);
+				} catch (InterruptedException e) {
+				}
+				runMagic();
 				captureScreen();
 
 			} else if (r.startsWith("ping") || r.startsWith("p")) {
@@ -1680,22 +1680,10 @@ public class MainFrame extends JFrame {
 				LOGGER.info("Ping...");
 				captureScreen();
 				service.done(r);
-
-			} else if (r.startsWith("start")) {
-				service.inProgress(r);
-				// _stats.reset();
-				// updateLabels();
-				Thread doMagicThread = new Thread(new Runnable() {
-					public void run() {
-
-						doMagic();
-					}
-				}, "DO_MAGIC");
-				doMagicThread.start();
 			}
 		}
 
-		service.purgeOld(1000 * 60 * 60);// 1 hour old
+		// service.purgeOld(1000 * 60 * 60);// 1 hour old
 	}
 
 	private void runSettingsListener() {
@@ -1727,37 +1715,38 @@ public class MainFrame extends JFrame {
 		requestsThread.start();
 
 	}
-  private void deleteOlder(String prefix, int amountFiles) {
-    File f = new File(".");
-    File[] files = f.listFiles();
-    List<File> targetFiles = new ArrayList<File>(6);
-    int cnt = 0;
-    for (File file : files) {
-      if (!file.isDirectory() && file.getName().startsWith(prefix)) {
-        targetFiles.add(file);
-        cnt++;
-      }
-    }
 
-    if (cnt > amountFiles) {
-      // delete some files
-      Collections.sort(targetFiles, new Comparator<File>() {
-        public int compare(File o1, File o2) {
-          if (o1.lastModified() > o2.lastModified())
-            return 1;
-          else if (o1.lastModified() < o2.lastModified())
-            return -1;
-          return 0;
-        };
-      });
+	private void deleteOlder(String prefix, int amountFiles) {
+		File f = new File(".");
+		File[] files = f.listFiles();
+		List<File> targetFiles = new ArrayList<File>(6);
+		int cnt = 0;
+		for (File file : files) {
+			if (!file.isDirectory() && file.getName().startsWith(prefix)) {
+				targetFiles.add(file);
+				cnt++;
+			}
+		}
 
-      int c = cnt - 5;
-      for (int i = 0; i < c; i++) {
-        File fd = targetFiles.get(i);
-        fd.delete();
-      }
-    }
-  }
+		if (cnt > amountFiles) {
+			// delete some files
+			Collections.sort(targetFiles, new Comparator<File>() {
+				public int compare(File o1, File o2) {
+					if (o1.lastModified() > o2.lastModified())
+						return 1;
+					else if (o1.lastModified() < o2.lastModified())
+						return -1;
+					return 0;
+				};
+			});
+
+			int c = cnt - 5;
+			for (int i = 0; i < c; i++) {
+				File fd = targetFiles.get(i);
+				fd.delete();
+			}
+		}
+	}
 
 	private void captureScreen() {
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -1788,6 +1777,31 @@ public class MainFrame extends JFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void runMagic() {
+		Thread myThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				LOGGER.info("Let's get rolling...");
+				if (!_scanner.isOptimized()) {
+					try {
+						scan();
+					} catch (RobotInterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+
+				if (_scanner.isOptimized()) {
+					// DO THE JOB
+					doMagic();
+				} else {
+					LOGGER.info("I need to know where the game is!");
+				}
+			}
+		});
+
+		myThread.start();
 	}
 
 }
