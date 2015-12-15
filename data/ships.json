@@ -1,8 +1,26 @@
 [
   {
-    "_name": "Horse",
+    "_name": "Lilly",
+    "_crew": 60,
+    "_capacity": 24,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/LillyS.bmp"
+  },
+  {
+    "_name": "Olifant",
     "_crew": 60,
     "_capacity": 20,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/OlifantS.bmp"
+  },
+  {
+    "_name": "Horse",
+    "_crew": 60,
+    "_capacity": 26,
     "_favorite": true,
     "_active": true,
     
@@ -11,7 +29,7 @@
   {
     "_name": "Cristofur",
     "_crew": 60,
-    "_capacity": 20,
+    "_capacity": 21,
     "_favorite": true,
     "_active": true,
     
@@ -38,7 +56,7 @@
   {
     "_name": "Gerome",
     "_crew": 80,
-    "_capacity": 22,
+    "_capacity": 23,
     "_favorite": true,
     "_active": true,
     
