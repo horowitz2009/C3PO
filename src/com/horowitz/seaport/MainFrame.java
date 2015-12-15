@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.36a";
+	private static String APP_TITLE = "Seaport v0.37a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1449,11 +1449,12 @@ public class MainFrame extends JFrame {
 		}
 
 	}
-
+	private Long _speedTime = null;
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
 		if (sailorsPos != null) {
 
+		if (_speedTime == null) {
 			try {
 				Rectangle miniArea = new Rectangle(sailorsPos.x + 20, sailorsPos.y + 4, 76, 15);
 				BufferedImage image = new Robot().createScreenCapture(miniArea);
@@ -1466,26 +1467,42 @@ public class MainFrame extends JFrame {
 
 				String sailorsStr = _ocr.scanImage(fb.toBufferedImage());
 				LOGGER.info("sailors:" + sailorsStr);
+				
 				try {
 					int sailors = Integer.parseInt(sailorsStr);
-					if (sailors > 1000) {
+					if (sailors > _settings.getInt("autoSailors.upperThreshold", 1000)) {
 						String newProtocolName = _shipProtocol != null ? _shipProtocol.getName() : "DEFAULT";
-						if (!newProtocolName.equals("SINGLE")) {
+						String speedProtocolName = _settings.getProperty("autoSailors.speedProtocol", "SINGLE");
+						if (!newProtocolName.equals(speedProtocolName)) {
 							_lastProtocolName = newProtocolName;
-							setProtocol("SINGLE");
+							setProtocol(speedProtocolName);
+							_speedTime = System.currentTimeMillis();
+							LOGGER.info("Switching to speed protocol: " + speedProtocolName);
 						}
-					} else if (sailors < 500) {
-						setProtocol(_lastProtocolName);
-					} else {
-						_lastProtocolName = null;
 					}
 				} catch (NumberFormatException e) {
 				}
 			} catch (AWTException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		} else {
+			if (System.currentTimeMillis() - _speedTime >= _settings.getInt("autoSailors.speedTime", 120) * 60000) {
+				_speedTime = null;
+				String newProtocolName = _lastProtocolName != null ? _lastProtocolName : "DEFAULT";
+				LOGGER.info("Going back to protocol: " + newProtocolName);
 
+				try {
+					_mapManager.resetDispatchEntries();
+				} catch (IOException e1) {
+					LOGGER.info("Failed to reset entries!");
+				}
+				setProtocol(newProtocolName);
+			} else {
+				long time = System.currentTimeMillis() - _speedTime - _settings.getInt("autoSailors.speedTime", 120) * 60000;
+				time = - time / 60000;
+				LOGGER.info("Time to switch back to normal protocol: " + time + " minutes");
+			}
+		}
 		}
 	}
 
