@@ -69,7 +69,6 @@ public class Task implements Cloneable, Serializable {
 	}
 
 	public void execute() throws RobotInterruptedException {
-		// TODO Auto-generated method stub
 		if (_protocol != null)
 			_protocol.execute();
 	}

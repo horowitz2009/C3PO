@@ -52,7 +52,7 @@ public class ManualBuildingsProtocol implements GameProtocol {
 		for (Building b : buildings) {
 			if (b.isEnabled()) {
 				try {
-
+					_mouse.checkUserMovement();
 					doBuilding(b);
 
 				} catch (IOException e) {

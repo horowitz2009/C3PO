@@ -46,7 +46,7 @@ public class FishingProtocol implements GameProtocol {
 	public void execute() throws RobotInterruptedException {
 		if (_fishes != null && !_fishes.isEmpty()) {
 			for (Pixel pixel : _fishes) {
-
+				_mouse.checkUserMovement();
 				_mouse.click(pixel);
 				//_mouse.delay(200);
 			}

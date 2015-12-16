@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.37b";
+	private static String APP_TITLE = "Seaport v0.38";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1397,14 +1397,20 @@ public class MainFrame extends JFrame {
 				if (task.isEnabled())
 					task.update();
 			}
-
+      
+			_mouse.saveCurrentPosition();
+			
 			do {
+				_mouse.checkUserMovement();
 				// 1. SCAN
 				handlePopups(false);
 
+				_mouse.checkUserMovement();
 				if (_pingToggle.isSelected()) {
 					ping();
 				}
+				
+				_mouse.checkUserMovement();
 				if (_autoSailorsToggle.isSelected())
 					scanSailors();
 				// recalcPositions(false, 1);
@@ -1415,7 +1421,9 @@ public class MainFrame extends JFrame {
 				for (Task task : _tasks) {
 					if (task.isEnabled()) {
 						try {
+							_mouse.checkUserMovement();
 							task.preExecute();
+							_mouse.checkUserMovement();
 							task.execute();
 						} catch (AWTException e) {
 							LOGGER.info("FAILED TO execute task: " + task.getName());

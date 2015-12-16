@@ -241,6 +241,7 @@ public class MouseRobot {
 
       getInstance().mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
       // mouseMove(_lastMousePos.x, _lastMousePos.y);
+      saveCurrentPosition();
       throw new RobotInterruptedException();
     }
     saveCurrentPosition();

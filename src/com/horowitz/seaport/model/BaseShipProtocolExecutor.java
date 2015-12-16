@@ -61,6 +61,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		if (_shipLocations != null && !_shipLocations.isEmpty()) {
 			for (Pixel pixel : _shipLocations) {
 				try {
+					_mouse.checkUserMovement();
 					_mouse.click(pixel);
 					_mouse.delay(750);
 
@@ -92,6 +93,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		_lastShip = null;
 		for (Ship ship : ships) {
 			if (ship.isActive()) {
+				_mouse.checkUserMovement();
 				if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false) != null) {
 					LOGGER.info("SHIP: " + ship.getName());
 					_lastShip = ship;
@@ -108,6 +110,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException {
 		LOGGER.info("CHAIN: " + chain);
+		_mouse.checkUserMovement();
 		Destination dest = chain.poll();
 		if (dest != null) {
 
@@ -129,11 +132,13 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
 				}
 				LOGGER.fine("Using custom area for " + dest.getImage());
+				_mouse.checkUserMovement();
 				destP = _scanner.scanOneFast(dest.getImageData(), destArea, false);
 			}
 
 			if (destP != null) {
 				LOGGER.info("Sending to " + dest.getName() + "...");
+				_mouse.checkUserMovement();
 				_mouse.click(destP);
 				_mouse.mouseMove(_scanner.getParkingPoint());
 				_mouse.delay(800);
@@ -142,6 +147,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 				if (destTitle != null) {
 					LOGGER.fine("SEND POPUP OPEN...");
+					_mouse.checkUserMovement();
 					LOGGER.info("OPTION: " + dest.getOption());
 					_mouse.mouseMove(_scanner.getParkingPoint());
 					_mouse.delay(300);
@@ -156,19 +162,22 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 								//coins
 								Pixel coins = new Pixel(destTitle);
 								coins.y += 228;
+								_mouse.checkUserMovement();
 								_mouse.click(coins);
 								_mouse.delay(650);
 							}
 						}
-
+						_mouse.checkUserMovement();
 						_mouse.click(destButton);
 						_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+						_mouse.checkUserMovement();
 						_mouse.delay(1500);
 						return true;
 					} else {
 						LOGGER.info(dest.getName() + " can't be done!");
 						boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
 						// if (found)
+						_mouse.checkUserMovement();
 						_mouse.delay(1500);
 						// chain.poll();
 						if (chain.isEmpty()) {
