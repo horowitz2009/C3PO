@@ -23,6 +23,10 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
+import Catalano.Core.IntRange;
+import Catalano.Imaging.FastBitmap;
+import Catalano.Imaging.Filters.ColorFiltering;
+
 import com.horowitz.commons.GameLocator;
 import com.horowitz.commons.ImageComparator;
 import com.horowitz.commons.ImageData;
@@ -160,7 +164,7 @@ public class ScreenScanner {
 		_popupAreaX.x += (20 + _popupAreaX.width / 2);
 		_popupAreaX.y -= 7;
 		_popupAreaX.height = 60;
-		_popupAreaX.width = _popupAreaX.width / 2;
+		_popupAreaX.width = 270 + _popupAreaX.width / 2;
 
 		_popupAreaB = new Rectangle(_popupArea);
 		_popupAreaB.y = _popupAreaB.y + _popupAreaB.height - 125;
@@ -178,9 +182,10 @@ public class ScreenScanner {
 
 		area = new Rectangle(_br.x - 30, _tl.y + 100, 30, getGameHeight() / 2 - 100);
 		ImageData sb = getImageData("scoreBoard.bmp", area, 0, 17);
+		sb.setDefaultArea(area);
 
 		try {
-			Pixel sbp = scanOne(sb, null, false);
+			Pixel sbp = scanPrecise(sb, null);
 			if (sbp != null) {
 				_zoomIn = new Pixel(sbp.x + 8, sbp.y + 108);
 				_zoomOut = new Pixel(sbp.x + 8, sbp.y + 141);
@@ -727,6 +732,40 @@ public class ScreenScanner {
 		return matches;
 	}
 
+	public Pixel scanPrecise(ImageData imageData, Rectangle area) throws AWTException,
+  RobotInterruptedException {
+	
+	if (area == null) {
+		area = imageData.getDefaultArea();
+	}
+	BufferedImage screen = new Robot().createScreenCapture(area);
+	writeImage2(area, "scoreboardArea.bmp");
+	
+  FastBitmap fbID = new FastBitmap(imageData.getImage());
+  FastBitmap fbAREA = new FastBitmap(screen);
+  
+	// COLOR FILTERING
+	ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255),
+	    new IntRange(255, 255));
+	colorFiltering.applyInPlace(fbID);
+	colorFiltering.applyInPlace(fbAREA);
+  
+	
+	
+	Pixel pixel = _matcher.findMatch(fbID.toBufferedImage(), fbAREA.toBufferedImage(), null);
+	LOGGER.fine("LOOKING FOR " + imageData.getName() + "  screen: " + area + " BYPASS: " + imageData.getColorToBypass());
+	
+	long start = System.currentTimeMillis();
+	if (pixel != null) {
+		pixel.x += (area.x + imageData.get_xOff());
+		pixel.y += (area.y + imageData.get_yOff());
+		LOGGER.fine("found : " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
+	}
+	return pixel;
+
+
+	}
+	
 	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click) throws AWTException,
 	    RobotInterruptedException {
 		if (area == null) {
@@ -1006,5 +1045,9 @@ public class ScreenScanner {
 	public Pixel getSailorsPos() {
 		return _sailorsPos;
 	}
+
+	public Pixel scanPrecise(String filename, Rectangle area) throws AWTException, IOException, RobotInterruptedException {
+	  return scanPrecise(getImageData(filename), area);
+  }
 
 }

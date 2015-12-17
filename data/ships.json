@@ -1,8 +1,8 @@
 [
   {
     "_name": "Lilly",
-    "_crew": 60,
-    "_capacity": 24,
+    "_crew": 90,
+    "_capacity": 26,
     "_favorite": true,
     "_active": true,
     
@@ -10,8 +10,8 @@
   },
   {
     "_name": "Olifant",
-    "_crew": 60,
-    "_capacity": 20,
+    "_crew": 70,
+    "_capacity": 21,
     "_favorite": true,
     "_active": true,
     
@@ -19,7 +19,7 @@
   },
   {
     "_name": "Horse",
-    "_crew": 60,
+    "_crew": 90,
     "_capacity": 26,
     "_favorite": true,
     "_active": true,
@@ -28,7 +28,7 @@
   },
   {
     "_name": "Cristofur",
-    "_crew": 60,
+    "_crew": 70,
     "_capacity": 21,
     "_favorite": true,
     "_active": true,
@@ -37,8 +37,8 @@
   },
   {
     "_name": "Barlamew",
-    "_crew": 50,
-    "_capacity": 19,
+    "_crew": 70,
+    "_capacity": 21,
     "_favorite": true,
     "_active": true,
     
@@ -55,7 +55,7 @@
   },
   {
     "_name": "Gerome",
-    "_crew": 80,
+    "_crew": 90,
     "_capacity": 23,
     "_favorite": true,
     "_active": true,
@@ -109,7 +109,7 @@
   },
   {
     "_name": "Berrio",
-    "_crew": 70,
+    "_crew": 60,
     "_capacity": 16,
     "_favorite": true,
     "_active": false,
@@ -145,7 +145,7 @@
   },
   {
     "_name": "Mary Rose",
-    "_crew": 70,
+    "_crew": 60,
     "_capacity": 17,
     "_favorite": true,
     "_active": true,

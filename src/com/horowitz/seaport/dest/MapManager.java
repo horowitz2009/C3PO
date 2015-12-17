@@ -29,10 +29,12 @@ public class MapManager {
 	private List<Destination> _destinations;
 	private List<Ship> _ships;
 	private Pixel _marketPos = null;
+	private List<Rectangle> _forbiddenAreas;
 
 	public MapManager(ScreenScanner scanner) {
 		super();
 		_scanner = scanner;
+		_forbiddenAreas = new ArrayList<Rectangle>(1);
 	}
 
 	public void loadData() throws IOException {
@@ -41,7 +43,7 @@ public class MapManager {
 	}
 
 	public void loadDestinations() throws IOException {
-		_destinations = new JsonStorage().loadDestinations();
+		_destinations = new JsonStorage().loadDestinationsNEW();
 	}
 
 	public List<Destination> getDestinations() {
@@ -72,9 +74,13 @@ public class MapManager {
 		deserializeDestinations2();
 		deserializeShips();
 
-		// _scanner.zoomOut();
-
-		// TODO check is map moved
+		_forbiddenAreas.clear();
+		Pixel br = _scanner.getBottomRight();
+		Rectangle anchorZone = new Rectangle(br.x - 127, br.y - 100, 127, 100);
+		_forbiddenAreas.add(anchorZone);
+		Pixel tl = _scanner.getTopLeft();
+		int w = _scanner.getGameWidth() - 268 - 29;
+		_mapArea = new Rectangle(tl.x + 278, tl.y + 69, w, _scanner.getGameHeight() - 69);
 
 	}
 
@@ -89,8 +95,11 @@ public class MapManager {
 			destination.setImageDataTitle(_scanner.getImageData(destination.getImageTitle()));
 
 			ImageData id = destination.getImageData();
-			id.set_xOff(id.getImage().getWidth() / 2);
-			id.set_yOff(43);
+			//id.set_xOff(id.getImage().getWidth() / 2);
+			//id.set_yOff(43);
+			id.set_xOff(0);
+			id.set_yOff(0);
+			
 			id.setDefaultArea(_scanner.getScanArea());
 			id = destination.getImageDataTitle();
 			id.setDefaultArea(_scanner.getPopupArea());
@@ -109,8 +118,10 @@ public class MapManager {
 			// destination.setImageDataTitle(_scanner.getImageData(destination.getImageTitle()));
 
 			ImageData id = destination.getImageData();
-			id.set_xOff(id.getImage().getWidth() / 2);
-			id.set_yOff(43);
+//			id.set_xOff(id.getImage().getWidth() / 2);
+//			id.set_yOff(43);
+			id.set_xOff(0);
+			id.set_yOff(0);
 			id.setDefaultArea(_scanner.getScanArea());
 			id = destination.getImageDataTitle();
 			id.setDefaultArea(_scanner.getPopupArea());
@@ -157,7 +168,7 @@ public class MapManager {
 		return null;
 	}
 
-	public Pixel ensureMap() throws AWTException, RobotInterruptedException, IOException {
+	public boolean ensureMap() throws AWTException, RobotInterruptedException, IOException {
 		// MAP ZONE
 
 		// first zoom out
@@ -168,8 +179,10 @@ public class MapManager {
 		if (_marketPos == null) {
 			LOGGER.info("Looking for market for the first time");
 
-			Rectangle smallerArea = new Rectangle(_scanner.getTopLeft().x + 50, _scanner.getTopLeft().y
-			    + _scanner.getGameHeight() / 2, _scanner.getGameWidth() - 100, _scanner.getGameHeight() / 2);
+			int xx = _scanner.getGameWidth() / 3;
+			Rectangle smallerArea = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y
+			    + _scanner.getGameHeight() / 2, xx, _scanner.getGameHeight() / 2);
+			//Rectangle smallerArea = _mapArea;
 			_marketPos = _scanner.scanOneFast(_market.getImageData(), smallerArea, false);
 			if (_marketPos == null) {
 				_marketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
@@ -178,12 +191,14 @@ public class MapManager {
 				LOGGER.info("BINGOOOOOOOOOO");
 			}
 		} else {
-			Rectangle areaSpec = new Rectangle(_marketPos.x - 20, _marketPos.y - 20, _market.getImageData().getImage()
-			    .getWidth() + 40, _market.getImageData().getImage().getHeight() + 40);
+			Rectangle areaSpec = new Rectangle(_marketPos.x - 10, _marketPos.y - 10, _market.getImageData().getImage()
+			    .getWidth() + 20, _market.getImageData().getImage().getHeight() + 20);
 
 			Pixel newMarketPos = _scanner.scanOneFast(_market.getImageData(), areaSpec, false);
-			if (newMarketPos == null)
+			if (newMarketPos == null) {
+				LOGGER.info("COULDN'T FIND MARKET at once. Trying again...");
 				newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+			}
 
 			if (_marketPos.equals(newMarketPos)) {
 				LOGGER.info("Market found in the same place.");
@@ -191,29 +206,80 @@ public class MapManager {
 			_marketPos = newMarketPos;
 		}
 
-		Pixel idealP = new Pixel(_scanner.getTopLeft().x + 120 + _scanner.getGameWidth() / 2, _scanner.getBottomRight().y - 155);
+		boolean isOK = true;
+		int xx2 = 0; int yy2 = 0;
+		int xx3 = 0; int yy3 = 0;
+		for (Destination dest : _destinations) {
+	    if (dest.isFavorite()) {
+	    	dest.getRelativePosition();
+				int x = _marketPos.x + dest.getRelativePosition().x;
+				int y = _marketPos.y + dest.getRelativePosition().y;
+				if (x < _mapArea.x) {
+					//2
+					dest.x = _mapArea.x - x;
+					if (dest.x > xx2)
+						xx2 = dest.x;
+				} else if (x > _mapArea.x + _mapArea.getWidth()) {
+					//3
+					dest.x = (int)(_mapArea.x + _mapArea.getWidth() - x);
+					if (dest.x < xx3)
+						xx3 = dest.x;
+				}
 
-		if (Math.abs(_marketPos.x - idealP.x) > 10 && Math.abs(_marketPos.x - idealP.y) > 10) {
-			// need adjusting
-			_scanner.getMouse().drag2(_marketPos.x, _marketPos.y - 50, idealP.x, idealP.y - 50);
-			_scanner.getMouse().delay(1200);
+				if (y < _mapArea.y) {
+					//2
+					dest.y = _mapArea.y - y;
+					if (dest.y > yy2)
+						yy2 = dest.y;
+				} else if (y > _mapArea.y + _mapArea.getHeight()) {
+					//3
+					dest.y = (int)(_mapArea.y + _mapArea.getHeight() - y);
+					if (dest.y < yy3)
+						yy3 = dest.y;
+				}
+				
+	    	
+	    }
+    }
+		
+		if ((xx2 != 0 && xx3 != 0) || (yy2 != 0 && yy3 != 0)) {
+			isOK = false;
+			LOGGER.info("ALL DESTINATIONS CAN'T BE IN THE ZONE!!!");
+		} else {
+			//can be fixed by dragging
+			int xxx = (xx2 != 0) ? xx2 : xx3;
+			int yyy = (yy2 != 0) ? yy2 : yy3;
+			if (xxx != 0 || yyy != 0) {
+				if (xxx > 0)
+					xxx += 15;
+				else
+					xxx -= 15;
+				if (yyy > 0)
+					yyy += 15;
+				else
+					yyy -= 15;
+				
+			  _scanner.getMouse().drag2(_marketPos.x, _marketPos.y - 50, _marketPos.x + xxx, _marketPos.y + yyy - 50);
+			  _scanner.getMouse().delay(1200);
+			  _marketPos.x += xxx;
+			  _marketPos.y += yyy;
+			  Rectangle areaSpec = new Rectangle(_marketPos.x - 10, _marketPos.y - 10, _market.getImageData().getImage()
+			      .getWidth() + 20, _market.getImageData().getImage().getHeight() + 20);
 
-			// //
-			Rectangle areaSpec = new Rectangle(_marketPos.x - 20, _marketPos.y - 20, _market.getImageData().getImage()
-			    .getWidth() + 40, _market.getImageData().getImage().getHeight() + 40);
+			  Pixel newMarketPos = _scanner.scanOneFast(_market.getImageData(), areaSpec, false);
+			  if (newMarketPos == null) {
+				  LOGGER.info("COULDN'T FIND MARKET at once. Trying again...");
+				  newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+			  }
 
-			Pixel newMarketPos = _scanner.scanOneFast(_market.getImageData(), areaSpec, false);
-			if (newMarketPos == null)
-				newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
-
-			if (_marketPos.equals(newMarketPos)) {
-				LOGGER.info("Market found in the same place.");
+			  if (_marketPos.equals(newMarketPos)) {
+				  LOGGER.info("Market found in the same place.");
+			  }
+			  _marketPos = newMarketPos;
 			}
-			_marketPos = newMarketPos;
-			// //
 		}
-
-		return _marketPos;
+		
+		return isOK;
 	}
 
 	public Pixel getMarketPos() {
@@ -228,8 +294,10 @@ public class MapManager {
 		JsonStorage jsonStorage = new JsonStorage();
 		jsonStorage.saveDispatchEntries(new ArrayList<DispatchEntry>());
 	}
-	
-	PropertyChangeSupport _support = new PropertyChangeSupport(this); 
+
+	PropertyChangeSupport _support = new PropertyChangeSupport(this);
+
+	private Rectangle _mapArea;
 
 	public void registerTrip(Ship ship, Destination dest) throws IOException {
 		JsonStorage jsonStorage = new JsonStorage();
@@ -252,31 +320,31 @@ public class MapManager {
 			des.add(theDE);
 		}
 		assert theDE != null;
-		
+
 		jsonStorage.saveDispatchEntries(des);
 		_support.firePropertyChange("TRIP_REGISTERED", null, theDE);
 
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
-	  _support.addPropertyChangeListener(listener);
-  }
+		_support.addPropertyChangeListener(listener);
+	}
 
 	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-	  _support.addPropertyChangeListener(propertyName, listener);
-  }
+		_support.addPropertyChangeListener(propertyName, listener);
+	}
 
 	public ShipProtocol getSingleProtocol() {
-	  try {
-	    List<ShipProtocol> shipProtocols = loadShipProtocols();
-	    for (ShipProtocol shipProtocol : shipProtocols) {
-	      if (shipProtocol.getName().equals("SINGLE"))
-	      	return shipProtocol;
-      }
-    } catch (IOException e) {
-	    e.printStackTrace();
-    }
-	  return null;
-  }
+		try {
+			List<ShipProtocol> shipProtocols = loadShipProtocols();
+			for (ShipProtocol shipProtocol : shipProtocols) {
+				if (shipProtocol.getName().equals("SINGLE"))
+					return shipProtocol;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 }

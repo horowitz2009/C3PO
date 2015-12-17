@@ -1,0 +1,212 @@
+[
+  {
+    "_name": "Market",
+    "_abbrs": "MC,MTC",
+    "_option": "Cocoa-Coins",
+    "_time": 30,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 44,
+      "y": 43
+    },
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
+    "_name": "Market XP",
+    "_abbrs":"MX,MTXP",
+    "_option": "Cocoa-XP",
+    "_time": 30,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 44,
+      "y": 43
+    },
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
+    "_name": "Small Town",
+    "_abbrs":"S,ST",
+    "_time": 5,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -38,
+      "y": -98
+    },
+    "_image": "dest/SmallTown.bmp",
+    "_imageTitle": "dest/SmallTownTitle.bmp"
+  },
+  {
+    "_name": "Coastline",
+    "_abbrs":"C,CL",
+    "_time": 15,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 119,
+      "y": -109
+    },
+    "_image": "dest/Coastline.bmp",
+    "_imageTitle": "dest/CoastlineTitle.bmp"
+  },
+  {
+    "_name": "Gulf",
+    "_abbrs":"G,GF",
+    "_time": 60,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 141,
+      "y": -213
+    },
+    "_image": "dest/Gulf.bmp",
+    "_imageTitle": "dest/GulfTitle.bmp"
+  },
+  {
+    "_name": "Blacksmith",
+    "_abbrs":"BS",
+    "_time": 60,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 163,
+      "y": 138
+    },
+    "_image": "dest/Blacksmith.bmp",
+    "_imageTitle": "dest/BlacksmithTitle.bmp"
+  },
+  {
+    "_name": "Cocoa Plant",
+    "_abbrs":"CP,CPL",
+    "_time": 120,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 346,
+      "y": 90
+    },
+    "_image": "dest/CocoaPlant.bmp",
+    "_imageTitle": "dest/CocoaPlantTitle.bmp"
+  },
+  {
+    "_name": "Bamboo",
+    "_abbrs":"BB,BM",
+    "_time": 10,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 141,
+      "y": -22
+    },
+    "_image": "dest/Bamboo.bmp",
+    "_imageTitle": "dest/BambooTitle.bmp"
+  },
+  {
+    "_name": "Rubble",
+    "_abbrs":"R,RB",
+    "_time": 240,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 281,
+      "y": -123
+    },
+    "_image": "dest/Rubble.bmp",
+    "_imageTitle": "dest/RubbleTitle.bmp"
+  },
+  {
+    "_name": "Forest",
+    "_abbrs":"F,FR",
+    "_time": 480,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 287,
+      "y": -269
+    },
+    "_image": "dest/Forest.bmp",
+    "_imageTitle": "dest/ForestTitle.bmp"
+  },
+  {
+    "_name": "Neighborhood",
+    "_abbrs":"N,NH",
+    "_time": 240,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -124,
+      "y": -239
+    },
+    "_image": "dest/Neighborhood.bmp",
+    "_imageTitle": "dest/NeighborhoodTitle.bmp"
+  },
+  {
+    "_name": "Iron Mill",
+    "_abbrs":"IM",
+    "_time": 480,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -227,
+      "y": -179
+    },
+    "_image": "dest/Forest.bmp",
+    "_imageTitle": "dest/ForestTitle.bmp"
+  },
+  {
+    "_name": "Rocky Mill",
+    "_abbrs":"RM",
+    "_time": 480,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -201,
+      "y": -283
+    },
+    "_image": "dest/Forest.bmp",
+    "_imageTitle": "dest/ForestTitle.bmp"
+  },
+  {
+    "_name": "Riviera",
+    "_abbrs":"RV",
+    "_time": 480,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -325,
+      "y": -234
+    },
+    "_image": "dest/Forest.bmp",
+    "_imageTitle": "dest/ForestTitle.bmp"
+  },
+  {
+    "_name": "John Kendrick",
+    "_abbrs":"JK",
+    "_time": 120,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -288,
+      "y": -148
+    },
+    "_image": "dest/Forest.bmp",
+    "_imageTitle": "dest/ForestTitle.bmp"
+  },
+  {
+    "_name": "Explore",
+    "_abbrs":"E,EX",
+    "_time": 240,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": -320,
+      "y": -339
+    },
+    "_image": "dest/Explore.bmp",
+    "_imageTitle": "dest/ExploreTitle.bmp"
+  }
+]

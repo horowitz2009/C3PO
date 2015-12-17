@@ -66,7 +66,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					_mouse.delay(750);
 
 					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
-					//_scanner.writeImage(miniArea, "pin.bmp");
+					// _scanner.writeImage(miniArea, "pin.bmp");
 					Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
 					if (pin != null) {
 						doShip(pin);
@@ -108,6 +108,17 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		return _lastShip;
 	}
 
+	protected void manageContractCases() throws IOException, AWTException, RobotInterruptedException {
+		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 10,
+		    _scanner.getBottomRight().y - 240, 205, 240);
+		Pixel destButton = _scanner.scanPrecise("dest/collect.bmp", buttonArea);
+		if (destButton != null) {
+			LOGGER.info("MISSION COMPLETED. MOVING ON...");
+			_mouse.click(destButton);
+			_mouse.delay(1000);
+		}
+	}
+
 	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException {
 		LOGGER.info("CHAIN: " + chain);
 		_mouse.checkUserMovement();
@@ -115,88 +126,58 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		if (dest != null) {
 
 			Pixel marketPos = _mapManager.getMarketPos();
-			if (marketPos == null)
-				marketPos = _mapManager.ensureMap();
+			if (marketPos == null) {
+				_mapManager.ensureMap();
+				marketPos = _mapManager.getMarketPos();
+			}
 			Destination _market = _mapManager.getMarket();
 
-			Pixel destP = marketPos;
-			if (!dest.getName().startsWith("Market")) {
-				int x = marketPos.x + dest.getRelativePosition().x - _market.getImageData().get_xOff() - 35;
-				int y = marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 35;
-				Rectangle destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
-				Pixel pp = _scanner.ensureAreaInGame(destArea);
-				if (pp.x != 0 || pp.y != 0) {
-					marketPos = _mapManager.ensureMap();
-					x = marketPos.x + dest.getRelativePosition().x - _market.getImageData().get_xOff() - 35;
-					y = marketPos.y + dest.getRelativePosition().y - _market.getImageData().get_yOff() - 35;
-					destArea = new Rectangle(x, y, 153 + 20 + 40, 25 + 40);
-				}
-				LOGGER.fine("Using custom area for " + dest.getImage());
-				_mouse.checkUserMovement();
-				destP = _scanner.scanOneFast(dest.getImageData(), destArea, false);
-			}
+			int x = marketPos.x + dest.getRelativePosition().x;
+			int y = marketPos.y + dest.getRelativePosition().y;
 
-			if (destP != null) {
-				LOGGER.info("Sending to " + dest.getName() + "...");
-				_mouse.checkUserMovement();
-				_mouse.click(destP);
-				_mouse.mouseMove(_scanner.getParkingPoint());
-				_mouse.delay(800);
+			_mouse.click(x, y);
+			_mouse.delay(1000);
 
-				Pixel destTitle = _scanner.scanOneFast(dest.getImageDataTitle(), null, false);
-
-				if (destTitle != null) {
-					LOGGER.fine("SEND POPUP OPEN...");
-					_mouse.checkUserMovement();
-					LOGGER.info("OPTION: " + dest.getOption());
-					_mouse.mouseMove(_scanner.getParkingPoint());
-					_mouse.delay(300);
-
-					Pixel destButton = _scanner.scanOneFast("dest/setSail.bmp", null, false);
-					if (destButton != null) {
-						// nice. we can continue
-						if (dest.getName().startsWith("Market")) {
-							if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
-								//XP
-							} else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
-								//coins
-								Pixel coins = new Pixel(destTitle);
-								coins.y += 228;
-								_mouse.checkUserMovement();
-								_mouse.click(coins);
-								_mouse.delay(650);
-							}
-						}
+			// assume the dialog is open
+			manageContractCases();
+			
+			Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2,
+			    _scanner.getBottomRight().y - 240, 205, 240);
+			Pixel destButton = _scanner.scanPrecise("dest/setSail.bmp", buttonArea);
+			if (destButton != null) {
+				// nice. we can continue
+				if (dest.getName().startsWith("Market")) {
+					if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
+						// XP
+					} else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
+						// coins
+						Pixel coins = new Pixel(destButton.x - 30 - 90, destButton.y - 6 - 195);// xOff: 30, yOff: 6
 						_mouse.checkUserMovement();
-						_mouse.click(destButton);
-						_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
-						_mouse.checkUserMovement();
-						_mouse.delay(1500);
-						return true;
-					} else {
-						LOGGER.info(dest.getName() + " can't be done!");
-						boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-						// if (found)
-						_mouse.checkUserMovement();
-						_mouse.delay(1500);
-						// chain.poll();
-						if (chain.isEmpty()) {
-							LOGGER.info("reached the end of chain");
-							//TODO close the map and move on
-							return false;
-						}
-						else
-							return sendShip(chain);
+						_mouse.click(coins);
+						_mouse.delay(650);
 					}
-
 				}
+				_mouse.checkUserMovement();
+				_mouse.click(destButton);
+				_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+				_mouse.checkUserMovement();
+				_mouse.delay(1500);
+				return true;
 			} else {
-				LOGGER.info("========");
-				LOGGER.info("Can't locate destination: " + dest.getName());
-				LOGGER.info("========");
-				//TODO close the map and move on
-				return false;
+				LOGGER.info(dest.getName() + " can't be done!");
+				boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+				// if (found)
+				_mouse.checkUserMovement();
+				_mouse.delay(1500);
+				// chain.poll();
+				if (chain.isEmpty()) {
+					LOGGER.info("reached the end of chain");
+					// TODO close the map and move on
+					return false;
+				} else
+					return sendShip(chain);
 			}
+
 		}
 		return false;
 	}

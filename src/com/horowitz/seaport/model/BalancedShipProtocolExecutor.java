@@ -59,7 +59,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
 		if (anchor != null) {
 			// MAP IS OPEN
-			_mapManager.ensureMap();
+			boolean isOK = _mapManager.ensureMap();
 
 			if (_lastShip == null) {
 				_lastShip = new Ship("<Unknown>");

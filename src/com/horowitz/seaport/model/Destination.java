@@ -9,6 +9,8 @@ public class Destination extends GameUnit {
 	private String _option;
 	private boolean _favorite;
 	private Pixel _relativePosition;
+	public transient int x;
+	public transient int y;
 
 	public Destination(String name, int time, String image, String imageTitle) {
 		super(name, image, imageTitle);
@@ -71,6 +73,22 @@ public class Destination extends GameUnit {
 
 	public void setOption(String option) {
 		_option = option;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
 	}
 
 }

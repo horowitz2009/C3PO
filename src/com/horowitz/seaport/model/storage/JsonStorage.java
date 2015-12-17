@@ -42,6 +42,14 @@ public class JsonStorage {
 		return new ArrayList<Destination>(Arrays.asList(destinations));
 	}
 
+	public List<Destination> loadDestinationsNEW() throws IOException {
+		String json = FileUtils.readFileToString(new File("data/destinationsNEW.json"));
+		
+		Destination[] destinations = _gson.fromJson(json, Destination[].class);
+		
+		return new ArrayList<Destination>(Arrays.asList(destinations));
+	}
+	
 	public void saveDestinations(List<Destination> destinations) throws IOException {
 
 		String json = _gson.toJson(destinations);
