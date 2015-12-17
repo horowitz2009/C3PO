@@ -739,7 +739,7 @@ public class ScreenScanner {
 		area = imageData.getDefaultArea();
 	}
 	BufferedImage screen = new Robot().createScreenCapture(area);
-	writeImage2(area, "scoreboardArea.bmp");
+	//writeImage2(area, "scoreboardArea.bmp");
 	
   FastBitmap fbID = new FastBitmap(imageData.getImage());
   FastBitmap fbAREA = new FastBitmap(screen);
