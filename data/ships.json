@@ -99,13 +99,13 @@
     "_imageTitle": "ships/HalygastS.bmp"
   },
   {
-    "_name": "Ark Royal",
+    "_name": "Wegiz",
     "_crew": 80,
     "_capacity": 21,
     "_favorite": true,
     "_active": true,
     
-    "_imageTitle": "ships/ArkRoyalS.bmp"
+    "_imageTitle": "ships/WegizS.bmp"
   },
   {
     "_name": "Berrio",
@@ -119,7 +119,7 @@
   {
     "_name": "Trinidad",
     "_crew": 80,
-    "_capacity": 17,
+    "_capacity": 24,
     "_favorite": true,
     "_active": true,
     
@@ -153,13 +153,13 @@
     "_imageTitle": "ships/MaryRoseS.bmp"
   },
   {
-    "_name": "Adler Von Lubeck",
+    "_name": "Husse",
     "_crew": 80,
     "_capacity": 19,
     "_favorite": true,
     "_active": true,
     
-    "_imageTitle": "ships/AdlerVonLubeckS.bmp"
+    "_imageTitle": "ships/HusseS.bmp"
   },
   {
     "_name": "Peter Von Danzig",

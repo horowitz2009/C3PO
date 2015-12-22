@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.39e";
+	private static String APP_TITLE = "Seaport v0.42";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -133,7 +133,7 @@ public class MainFrame extends JFrame {
 
 	private boolean _testMode;
 
-	private JToggleButton _slowToggle;
+	private JToggleButton _autoRefreshToggle;
 
 	private JLabel _shipSentLabel;
 
@@ -210,6 +210,7 @@ public class MainFrame extends JFrame {
 
 			// SHIPS TASK
 			_shipsTask = new Task("Ships", 2);
+			_shipsTask.setEnabled(true);
 			_shipProtocolExecutor = new BalancedShipProtocolExecutor(_scanner, _mouse, _mapManager);
 			_shipProtocolExecutor.addPropertyChangeListener(new StatsListener());
 			_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
@@ -417,6 +418,14 @@ public class MainFrame extends JFrame {
 		_labels.put("S", l);
 		panel.add(l, gbc2);
 
+		// C
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("C:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("C", l);
+		panel.add(l, gbc2);
+
 		// G
 		gbc.gridy++;
 		gbc2.gridy++;
@@ -424,6 +433,20 @@ public class MainFrame extends JFrame {
 		l = new JLabel(" ");
 		_labels.put("G", l);
 		panel.add(l, gbc2);
+
+		// RV
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("RV:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("RV", l);
+		panel.add(l, gbc2);
+
+		gbc.insets = new Insets(2, 12, 2, 2);
+		gbc.gridx = 3;
+		gbc2.gridx = 4;
+		gbc.gridy = 0;
+		gbc2.gridy = 0;
 
 		// CP
 		gbc.gridy++;
@@ -441,19 +464,27 @@ public class MainFrame extends JFrame {
 		_labels.put("MC", l);
 		panel.add(l, gbc2);
 
-		gbc.insets = new Insets(2, 12, 2, 2);
-		gbc.gridx = 3;
-		gbc2.gridx = 4;
-		gbc.gridy = 0;
-		gbc2.gridy = 0;
-
-		// BM
+		// MX
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("BB:"), gbc);
+		panel.add(new JLabel("MX:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("BB", l);
+		_labels.put("MX", l);
 		panel.add(l, gbc2);
+
+		// JK
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("JK:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("JK", l);
+		panel.add(l, gbc2);
+
+		gbc.insets = new Insets(2, 12, 2, 2);
+		gbc.gridx = 5;
+		gbc2.gridx = 6;
+		gbc.gridy = 0;
+		gbc2.gridy = 0;
 
 		// BS
 		gbc.gridy++;
@@ -477,6 +508,14 @@ public class MainFrame extends JFrame {
 		panel.add(new JLabel("N:"), gbc);
 		l = new JLabel(" ");
 		_labels.put("N", l);
+		panel.add(l, gbc2);
+
+		// IM
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("IM:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("IM", l);
 		panel.add(l, gbc2);
 
 		// FAKE
@@ -887,25 +926,19 @@ public class MainFrame extends JFrame {
 			});
 			toolbar.add(_industriesToggle);
 
-			_slowToggle = new JToggleButton("Slow");
-			_slowToggle.addItemListener(new ItemListener() {
+			_autoRefreshToggle = new JToggleButton("AR");
+			_autoRefreshToggle.addItemListener(new ItemListener() {
 
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					LOGGER.info("Slow mode: " + (b ? "on" : "off"));
-					if (b) {
-						_mouse.setDelayBetweenActions(500);
-					} else {
-						_mouse.setDelayBetweenActions(50);
-					}
-					_settings.setProperty("slow", "" + b);
+					LOGGER.info("Auto Refresh mode: " + (b ? "on" : "off"));
+					_settings.setProperty("autoRefresh", "" + b);
 					_settings.saveSettingsSorted();
-
 				}
 			});
 			// _slowToggle.setSelected(false);
-			toolbar.add(_slowToggle);
+			toolbar.add(_autoRefreshToggle);
 
 			_autoSailorsToggle = new JToggleButton("AS");
 			// _autoSailorsToggle.setSelected(false);
@@ -915,6 +948,9 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					LOGGER.info("AutoSailors mode: " + (b ? "on" : "off"));
+					if (!b) {
+						_speedTime = null;
+					}
 					_settings.setProperty("autoSailors", "" + b);
 					_settings.saveSettingsSorted();
 
@@ -1397,19 +1433,35 @@ public class MainFrame extends JFrame {
 				if (task.isEnabled())
 					task.update();
 			}
-      
+
 			_mouse.saveCurrentPosition();
-			
+			long fstart = System.currentTimeMillis();
 			do {
+				long mandatoryRefresh = _settings.getInt("autoRefresh.mandatoryRefresh", 45) * 60 * 1000;
+				long now = System.currentTimeMillis();
 				_mouse.checkUserMovement();
 				// 1. SCAN
 				handlePopups(false);
+
+				// REFRESH
+				LOGGER.info("refresh ? " + _autoRefreshToggle.isSelected() + " - " + mandatoryRefresh + " < " + (now - fstart));
+				if (_autoRefreshToggle.isSelected() && mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
+					LOGGER.info("refresh time...");
+					try {
+						refresh(false);
+					} catch (AWTException e) {
+						LOGGER.info("FAILED TO refresh: " + e.getMessage());
+					} catch (IOException e) {
+						LOGGER.info("FAILED TO refresh: " + e.getMessage());
+					}
+					fstart = System.currentTimeMillis();
+				}
 
 				_mouse.checkUserMovement();
 				if (_pingToggle.isSelected()) {
 					ping();
 				}
-				
+
 				_mouse.checkUserMovement();
 				if (_autoSailorsToggle.isSelected())
 					scanSailors();
@@ -1448,69 +1500,131 @@ public class MainFrame extends JFrame {
 		}
 	}
 
+	private void refresh(boolean bookmark) throws AWTException, IOException, RobotInterruptedException {
+		deleteOlder("refresh", 5);
+		LOGGER.info("Time to refresh...");
+		_scanner.captureGame("refresh ");
+		Pixel p;
+		if (!bookmark) {
+			if (_scanner.isOptimized()) {
+				p = _scanner.getBottomRight();
+				p.y = _scanner.getTopLeft().y + 100;
+				p.x = _scanner.getBottomRight().x + 4;
+			} else {
+				p = new Pixel(0, 510);
+			}
+			_mouse.click(p.x, p.y);
+			try {
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_F5);
+				robot.keyRelease(KeyEvent.VK_F5);
+			} catch (AWTException e) {
+			}
+			try {
+				Thread.sleep(15000);
+			} catch (InterruptedException e) {
+			}
+			_scanner.reset();
+
+			boolean done = false;
+			for (int i = 0; i < 17 && !done; i++) {
+				LOGGER.info("after refresh recovery try " + (i + 1));
+				// LOCATE THE GAME
+				if (_scanner.locateGameArea(false)) {
+					LOGGER.info("Game located successfully!");
+					done = true;
+				} else {
+					processRequests();
+				}
+				if (i > 8) {
+					captureScreen("refresh trouble ");
+				}
+			}
+			if (done) {
+				// runMagic();
+				captureScreen("refresh done ");
+			} else {
+				// blah
+				// try bookmark
+			}
+			
+			//not sure why shipsTasks gets off after refresh
+			reapplySettings();
+
+		} else {
+			// try {
+			// p = _scanner.generateImageData("tsFavicon2.bmp", 8, 7).findImage(new Rectangle(0, 30, 400, 200));
+			// _mouse.click(p.x, p.y);
+			// } catch (IOException e) {
+			// }
+		}
+	}
+
 	private Long _lastPing = System.currentTimeMillis();
 
 	private void ping() {
 		if (System.currentTimeMillis() - _lastPing > _settings.getInt("ping.time", 120) * 1000) {
-			captureScreen();
+			captureScreen(null);
 			_lastPing = System.currentTimeMillis();
 		}
 
 	}
+
 	private Long _speedTime = null;
+
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
 		if (sailorsPos != null) {
 
-		if (_speedTime == null) {
-			try {
-				Rectangle miniArea = new Rectangle(sailorsPos.x + 20, sailorsPos.y + 4, 76, 15);
-				BufferedImage image = new Robot().createScreenCapture(miniArea);
-
-				FastBitmap fb = new FastBitmap(image);
-				// COLOR FILTERING
-				ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255),
-				    new IntRange(255, 255));
-				colorFiltering.applyInPlace(fb);
-
-				String sailorsStr = _ocr.scanImage(fb.toBufferedImage());
-				LOGGER.info("sailors:" + sailorsStr);
-				
+			if (_speedTime == null) {
 				try {
-					int sailors = Integer.parseInt(sailorsStr);
-					if (sailors > _settings.getInt("autoSailors.upperThreshold", 1000)) {
-						String newProtocolName = _shipProtocol != null ? _shipProtocol.getName() : "DEFAULT";
-						String speedProtocolName = _settings.getProperty("autoSailors.speedProtocol", "SINGLE");
-						if (!newProtocolName.equals(speedProtocolName)) {
-							_lastProtocolName = newProtocolName;
-							setProtocol(speedProtocolName);
-							_speedTime = System.currentTimeMillis();
-							LOGGER.info("Switching to speed protocol: " + speedProtocolName);
+					Rectangle miniArea = new Rectangle(sailorsPos.x + 20, sailorsPos.y + 4, 76, 15);
+					BufferedImage image = new Robot().createScreenCapture(miniArea);
+
+					FastBitmap fb = new FastBitmap(image);
+					// COLOR FILTERING
+					ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255),
+					    new IntRange(255, 255));
+					colorFiltering.applyInPlace(fb);
+
+					String sailorsStr = _ocr.scanImage(fb.toBufferedImage());
+					LOGGER.info("sailors:" + sailorsStr);
+
+					try {
+						int sailors = Integer.parseInt(sailorsStr);
+						if (sailors > _settings.getInt("autoSailors.upperThreshold", 1000)) {
+							String newProtocolName = _shipProtocol != null ? _shipProtocol.getName() : "DEFAULT";
+							String speedProtocolName = _settings.getProperty("autoSailors.speedProtocol", "SINGLE");
+							if (!newProtocolName.equals(speedProtocolName)) {
+								_lastProtocolName = newProtocolName;
+								setProtocol(speedProtocolName);
+								_speedTime = System.currentTimeMillis();
+								LOGGER.info("Switching to speed protocol: " + speedProtocolName);
+							}
 						}
+					} catch (NumberFormatException e) {
 					}
-				} catch (NumberFormatException e) {
+				} catch (AWTException e) {
+					e.printStackTrace();
 				}
-			} catch (AWTException e) {
-				e.printStackTrace();
-			}
-		} else {
-			if (System.currentTimeMillis() - _speedTime >= _settings.getInt("autoSailors.speedTime", 120) * 60000) {
-				_speedTime = null;
-				String newProtocolName = _lastProtocolName != null ? _lastProtocolName : "DEFAULT";
-				LOGGER.info("Going back to protocol: " + newProtocolName);
-
-				try {
-					_mapManager.resetDispatchEntries();
-				} catch (IOException e1) {
-					LOGGER.info("Failed to reset entries!");
-				}
-				setProtocol(newProtocolName);
 			} else {
-				long time = System.currentTimeMillis() - _speedTime - _settings.getInt("autoSailors.speedTime", 120) * 60000;
-				time = - time / 60000;
-				LOGGER.info("Time to switch back to normal protocol: " + time + " minutes");
+				if (System.currentTimeMillis() - _speedTime >= _settings.getInt("autoSailors.speedTime", 120) * 60000) {
+					_speedTime = null;
+					String newProtocolName = _lastProtocolName != null ? _lastProtocolName : "DEFAULT";
+					LOGGER.info("Going back to protocol: " + newProtocolName);
+
+					try {
+						_mapManager.resetDispatchEntries();
+					} catch (IOException e1) {
+						LOGGER.info("Failed to reset entries!");
+					}
+					setProtocol(newProtocolName);
+				} else {
+					long time = System.currentTimeMillis() - _speedTime - _settings.getInt("autoSailors.speedTime", 120) * 60000;
+					time = -time / 60000;
+					LOGGER.info("Time to switch back to normal protocol: " + time + " minutes");
+				}
 			}
-		}
 		}
 	}
 
@@ -1619,9 +1733,9 @@ public class MainFrame extends JFrame {
 			_industriesToggle.setSelected(industries);
 		}
 
-		boolean slow = "true".equalsIgnoreCase(_settings.getProperty("slow"));
-		if (slow != _slowToggle.isSelected()) {
-			_slowToggle.setSelected(slow);
+		boolean slow = "true".equalsIgnoreCase(_settings.getProperty("autoRefresh"));
+		if (slow != _autoRefreshToggle.isSelected()) {
+			_autoRefreshToggle.setSelected(slow);
 		}
 
 		boolean autoSailors = "true".equalsIgnoreCase(_settings.getProperty("autoSailors"));
@@ -1658,6 +1772,27 @@ public class MainFrame extends JFrame {
 
 	}
 
+	private void stopMagic() {
+		_stopAllThreads = true;
+		LOGGER.info("Stopping...");
+		int tries = 10;
+		boolean stillRunning = true;
+		for (int i = 0; i < tries && stillRunning; ++i) {
+			stillRunning = isRunning("MAGIC");
+			if (stillRunning) {
+				LOGGER.info("Magic still working...");
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
+			} else {
+				LOGGER.info("INSOMNIA STOPPED");
+				setTitle(APP_TITLE);
+			}
+		}
+		_stopAllThreads = false;
+	}
+
 	private void processRequests() {
 		Service service = new Service();
 
@@ -1666,44 +1801,32 @@ public class MainFrame extends JFrame {
 
 			if (r.startsWith("stop") || r.startsWith("s")) {
 				service.inProgress(r);
-				// reload(r);
-				_stopAllThreads = true;
-				LOGGER.info("INSOMNIA STOPPING...");
-				captureScreen();
+				stopMagic();
+				captureScreen(null);
 
 			} else if (r.startsWith("run") || r.startsWith("start")) {
 				service.inProgress(r);
+				stopMagic();
 				runMagic();
-				captureScreen();
+				captureScreen(null);
 
 			} else if (r.startsWith("refresh") || r.startsWith("r")) {
 				service.inProgress(r);
-				Pixel p;
-				if (_scanner.isOptimized()) {
-					p = _scanner.getBottomRight();
-					p.y = _scanner.getTopLeft().y + 100;
-					p.x = _scanner.getBottomRight().x + 4;
-				} else {
-					p = new Pixel(0, 110);
-				}
-				_mouse.click(p.x, p.y);
 				try {
-					Robot robot = new Robot();
-					robot.keyPress(KeyEvent.VK_F5);
-					robot.keyRelease(KeyEvent.VK_F5);
+					stopMagic();
+					refresh(false);
 				} catch (AWTException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (RobotInterruptedException e) {
+					e.printStackTrace();
 				}
-				try {
-					Thread.sleep(15000);
-				} catch (InterruptedException e) {
-				}
-				runMagic();
-				captureScreen();
 
 			} else if (r.startsWith("ping") || r.startsWith("p")) {
 				service.inProgress(r);
 				LOGGER.info("Ping...");
-				captureScreen();
+				captureScreen(null);
 				service.done(r);
 			}
 		}
@@ -1773,10 +1896,12 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void captureScreen() {
+	private void captureScreen(String filename) {
+		if (filename == null)
+			filename = "ping ";
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		writeImage(new Rectangle(0, 0, screenSize.width, screenSize.height),
-		    "ping " + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".jpg");
+		    filename + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".jpg");
 		deleteOlder("ping", 8);
 	}
 
@@ -1824,7 +1949,7 @@ public class MainFrame extends JFrame {
 					LOGGER.info("I need to know where the game is!");
 				}
 			}
-		});
+		}, "MAGIC");
 
 		myThread.start();
 	}
