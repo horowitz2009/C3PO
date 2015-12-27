@@ -85,7 +85,7 @@ public class CocoaProtocol2Executor extends BaseShipProtocolExecutor {
 			if (whatShip != null) {
 				if (whatShip.getName().equals(_sellingShip)) {
 					LOGGER.info("SELLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-					_destChain.add(_mapManager.getMarket());
+					_destChain.add(_mapManager.getSmallTown());
 					_destChain.add(_mapManager.getDestination("Coastline"));
 					_destChain.add(_mapManager.getDestination("Small Town"));
 				} else if (isCocoaShip(whatShip)) {

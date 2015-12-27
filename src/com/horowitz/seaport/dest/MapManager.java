@@ -28,7 +28,7 @@ public class MapManager {
 
 	private List<Destination> _destinations;
 	private List<Ship> _ships;
-	private Pixel _marketPos = null;
+	private Pixel _smallTownPos = null;
 	private List<Rectangle> _forbiddenAreas;
 
 	public MapManager(ScreenScanner scanner) {
@@ -84,8 +84,8 @@ public class MapManager {
 
 	}
 
-	public Destination getMarket() {
-		return getDestination("Market");
+	public Destination getSmallTown() {
+		return getDestination("Small Town");
 	}
 
 	public void deserializeDestinations() throws IOException {
@@ -174,36 +174,37 @@ public class MapManager {
 		// first zoom out
 		_scanner.zoomOut();
 
-		Destination _market = getMarket();
+		Destination _smallTown = getSmallTown();
 		// _marketPos = null;
-		if (_marketPos == null) {
-			LOGGER.info("Looking for market for the first time");
+		if (_smallTownPos == null) {
+			LOGGER.info("Looking for Small Town for the first time");
 
 			int xx = _scanner.getGameWidth() / 3;
+			int yy = _scanner.getGameHeight() / 2;
 			Rectangle smallerArea = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y
-			    + _scanner.getGameHeight() / 2, xx, _scanner.getGameHeight() / 2);
+			    + yy / 2, xx, yy);
 			//Rectangle smallerArea = _mapArea;
-			_marketPos = _scanner.scanOneFast(_market.getImageData(), smallerArea, false);
-			if (_marketPos == null) {
-				_marketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+			_smallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), smallerArea, false);
+			if (_smallTownPos == null) {
+				_smallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), null, false);
 				LOGGER.info("DAMMMMMMMMMMMN");
 			} else {
 				LOGGER.info("BINGOOOOOOOOOO");
 			}
 		} else {
-			Rectangle areaSpec = new Rectangle(_marketPos.x - 10, _marketPos.y - 10, _market.getImageData().getImage()
-			    .getWidth() + 20, _market.getImageData().getImage().getHeight() + 20);
+			Rectangle areaSpec = new Rectangle(_smallTownPos.x - 10, _smallTownPos.y - 10, _smallTown.getImageData().getImage()
+			    .getWidth() + 20, _smallTown.getImageData().getImage().getHeight() + 20);
 
-			Pixel newMarketPos = _scanner.scanOneFast(_market.getImageData(), areaSpec, false);
-			if (newMarketPos == null) {
-				LOGGER.info("COULDN'T FIND MARKET at once. Trying again...");
-				newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+			Pixel newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), areaSpec, false);
+			if (newSmallTownPos == null) {
+				LOGGER.info("COULDN'T FIND Small Town at once. Trying again...");
+				newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), null, false);
 			}
 
-			if (_marketPos.equals(newMarketPos)) {
-				LOGGER.info("Market found in the same place.");
+			if (_smallTownPos.equals(newSmallTownPos)) {
+				LOGGER.info("Small Town found in the same place.");
 			}
-			_marketPos = newMarketPos;
+			_smallTownPos = newSmallTownPos;
 		}
 
 		boolean isOK = true;
@@ -212,8 +213,8 @@ public class MapManager {
 		for (Destination dest : _destinations) {
 	    if (dest.isFavorite()) {
 	    	dest.getRelativePosition();
-				int x = _marketPos.x + dest.getRelativePosition().x;
-				int y = _marketPos.y + dest.getRelativePosition().y;
+				int x = _smallTownPos.x + dest.getRelativePosition().x;
+				int y = _smallTownPos.y + dest.getRelativePosition().y;
 				if (x < _mapArea.x) {
 					//2
 					dest.x = _mapArea.x - x;
@@ -259,35 +260,35 @@ public class MapManager {
 				else
 					yyy -= 15;
 				
-			  _scanner.getMouse().drag2(_marketPos.x, _marketPos.y - 50, _marketPos.x + xxx, _marketPos.y + yyy - 50);
+			  _scanner.getMouse().drag2(_smallTownPos.x, _smallTownPos.y - 50, _smallTownPos.x + xxx, _smallTownPos.y + yyy - 50);
 			  _scanner.getMouse().delay(1200);
-			  _marketPos.x += xxx;
-			  _marketPos.y += yyy;
-			  Rectangle areaSpec = new Rectangle(_marketPos.x - 10, _marketPos.y - 10, _market.getImageData().getImage()
-			      .getWidth() + 20, _market.getImageData().getImage().getHeight() + 20);
+			  _smallTownPos.x += xxx;
+			  _smallTownPos.y += yyy;
+			  Rectangle areaSpec = new Rectangle(_smallTownPos.x - 10, _smallTownPos.y - 10, _smallTown.getImageData().getImage()
+			      .getWidth() + 20, _smallTown.getImageData().getImage().getHeight() + 20);
 
-			  Pixel newMarketPos = _scanner.scanOneFast(_market.getImageData(), areaSpec, false);
-			  if (newMarketPos == null) {
-				  LOGGER.info("COULDN'T FIND MARKET at once. Trying again...");
-				  newMarketPos = _scanner.scanOneFast(_market.getImageData(), null, false);
+			  Pixel newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), areaSpec, false);
+			  if (newSmallTownPos == null) {
+				  LOGGER.info("COULDN'T FIND Small Town at once. Trying again...");
+				  newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), null, false);
 			  }
 
-			  if (_marketPos.equals(newMarketPos)) {
-				  LOGGER.info("Market found in the same place.");
+			  if (_smallTownPos.equals(newSmallTownPos)) {
+				  LOGGER.info("Small Town found in the same place.");
 			  }
-			  _marketPos = newMarketPos;
+			  _smallTownPos = newSmallTownPos;
 			}
 		}
 		
 		return isOK;
 	}
 
-	public Pixel getMarketPos() {
-		return _marketPos;
+	public Pixel getSmallTownPos() {
+		return _smallTownPos;
 	}
 
-	public void setMarketPos(Pixel marketPos) {
-		_marketPos = marketPos;
+	public void setSmallTownPos(Pixel marketPos) {
+		_smallTownPos = marketPos;
 	}
 
 	public void resetDispatchEntries() throws IOException {

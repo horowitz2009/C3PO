@@ -125,12 +125,12 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		Destination dest = chain.poll();
 		if (dest != null) {
 
-			Pixel marketPos = _mapManager.getMarketPos();
+			Pixel marketPos = _mapManager.getSmallTownPos();
 			if (marketPos == null) {
 				_mapManager.ensureMap();
-				marketPos = _mapManager.getMarketPos();
+				marketPos = _mapManager.getSmallTownPos();
 			}
-			Destination _market = _mapManager.getMarket();
+			Destination _market = _mapManager.getSmallTown();
 
 			int x = marketPos.x + dest.getRelativePosition().x;
 			int y = marketPos.y + dest.getRelativePosition().y;

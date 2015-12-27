@@ -39,7 +39,7 @@ public class CocoaProtocol1Executor extends BaseShipProtocolExecutor {
 			if (_lastShip != null && _lastShip.getName().equals(_noCocoaShip)) {
 				_destChain.add(_mapManager.getDestination("Coastline"));
 			} else {
-				_destChain.add(_mapManager.getMarket());// market
+				_destChain.add(_mapManager.getSmallTown());// market
 				_destChain.add(_mapManager.getDestination("Cocoa Plant"));
 			}
 			

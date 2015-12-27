@@ -1,17 +1,4 @@
 [
- {
-   "_name": "Small Town",
-   "_abbrs":"S,ST",
-   "_time": 5,
-   "_favorite": true,
-   "_relativePosition": {
-     "weight": 0,
-     "x": 41,
-     "y": 45
-   },
-   "_image": "dest/small.bmp",
-   "_imageTitle": "dest/SmallTownTitle.bmp"
- },
   {
     "_name": "Market",
     "_abbrs": "MC,MTC",
@@ -20,8 +7,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 122,
-      "y": 182
+      "x": 44,
+      "y": 43
     },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"
@@ -34,39 +21,24 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 122,
-      "y": 182
+      "x": 44,
+      "y": 43
     },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"
   },
   {
-    "_name": "Market2",
-    "_abbrs": "MC2,MTC2",
-    "_option": "Cocoa-Coins",
-    "_time": 30,
+    "_name": "Small Town",
+    "_abbrs":"S,ST",
+    "_time": 5,
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -262,
-      "y": 186
+      "x": -38,
+      "y": -98
     },
-    "_image": "dest/MarketTown.bmp",
-    "_imageTitle": "dest/MarketTownTitle.bmp"
-  },
-  {
-    "_name": "Market XP2",
-    "_abbrs":"MX2,MTXP2",
-    "_option": "Cocoa-XP",
-    "_time": 30,
-    "_favorite": true,
-    "_relativePosition": {
-      "weight": 0,
-      "x": -262,
-      "y": 186
-    },
-    "_image": "dest/MarketTown.bmp",
-    "_imageTitle": "dest/MarketTownTitle.bmp"
+    "_image": "dest/small.bmp",
+    "_imageTitle": "dest/SmallTownTitle.bmp"
   },
   {
     "_name": "Coastline",
@@ -75,8 +47,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": 195,
-      "y": 28
+      "x": 119,
+      "y": -109
     },
     "_image": "dest/Coastline.bmp",
     "_imageTitle": "dest/CoastlineTitle.bmp"
@@ -88,8 +60,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 217,
-      "y": -74
+      "x": 141,
+      "y": -213
     },
     "_image": "dest/Gulf.bmp",
     "_imageTitle": "dest/GulfTitle.bmp"
@@ -101,8 +73,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 207,
-      "y": 241
+      "x": 163,
+      "y": 138
     },
     "_image": "dest/Blacksmith.bmp",
     "_imageTitle": "dest/BlacksmithTitle.bmp"
@@ -114,8 +86,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 362,
-      "y": 200
+      "x": 346,
+      "y": 90
     },
     "_image": "dest/CocoaPlant.bmp",
     "_imageTitle": "dest/CocoaPlantTitle.bmp"
@@ -127,8 +99,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 190,
-      "y": 108
+      "x": 141,
+      "y": -22
     },
     "_image": "dest/Bamboo.bmp",
     "_imageTitle": "dest/BambooTitle.bmp"
@@ -140,8 +112,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": 306,
-      "y": 22
+      "x": 281,
+      "y": -123
     },
     "_image": "dest/Rubble.bmp",
     "_imageTitle": "dest/RubbleTitle.bmp"
@@ -153,8 +125,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": 313,
-      "y": -103
+      "x": 287,
+      "y": -269
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -166,8 +138,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -35,
-      "y": -77
+      "x": -124,
+      "y": -239
     },
     "_image": "dest/Neighborhood.bmp",
     "_imageTitle": "dest/NeighborhoodTitle.bmp"
@@ -179,8 +151,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": -121,
-      "y": -27
+      "x": -227,
+      "y": -179
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -192,8 +164,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": -99,
-      "y": -119
+      "x": -201,
+      "y": -283
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -205,8 +177,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": -206,
-      "y": -72
+      "x": -325,
+      "y": -234
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -218,8 +190,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -172,
-      "y": 0
+      "x": -288,
+      "y": -148
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"

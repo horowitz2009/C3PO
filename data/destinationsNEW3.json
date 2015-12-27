@@ -6,8 +6,8 @@
    "_favorite": true,
    "_relativePosition": {
      "weight": 0,
-     "x": 41,
-     "y": 45
+     "x": 39,
+     "y": 41
    },
    "_image": "dest/small.bmp",
    "_imageTitle": "dest/SmallTownTitle.bmp"
@@ -20,8 +20,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 122,
-      "y": 182
+      "x": 108,
+      "y": 161
     },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"
@@ -34,8 +34,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 122,
-      "y": 182
+      "x": 108,
+      "y": 161
     },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"
@@ -48,8 +48,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -262,
-      "y": 186
+      "x": -219,
+      "y": 164
     },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"
@@ -62,8 +62,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -262,
-      "y": 186
+      "x": -219,
+      "y": 164
     },
     "_image": "dest/MarketTown.bmp",
     "_imageTitle": "dest/MarketTownTitle.bmp"
@@ -75,8 +75,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": 195,
-      "y": 28
+      "x": 170,
+      "y": 30
     },
     "_image": "dest/Coastline.bmp",
     "_imageTitle": "dest/CoastlineTitle.bmp"
@@ -88,8 +88,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 217,
-      "y": -74
+      "x": 189,
+      "y": -55
     },
     "_image": "dest/Gulf.bmp",
     "_imageTitle": "dest/GulfTitle.bmp"
