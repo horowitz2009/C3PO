@@ -1503,7 +1503,7 @@ public class MainFrame extends JFrame {
 	private void refresh(boolean bookmark) throws AWTException, IOException, RobotInterruptedException {
 		deleteOlder("refresh", 5);
 		LOGGER.info("Time to refresh...");
-		_scanner.captureGame("refresh ");
+		_scanner.captureGameArea("refresh ");
 		Pixel p;
 		if (!bookmark) {
 			if (_scanner.isOptimized()) {

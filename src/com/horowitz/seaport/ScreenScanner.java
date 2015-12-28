@@ -39,7 +39,6 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.SimilarityImageComparator;
 import com.horowitz.commons.TemplateMatcher;
-import com.horowitz.seaport.model.Destination;
 
 public class ScreenScanner {
 
@@ -58,7 +57,6 @@ public class ScreenScanner {
 
 	private Rectangle _scanArea = null;
 
-	private Settings _settings;
 	private GameLocator _gameLocator;
 
 	private Map<String, ImageData> _imageDataCache;
@@ -77,7 +75,6 @@ public class ScreenScanner {
 	public Rectangle _popupArea;
 	public Rectangle _popupAreaX;
 	public Rectangle _popupAreaB;
-	private List<Destination> _destinations;
 	private Pixel _zoomIn;
 	private Pixel _zoomOut;
 	private Pixel _fullScreen;
@@ -95,7 +92,6 @@ public class ScreenScanner {
 	}
 
 	public ScreenScanner(Settings settings) {
-		_settings = settings;
 		_comparator = new SimilarityImageComparator(0.04, 2000);
 		_matcher = new TemplateMatcher();
 		// _matcher.setSimilarityThreshold(.91d);
@@ -378,51 +374,23 @@ public class ScreenScanner {
 		return p;
 	}
 
-	public void writeImage(Rectangle rect, String filename) {
-		try {
-			writeImage(new Robot().createScreenCapture(rect), filename);
-		} catch (AWTException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void writeImage2(Rectangle rect, String filename) {
-		try {
-			SimpleDateFormat sdf = new SimpleDateFormat("MM-dd  HH-mm-ss-SSS");
-			String date = sdf.format(Calendar.getInstance().getTime());
-			String filename2 = filename + " " + date + ".png";
-
-			writeImage(new Robot().createScreenCapture(rect), filename2);
-		} catch (AWTException e) {
-			e.printStackTrace();
-		}
+	public void writeArea(Rectangle rect, String filename) {
+		MyImageIO.writeArea(rect, filename);
 	}
 
 	public void writeImage(BufferedImage image, String filename) {
-
-		try {
-			int ind = filename.lastIndexOf("/");
-			if (ind > 0) {
-				String path = filename.substring(0, ind);
-				File f = new File(path);
-				f.mkdirs();
-			}
-			File file = new File(filename);
-			MyImageIO.write(image, filename.substring(filename.length() - 3).toUpperCase(), file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		MyImageIO.writeImage(image, filename);
 	}
 
-	public void captureGame() {
+	public void captureGameAreaDT() {
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd  HH-mm-ss-SSS");
 		String date = sdf.format(Calendar.getInstance().getTime());
 		String filename = "popup " + date + ".png";
-		captureGame(filename);
+		captureGameArea(filename);
 	}
 
-	public void captureGame(String filename) {
-		writeImage(new Rectangle(new Point(_tl.x, _tl.y), new Dimension(getGameWidth(), getGameHeight())), filename);
+	public void captureGameArea(String filename) {
+		writeArea(new Rectangle(new Point(_tl.x, _tl.y), new Dimension(getGameWidth(), getGameHeight())), filename);
 	}
 
 	public Pixel locateImageCoords(String imageName, Rectangle[] area, int xOff, int yOff) throws AWTException,
