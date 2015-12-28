@@ -1799,7 +1799,7 @@ public class MainFrame extends JFrame {
 		String[] requests = service.getActiveRequests();
 		for (String r : requests) {
 
-			if (r.startsWith("stop") || r.startsWith("s")) {
+			if (r.startsWith("stop")) {
 				service.inProgress(r);
 				stopMagic();
 				captureScreen(null);
@@ -1810,7 +1810,7 @@ public class MainFrame extends JFrame {
 				runMagic();
 				captureScreen(null);
 
-			} else if (r.startsWith("refresh") || r.startsWith("r")) {
+			} else if (r.startsWith("refresh")) {
 				service.inProgress(r);
 				try {
 					stopMagic();
