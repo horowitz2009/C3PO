@@ -77,7 +77,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Service;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
-import com.horowitz.mickey.ocr.OCRB;
+import com.horowitz.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.BalancedShipProtocolExecutor;

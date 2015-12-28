@@ -6,8 +6,8 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.CompareToBuilder;
 
 import com.horowitz.commons.Deserializable;
+import com.horowitz.commons.Deserializer;
 import com.horowitz.commons.ImageData;
-import com.horowitz.seaport.model.storage.Deserializer;
 
 @SuppressWarnings("rawtypes")
 public class GameUnit implements Cloneable, Serializable, Deserializable, Comparable {

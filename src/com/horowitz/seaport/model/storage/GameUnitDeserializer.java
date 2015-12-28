@@ -3,6 +3,7 @@ package com.horowitz.seaport.model.storage;
 import java.io.IOException;
 
 import com.horowitz.commons.Deserializable;
+import com.horowitz.commons.Deserializer;
 import com.horowitz.commons.ImageData;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.GameUnit;

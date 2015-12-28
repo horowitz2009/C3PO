@@ -3,8 +3,8 @@ package com.horowitz.seaport.model;
 import java.io.IOException;
 
 import com.horowitz.commons.Deserializable;
+import com.horowitz.commons.Deserializer;
 import com.horowitz.commons.Pixel;
-import com.horowitz.seaport.model.storage.Deserializer;
 /**
  * 
  * @author zhristov

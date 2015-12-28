@@ -16,9 +16,10 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/Catalano.Core.jar"/>
-	<classpathentry kind="lib" path="lib/Catalano.Image.jar"/>
+	<classpathentry kind="lib" path="lib/Catalano.Image.jar" sourcepath="/CatalanoImage"/>
 	<classpathentry kind="lib" path="lib/Catalano.Math.jar"/>
 	<classpathentry kind="lib" path="lib/Catalano.Statistics.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/R2D2"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

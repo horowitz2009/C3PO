@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.horowitz.commons.Deserializable;
-import com.horowitz.seaport.model.storage.Deserializer;
+import com.horowitz.commons.Deserializer;
 
 public class ProtocolEntry implements Serializable, Cloneable, Deserializable {
 

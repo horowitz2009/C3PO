@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.horowitz.commons.Deserializable;
+import com.horowitz.commons.Deserializer;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
