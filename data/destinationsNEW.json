@@ -101,8 +101,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 207,
-      "y": 241
+      "x": 239,
+      "y": 277
     },
     "_image": "dest/Blacksmith.bmp",
     "_imageTitle": "dest/BlacksmithTitle.bmp"
@@ -114,8 +114,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 362,
-      "y": 200
+      "x": 423,
+      "y": 227
     },
     "_image": "dest/CocoaPlant.bmp",
     "_imageTitle": "dest/CocoaPlantTitle.bmp"
@@ -127,8 +127,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": 190,
-      "y": 108
+      "x": 218,
+      "y": 120
     },
     "_image": "dest/Bamboo.bmp",
     "_imageTitle": "dest/BambooTitle.bmp"
@@ -140,8 +140,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": 306,
-      "y": 22
+      "x": 358,
+      "y": 19
     },
     "_image": "dest/Rubble.bmp",
     "_imageTitle": "dest/RubbleTitle.bmp"
@@ -153,8 +153,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": 313,
-      "y": -103
+      "x": 363,
+      "y": -128
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -166,8 +166,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -35,
-      "y": -77
+      "x": -47,
+      "y": -98
     },
     "_image": "dest/Neighborhood.bmp",
     "_imageTitle": "dest/NeighborhoodTitle.bmp"
@@ -179,8 +179,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": -121,
-      "y": -27
+      "x": -149,
+      "y": -39
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -192,8 +192,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": -99,
-      "y": -119
+      "x": -121,
+      "y": -145
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -205,8 +205,8 @@
     "_favorite": false,
     "_relativePosition": {
       "weight": 0,
-      "x": -206,
-      "y": -72
+      "x": -247,
+      "y": -95
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
@@ -218,8 +218,8 @@
     "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -172,
-      "y": 0
+      "x": -213,
+      "y": -7
     },
     "_image": "dest/Forest.bmp",
     "_imageTitle": "dest/ForestTitle.bmp"
