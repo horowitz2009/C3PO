@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.43";
+	private static String APP_TITLE = "Seaport v0.45";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1639,24 +1639,32 @@ public class MainFrame extends JFrame {
 			Pixel p = null;
 			if (_scanner.isOptimized()) {
 				_mouse.click(_scanner.getSafePoint());
-				_mouse.delay(300);
+				_mouse.delay(130);
 			}
 			found = _scanner.scanOneFast("anchor.bmp", null, true) != null;
 
-			if (found)
+			if (found) {
 				return;
+			}
 			// reload
 			long start = System.currentTimeMillis();
 			long now, t1 = 0, t2 = 0, t3, t4;
 			if (!fast) {
 				Rectangle area = _scanner.generateWindowedArea(412, 550);
 				p = _scanner.scanOneFast("reload.bmp", area, false);
+				if (p != null) {
+					LOGGER.info("RELOAD1...");
+				}
 				now = System.currentTimeMillis();
 
 				t1 = now - start;
 				t2 = now;
 				if (p == null) {
 					p = _scanner.scanOneFast("reload2.bmp", area, false);
+					if (p != null) {
+						LOGGER.info("RELOAD2...");
+					}
+					
 					now = System.currentTimeMillis();
 					t2 = now - t2;
 				}

@@ -225,14 +225,14 @@
     "_imageTitle": "dest/ForestTitle.bmp"
   },
   {
-    "_name": "Explore",
-    "_abbrs":"E,EX",
-    "_time": 240,
-    "_favorite": false,
+    "_name": "Amerigo Vespucci",
+    "_abbrs":"A,AV",
+    "_time": 120,
+    "_favorite": true,
     "_relativePosition": {
       "weight": 0,
-      "x": -320,
-      "y": -339
+      "x": 491,
+      "y": 102
     },
     "_image": "dest/Explore.bmp",
     "_imageTitle": "dest/ExploreTitle.bmp"

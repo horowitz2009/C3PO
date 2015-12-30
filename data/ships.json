@@ -1,5 +1,23 @@
 [
-  {
+ {
+    "_name": "Adler von Lubeck",
+    "_crew": 60,
+    "_capacity": 20,
+    "_favorite": true,
+    "_active": true,
+    
+    "_imageTitle": "ships/AdlerVonLubeckS.bmp"
+ },
+ {
+   "_name": "Mary Rose",
+   "_crew": 60,
+   "_capacity": 22,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/MaryRoseS.bmp"
+ },
+ {
     "_name": "Lilly",
     "_crew": 90,
     "_capacity": 26,
@@ -11,7 +29,7 @@
   {
     "_name": "Olifant",
     "_crew": 70,
-    "_capacity": 21,
+    "_capacity": 26,
     "_favorite": true,
     "_active": true,
     
@@ -29,7 +47,7 @@
   {
     "_name": "Cristofur",
     "_crew": 70,
-    "_capacity": 21,
+    "_capacity": 25,
     "_favorite": true,
     "_active": true,
     
@@ -38,7 +56,7 @@
   {
     "_name": "Barlamew",
     "_crew": 70,
-    "_capacity": 21,
+    "_capacity": 25,
     "_favorite": true,
     "_active": true,
     
@@ -119,7 +137,7 @@
   {
     "_name": "Trinidad",
     "_crew": 80,
-    "_capacity": 24,
+    "_capacity": 26,
     "_favorite": true,
     "_active": true,
     
@@ -142,15 +160,6 @@
     "_active": false,
     
     "_imageTitle": "ships/HulkZigmundS.bmp"
-  },
-  {
-    "_name": "Mary Rose",
-    "_crew": 60,
-    "_capacity": 17,
-    "_favorite": true,
-    "_active": true,
-    
-    "_imageTitle": "ships/MaryRoseS.bmp"
   },
   {
     "_name": "Husse",
@@ -205,14 +214,5 @@
     "_active": true,
     
     "_imageTitle": "ships/SaoRafaelS.bmp"
-  },
-  {
-    "_name": "Venetian",
-    "_crew": 40,
-    "_capacity": 7,
-    "_favorite": true,
-    "_active": false,
-    
-    "_imageTitle": "ships/VenetianS.bmp"
   }
 ]
