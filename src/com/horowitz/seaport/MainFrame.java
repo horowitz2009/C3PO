@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.45";
+	private static String APP_TITLE = "Seaport v0.45a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1527,7 +1527,7 @@ public class MainFrame extends JFrame {
 			_scanner.reset();
 
 			boolean done = false;
-			for (int i = 0; i < 17 && !done; i++) {
+			for (int i = 0; i < 37 && !done; i++) {
 				LOGGER.info("after refresh recovery try " + (i + 1));
 				// LOCATE THE GAME
 				if (_scanner.locateGameArea(false)) {
@@ -1815,6 +1815,7 @@ public class MainFrame extends JFrame {
 			} else if (r.startsWith("run") || r.startsWith("start")) {
 				service.inProgress(r);
 				stopMagic();
+				_scanner.reset();
 				runMagic();
 				captureScreen(null);
 
@@ -1823,6 +1824,8 @@ public class MainFrame extends JFrame {
 				try {
 					stopMagic();
 					refresh(false);
+					_scanner.reset();
+					runMagic();
 				} catch (AWTException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
