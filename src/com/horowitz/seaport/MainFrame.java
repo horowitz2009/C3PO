@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.46";
+	private static String APP_TITLE = "Seaport v0.46b";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1508,47 +1508,48 @@ public class MainFrame extends JFrame {
 		if (!bookmark) {
 			if (_scanner.isOptimized()) {
 				p = _scanner.getBottomRight();
-				p.y = _scanner.getTopLeft().y + 100;
-				p.x = _scanner.getBottomRight().x + 4;
+				p.x -= 10;
+				p.y += 3;
 			} else {
-				p = new Pixel(0, 510);
+				p = _scanner.scanOne("refreshChrome.bmp", null, false);
 			}
-			_mouse.click(p.x, p.y);
-			try {
-				Robot robot = new Robot();
-				robot.keyPress(KeyEvent.VK_F5);
-				robot.keyRelease(KeyEvent.VK_F5);
-			} catch (AWTException e) {
-			}
-			try {
-				Thread.sleep(15000);
-			} catch (InterruptedException e) {
-			}
-			_scanner.reset();
+			if (p != null) {
+				_mouse.click(p.x, p.y);
+				try {
+					Robot robot = new Robot();
+					robot.keyPress(KeyEvent.VK_F5);
+					robot.keyRelease(KeyEvent.VK_F5);
+				} catch (AWTException e) {
+				}
+				try {
+					Thread.sleep(15000);
+				} catch (InterruptedException e) {
+				}
+				_scanner.reset();
 
-			boolean done = false;
-			for (int i = 0; i < 37 && !done; i++) {
-				LOGGER.info("after refresh recovery try " + (i + 1));
-				// LOCATE THE GAME
-				if (_scanner.locateGameArea(false)) {
-					LOGGER.info("Game located successfully!");
-					done = true;
+				boolean done = false;
+				for (int i = 0; i < 37 && !done; i++) {
+					LOGGER.info("after refresh recovery try " + (i + 1));
+					// LOCATE THE GAME
+					if (_scanner.locateGameArea(false)) {
+						LOGGER.info("Game located successfully!");
+						done = true;
+					} else {
+						processRequests();
+					}
+					if (i > 8) {
+						captureScreen("refresh trouble ");
+					}
+				}
+				if (done) {
+					// runMagic();
+					captureScreen("refresh done ");
 				} else {
-					processRequests();
-				}
-				if (i > 8) {
-					captureScreen("refresh trouble ");
+					// blah
+					// try bookmark
 				}
 			}
-			if (done) {
-				// runMagic();
-				captureScreen("refresh done ");
-			} else {
-				// blah
-				// try bookmark
-			}
-			
-			//not sure why shipsTasks gets off after refresh
+			// not sure why shipsTasks gets off after refresh
 			reapplySettings();
 
 		} else {
@@ -1664,7 +1665,7 @@ public class MainFrame extends JFrame {
 					if (p != null) {
 						LOGGER.info("RELOAD2...");
 					}
-					
+
 					now = System.currentTimeMillis();
 					t2 = now - t2;
 				}
