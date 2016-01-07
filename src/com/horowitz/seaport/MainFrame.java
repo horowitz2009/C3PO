@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.46b";
+	private static String APP_TITLE = "Seaport v0.47";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1839,6 +1839,11 @@ public class MainFrame extends JFrame {
 				service.inProgress(r);
 				LOGGER.info("Ping...");
 				captureScreen(null);
+				service.done(r);
+			} else if (r.startsWith("reload")) {
+				service.inProgress(r);
+				LOGGER.info("Reloading protocols...");
+				_shipProtocolManagerUI.reload();
 				service.done(r);
 			}
 		}

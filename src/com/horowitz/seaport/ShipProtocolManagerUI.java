@@ -224,7 +224,7 @@ public class ShipProtocolManagerUI extends JPanel {
 
 	private MyListModel _model;
 
-	private void reload() {
+	public void reload() {
 		SwingUtilities.invokeLater(new Runnable() {
 
 			public void run() {
