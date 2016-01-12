@@ -1,8 +1,26 @@
 [
  {
-   "_name": "Golden Hind",
+   "_name": "Katren",
    "_crew": 80,
-   "_capacity": 24,
+   "_capacity": 23,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Katren.bmp"
+ },
+ {
+   "_name": "Engelen",
+   "_crew": 80,
+   "_capacity": 26,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Engelen.bmp"
+ },
+ {
+   "_name": "Golden Hind",
+   "_crew": 90,
+   "_capacity": 26,
    "_favorite": true,
    "_active": true,
    
@@ -10,8 +28,8 @@
  },
  {
     "_name": "Ark Royal",
-    "_crew": 70,
-    "_capacity": 23,
+    "_crew": 90,
+    "_capacity": 29,
     "_favorite": true,
     "_active": true,
     
