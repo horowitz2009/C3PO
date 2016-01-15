@@ -144,6 +144,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 			Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2,
 			    _scanner.getBottomRight().y - 240, 205, 240);
 			Pixel destButton = _scanner.scanPrecise("dest/setSail.bmp", buttonArea);
+			if (destButton == null)
+				destButton = _scanner.scanPrecise("dest/setSail2.bmp", buttonArea);
 			if (destButton != null) {
 				// nice. we can continue
 				if (dest.getName().startsWith("Market")) {
