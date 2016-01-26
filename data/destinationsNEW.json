@@ -82,6 +82,19 @@
     "_imageTitle": "dest/CoastlineTitle.bmp"
   },
   {
+    "_name": "Friend's contracts",
+    "_abbrs":"F",
+    "_time": 30,
+    "_favorite": false,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 144,
+      "y": -43
+    },
+    "_image": "dest/Coastline.bmp",
+    "_imageTitle": "dest/CoastlineTitle.bmp"
+  },
+  {
     "_name": "Gulf",
     "_abbrs":"G,GF",
     "_time": 60,

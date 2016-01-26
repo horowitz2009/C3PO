@@ -1,8 +1,17 @@
 [
  {
+   "_name": "Repertago",
+   "_crew": 100,
+   "_capacity": 30,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Repertago.bmp"
+ },
+ {
    "_name": "Katren",
-   "_crew": 80,
-   "_capacity": 23,
+   "_crew": 90,
+   "_capacity": 28,
    "_favorite": true,
    "_active": true,
    
@@ -10,8 +19,8 @@
  },
  {
    "_name": "Engelen",
-   "_crew": 80,
-   "_capacity": 26,
+   "_crew": 100,
+   "_capacity": 30,
    "_favorite": true,
    "_active": true,
    
@@ -20,7 +29,7 @@
  {
    "_name": "Golden Hind",
    "_crew": 90,
-   "_capacity": 26,
+   "_capacity": 27,
    "_favorite": true,
    "_active": true,
    
