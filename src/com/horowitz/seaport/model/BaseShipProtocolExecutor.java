@@ -146,6 +146,19 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 			Pixel destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
 			if (destButton == null)
 				destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+			if (destButton == null) {
+				//check for got it button
+				LOGGER.info("CHECK FOR BLUE GOT IT...");
+				buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
+				    _scanner.getBottomRight().y - 240, 205, 240);
+				Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+				if (gotitButtonBlue != null) {
+					_mouse.click(gotitButtonBlue);
+					LOGGER.info("DESTINATION COMPLETED!");
+					_mouse.delay(1000);
+					return false;
+				}
+			}
 			if (destButton != null) {
 				// nice. we can continue
 				if (dest.getName().startsWith("Market")) {
