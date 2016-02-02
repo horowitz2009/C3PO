@@ -1,5 +1,18 @@
 [
  {
+   "_name": "Ming",
+   "_abbrs":"M,MG",
+   "_time": 120,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": -27,
+     "y": -19
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
    "_name": "Small Town",
    "_abbrs":"S,ST",
    "_time": 5,

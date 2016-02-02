@@ -332,9 +332,9 @@ public class ScreenScanner {
 			}
 		}
 
-		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93, _tl.y + 220);
+		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93 + 50, _tl.y + 210);
 
-		if (Math.abs(_rock.x - goodRock.x) > 5 && Math.abs(_rock.x - goodRock.y) > 2) {
+		if (Math.abs(_rock.x - goodRock.x) > 22 || Math.abs(_rock.y - goodRock.y) > 22) {
 			// need adjusting
 			_mouse.drag2(_rock.x, _rock.y, goodRock.x, goodRock.y);
 			_mouse.delay(1200);
