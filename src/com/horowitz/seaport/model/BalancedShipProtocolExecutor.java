@@ -56,7 +56,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		_mouse.mouseMove(_scanner.getParkingPoint());
 		_mouse.delay(100);
 
-		Pixel anchor = _scanner.scanOneFast("anchor.bmp", null, false);
+		Pixel anchor = _scanner.scanOne("anchor2.bmp", null, false);
 		if (anchor != null) {
 			// MAP IS OPEN
 			boolean isOK = _mapManager.ensureMap();
@@ -114,7 +114,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 				// use this chain
 				boolean sent = sendShip(new LinkedList<Destination>(chainList));
 				if (!sent) {
-					_scanner.scanOneFast("anchor.bmp", null, true);
+					_scanner.scanOne("anchor2.bmp", null, true);
 				}
 
 			} else {

@@ -75,6 +75,7 @@ public class ScreenScanner {
 	public Rectangle _popupArea;
 	public Rectangle _popupAreaX;
 	public Rectangle _popupAreaB;
+	private Pixel _scoreBoard;
 	private Pixel _zoomIn;
 	private Pixel _zoomOut;
 	private Pixel _fullScreen;
@@ -86,6 +87,7 @@ public class ScreenScanner {
 	private Rectangle _rightNumbersArea;
 
 	private Pixel _sailorsPos;
+
 
 	public Pixel[] getShipLocations() {
 		return _shipLocations;
@@ -174,7 +176,7 @@ public class ScreenScanner {
 		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
 
 		area = new Rectangle(_br.x - 110, _br.y - 75, 60, 40);
-		_anchorButton = getImageData("anchor.bmp", area, 20, 7);
+		_anchorButton = getImageData("anchor2.bmp", area, 20, 7);
 		_mapButton = getImageData("mapButton.bmp", area, 20, 7);
 
 		area = new Rectangle(_br.x - 30, _tl.y + 100, 30, getGameHeight() / 2 - 100);
@@ -184,6 +186,7 @@ public class ScreenScanner {
 		try {
 			Pixel sbp = scanPrecise(sb, null);
 			if (sbp != null) {
+				_scoreBoard = new Pixel(sbp.x + 8, sbp.y - 8);
 				_zoomIn = new Pixel(sbp.x + 8, sbp.y + 108);
 				_zoomOut = new Pixel(sbp.x + 8, sbp.y + 141);
 				_fullScreen = new Pixel(sbp.x + 8, sbp.y + 179);
@@ -857,6 +860,14 @@ public class ScreenScanner {
 
 	public void setDebugMode(boolean debugMode) {
 		_debugMode = debugMode;
+	}
+
+	public Pixel getScoreBoard() {
+		return _scoreBoard;
+	}
+
+	public void setScoreBoard(Pixel scoreBoard) {
+		_scoreBoard = scoreBoard;
 	}
 
 	public Pixel getZoomIn() {

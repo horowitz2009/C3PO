@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.53";
+	private static String APP_TITLE = "Seaport v0.53c";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -537,6 +537,7 @@ public class MainFrame extends JFrame {
 	private JToolBar _buildingsToolbar;
 
 	private JToggleButton _pingToggle;
+	private JToggleButton _ping2Toggle;
 
 	private JPanel createShipProtocolManagerPanel() {
 		_shipProtocolManagerUI = new ShipProtocolManagerUI(_mapManager);
@@ -974,6 +975,22 @@ public class MainFrame extends JFrame {
 			});
 
 			toolbar.add(_pingToggle);
+
+			_ping2Toggle = new JToggleButton("Ping2");
+			// _autoSailorsToggle.setSelected(false);
+			_ping2Toggle.addItemListener(new ItemListener() {
+
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					LOGGER.info("Ping2: " + (b ? "on" : "off"));
+					_settings.setProperty("ping2", "" + b);
+					_settings.saveSettingsSorted();
+
+				}
+			});
+
+			toolbar.add(_ping2Toggle);
 
 			// _xpToggle = new JToggleButton("XP");
 			// _xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
@@ -1420,7 +1437,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private void doMagic() {
+	private void doMagic() throws IOException, AWTException {
 		assert _scanner.isOptimized();
 		setTitle(APP_TITLE + " RUNNING");
 		_stopAllThreads = false;
@@ -1460,6 +1477,10 @@ public class MainFrame extends JFrame {
 				_mouse.checkUserMovement();
 				if (_pingToggle.isSelected()) {
 					ping();
+				}
+
+				if (_ping2Toggle.isSelected()) {
+					ping2();
 				}
 
 				_mouse.checkUserMovement();
@@ -1548,7 +1569,7 @@ public class MainFrame extends JFrame {
 					// blah
 					// try bookmark
 					if (!bookmark)
-					  refresh(true);
+						refresh(true);
 				}
 			}
 			// not sure why shipsTasks gets off after refresh
@@ -1564,13 +1585,65 @@ public class MainFrame extends JFrame {
 	}
 
 	private Long _lastPing = System.currentTimeMillis();
+	private Long _lastPing2 = System.currentTimeMillis();
 
-	private void ping() {
+	private void ping() throws RobotInterruptedException {
 		if (System.currentTimeMillis() - _lastPing > _settings.getInt("ping.time", 120) * 1000) {
+			LOGGER.info("ping...");
+			if (_scanner.getScoreBoard() != null) {
+				_mouse.click(_scanner.getScoreBoard());
+				_mouse.delay(2000);
+			}
 			captureScreen(null);
+			if (_scanner.getScoreBoard() != null) {
+				_mouse.click(_scanner.getBottomRight().x - 17, _scanner.getTopLeft().y + 68);
+				_mouse.delay(200);
+			}
 			_lastPing = System.currentTimeMillis();
 		}
 
+	}
+
+	private void ping2() throws RobotInterruptedException, IOException, AWTException {
+		if (_scanner.getScoreBoard() != null) {
+			if (System.currentTimeMillis() - _lastPing2 > _settings.getInt("ping2.time", 60) * 1000) {
+				LOGGER.info("ping2...");
+				_mouse.click(_scanner.getScoreBoard());
+				_mouse.delay(2000);
+				Pixel tr = new Pixel(_scanner.getBottomRight().x, _scanner.getTopLeft().y);
+
+				// click the coins tab
+				_mouse.click(tr.x - 53, tr.y + 106);
+				_mouse.delay(1000);
+
+				// look for Carlos
+				// carlosFB.bmp
+				Rectangle area = new Rectangle(tr.x - 269, tr.y + 122, 25, 437);
+				Pixel p = null;
+				int pages = 0;
+				do {
+					p = _scanner.scanOne("carlosFB.bmp", area, false);
+					pages++;
+					if (p == null) {
+						_mouse.click(tr.x - 125, tr.y + 575);
+						_mouse.delay(750);
+					}
+				} while (p == null && pages < 4);
+
+				Rectangle carlosArea;
+				if (p != null)
+					carlosArea = new Rectangle(p.x - 47, p.y, 300, 19);
+				else
+					carlosArea = new Rectangle(tr.x - 313, tr.y + 121, 301, 436);
+				captureArea(carlosArea, "carlos ");
+				
+				//close the scoreboard
+				_mouse.click(tr.x - 17, tr.y + 68);
+				_mouse.delay(200);
+				
+				_lastPing2 = System.currentTimeMillis();
+			}
+		}
 	}
 
 	private Long _speedTime = null;
@@ -1644,7 +1717,7 @@ public class MainFrame extends JFrame {
 				_mouse.click(_scanner.getSafePoint());
 				_mouse.delay(130);
 			}
-			found = _scanner.scanOneFast("anchor.bmp", null, true) != null;
+			found = _scanner.scanOneFast("anchor2.bmp", null, true) != null;
 
 			if (found) {
 				return;
@@ -1759,6 +1832,11 @@ public class MainFrame extends JFrame {
 			_pingToggle.setSelected(ping);
 		}
 
+		ping = "true".equalsIgnoreCase(_settings.getProperty("ping2"));
+		if (ping != _ping2Toggle.isSelected()) {
+			_ping2Toggle.setSelected(ping);
+		}
+
 		// buildings
 
 		for (int i = 0; i < _buildingsToolbar.getComponentCount(); i++) {
@@ -1859,7 +1937,7 @@ public class MainFrame extends JFrame {
 				// new Service().purgeAll();
 				boolean stop = false;
 				do {
-					LOGGER.info("......");
+					LOGGER.fine("......");
 					try {
 						_settings.loadSettings();
 						reapplySettings();
@@ -1916,11 +1994,17 @@ public class MainFrame extends JFrame {
 	}
 
 	private void captureScreen(String filename) {
+		captureArea(null, filename);
+	}
+
+	private void captureArea(Rectangle area, String filename) {
 		if (filename == null)
 			filename = "ping ";
-		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		writeImage(new Rectangle(0, 0, screenSize.width, screenSize.height),
-		    filename + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".jpg");
+		if (area == null) {
+			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			area = new Rectangle(0, 0, screenSize.width, screenSize.height);
+		}
+		writeImage(area, filename + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".jpg");
 		deleteOlder("ping", 8);
 	}
 
@@ -1963,7 +2047,13 @@ public class MainFrame extends JFrame {
 
 				if (_scanner.isOptimized()) {
 					// DO THE JOB
-					doMagic();
+
+					try {
+						doMagic();
+					} catch (IOException | AWTException e) {
+						e.printStackTrace();
+						LOGGER.warning("Something went wrong!");
+					}
 				} else {
 					LOGGER.info("I need to know where the game is!");
 				}
