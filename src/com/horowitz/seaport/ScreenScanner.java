@@ -335,7 +335,7 @@ public class ScreenScanner {
 			}
 		}
 
-		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93 + 50, _tl.y + 210);
+		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93 + 50, _tl.y + 219);
 
 		if (Math.abs(_rock.x - goodRock.x) > 22 || Math.abs(_rock.y - goodRock.y) > 22) {
 			// need adjusting
