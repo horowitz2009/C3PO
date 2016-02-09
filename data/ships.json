@@ -1,5 +1,23 @@
 [
  {
+   "_name": "Grace De Dew",
+   "_crew": 110,
+   "_capacity": 34,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/GraceDeDew.bmp"
+ },
+ {
+   "_name": "Girmand",
+   "_crew": 100,
+   "_capacity": 27,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Girmand.bmp"
+ },
+ {
    "_name": "Ming",
    "_crew": 100,
    "_capacity": 28,
