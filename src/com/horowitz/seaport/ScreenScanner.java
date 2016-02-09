@@ -206,6 +206,7 @@ public class ScreenScanner {
 
 		// getImageData("dest/missing.bmp", _scanArea, 41, 45);
 		getImageData("dest/setSail4.bmp", _popupArea, 27, 5);
+		getImageData("dest/setSail.bmp", _popupArea, 27, 5);
 
 		ImageData gear2 = getImageData("buildings/gears2.bmp", _popupArea, 0, 0);
 		gear2.setColorToBypass(Color.BLACK);
