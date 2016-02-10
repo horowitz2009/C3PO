@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.55c";
+	private static String APP_TITLE = "Seaport v0.57";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -538,6 +538,7 @@ public class MainFrame extends JFrame {
 
 	private JToggleButton _pingToggle;
 	private JToggleButton _ping2Toggle;
+	private JToggleButton _ping3Toggle;
 
 	private JPanel createShipProtocolManagerPanel() {
 		_shipProtocolManagerUI = new ShipProtocolManagerUI(_mapManager);
@@ -976,7 +977,7 @@ public class MainFrame extends JFrame {
 
 			toolbar.add(_pingToggle);
 
-			_ping2Toggle = new JToggleButton("Ping2");
+			_ping2Toggle = new JToggleButton("P2");
 			// _autoSailorsToggle.setSelected(false);
 			_ping2Toggle.addItemListener(new ItemListener() {
 
@@ -991,6 +992,22 @@ public class MainFrame extends JFrame {
 			});
 
 			toolbar.add(_ping2Toggle);
+
+			_ping3Toggle = new JToggleButton("P3");
+			// _autoSailorsToggle.setSelected(false);
+			_ping3Toggle.addItemListener(new ItemListener() {
+
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					LOGGER.info("Ping3: " + (b ? "on" : "off"));
+					_settings.setProperty("ping3", "" + b);
+					_settings.saveSettingsSorted();
+
+				}
+			});
+
+			toolbar.add(_ping3Toggle);
 
 			// _xpToggle = new JToggleButton("XP");
 			// _xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
@@ -1460,7 +1477,21 @@ public class MainFrame extends JFrame {
 				// 1. SCAN
 				handlePopups(false);
 
-				// REFRESH
+				// 2. PING
+				_mouse.checkUserMovement();
+				if (_pingToggle.isSelected()) {
+					ping();
+				}
+
+				if (_ping2Toggle.isSelected()) {
+					ping2();
+				}
+
+				if (_ping3Toggle.isSelected()) {
+					ping3();
+				}
+
+				// 3. REFRESH
 				LOGGER.info("refresh ? " + _autoRefreshToggle.isSelected() + " - " + mandatoryRefresh + " < " + (now - fstart));
 				if (_autoRefreshToggle.isSelected() && mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
 					LOGGER.info("refresh time...");
@@ -1472,15 +1503,6 @@ public class MainFrame extends JFrame {
 						LOGGER.info("FAILED TO refresh: " + e.getMessage());
 					}
 					fstart = System.currentTimeMillis();
-				}
-
-				_mouse.checkUserMovement();
-				if (_pingToggle.isSelected()) {
-					ping();
-				}
-
-				if (_ping2Toggle.isSelected()) {
-					ping2();
 				}
 
 				_mouse.checkUserMovement();
@@ -1586,12 +1608,15 @@ public class MainFrame extends JFrame {
 
 	private Long _lastPing = System.currentTimeMillis();
 	private Long _lastPing2 = System.currentTimeMillis();
+	private Long _lastPing3 = System.currentTimeMillis();
 
 	private void ping() throws RobotInterruptedException {
 		if (System.currentTimeMillis() - _lastPing > _settings.getInt("ping.time", 120) * 1000) {
 			LOGGER.info("ping...");
 			if (_scanner.getScoreBoard() != null) {
 				_mouse.click(_scanner.getScoreBoard());
+				_mouse.delay(200);
+				_mouse.mouseMove(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2, _scanner.getTopLeft().y + 49);
 				_mouse.delay(2000);
 			}
 			captureScreen(null);
@@ -1600,6 +1625,21 @@ public class MainFrame extends JFrame {
 				_mouse.delay(200);
 			}
 			_lastPing = System.currentTimeMillis();
+		}
+
+	}
+
+	private void ping3() throws RobotInterruptedException, IOException, AWTException {
+		if (System.currentTimeMillis() - _lastPing3 > _settings.getInt("ping3.time", 300) * 1000) {
+			LOGGER.info("ping3...");
+
+			_mouse.click(_scanner.getBottomRight().x - 80, _scanner.getBottomRight().y - 53);
+			_mouse.delay(2000);
+
+			captureScreen("ping map ");
+
+			_scanner.scanOneFast("anchor2.bmp", null, true);
+			_lastPing3 = System.currentTimeMillis();
 		}
 
 	}
@@ -1636,11 +1676,11 @@ public class MainFrame extends JFrame {
 				else
 					carlosArea = new Rectangle(tr.x - 313, tr.y + 121, 301, 436);
 				captureArea(carlosArea, "carlos ");
-				
-				//close the scoreboard
+
+				// close the scoreboard
 				_mouse.click(tr.x - 17, tr.y + 68);
 				_mouse.delay(200);
-				
+
 				_lastPing2 = System.currentTimeMillis();
 			}
 		}
@@ -1835,6 +1875,11 @@ public class MainFrame extends JFrame {
 		ping = "true".equalsIgnoreCase(_settings.getProperty("ping2"));
 		if (ping != _ping2Toggle.isSelected()) {
 			_ping2Toggle.setSelected(ping);
+		}
+
+		ping = "true".equalsIgnoreCase(_settings.getProperty("ping3"));
+		if (ping != _ping3Toggle.isSelected()) {
+			_ping3Toggle.setSelected(ping);
 		}
 
 		// buildings
