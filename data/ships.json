@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Eagle",
+   "_crew": 110,
+   "_capacity": 32,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Eagle.bmp"
+ },
+ {
    "_name": "Grace De Dew",
    "_crew": 110,
    "_capacity": 34,
@@ -11,7 +20,7 @@
  {
    "_name": "Girmand",
    "_crew": 100,
-   "_capacity": 27,
+   "_capacity": 31,
    "_favorite": true,
    "_active": true,
    
@@ -64,8 +73,8 @@
  },
  {
     "_name": "Ark Royal",
-    "_crew": 90,
-    "_capacity": 29,
+    "_crew": 100,
+    "_capacity": 32,
     "_favorite": true,
     "_active": true,
     
@@ -74,7 +83,7 @@
  {
    "_name": "Saint Ive",
    "_crew": 90,
-   "_capacity": 25,
+   "_capacity": 27,
    "_favorite": true,
    "_active": true,
    
