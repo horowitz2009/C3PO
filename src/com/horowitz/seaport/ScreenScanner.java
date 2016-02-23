@@ -299,7 +299,7 @@ public class ScreenScanner {
 			setKeyAreas();
 			return true;
 		} else {
-			boolean found = _gameLocator.locateGameArea(new ImageData("topLeft.bmp", null, _comparator, -38, -12),
+			boolean found = _gameLocator.locateGameArea(new ImageData("topLeft.bmp", null, _comparator, -22, -13),
 			    new ImageData("bottomRight.bmp", null, _comparator, 45 + 53, 64), false);
 			if (found) {
 				_tl = _gameLocator.getTopLeft();

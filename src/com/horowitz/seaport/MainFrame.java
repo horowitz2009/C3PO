@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.58";
+	private static String APP_TITLE = "Seaport v0.59";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1621,7 +1621,7 @@ public class MainFrame extends JFrame {
 			}
 			captureScreen(null);
 			if (_scanner.getScoreBoard() != null) {
-				_mouse.click(_scanner.getBottomRight().x - 17, _scanner.getTopLeft().y + 68);
+				_mouse.click(_scanner.getBottomRight().x - 23, _scanner.getTopLeft().y + 70);
 				_mouse.delay(200);
 			}
 			_lastPing = System.currentTimeMillis();

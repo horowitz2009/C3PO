@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Victoria",
+   "_crew": 110,
+   "_capacity": 33,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Victoria.bmp"
+ },
+ {
    "_name": "Eagle",
    "_crew": 110,
    "_capacity": 32,
