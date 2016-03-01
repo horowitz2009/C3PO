@@ -217,7 +217,13 @@ public class ShipProtocolEditor extends JPanel {
 			add(removeButton);
 			add(Box.createHorizontalStrut(6));
 			// ship
-			List<Ship> ships = new ArrayList<Ship>(_mapManager.getShips());
+			
+			//ONLY ACTIVE SHIPS
+			List<Ship> ships = new ArrayList<Ship>();
+			for (Ship ship : _mapManager.getShips()) {
+	      if (ship.isActive())
+	      	ships.add(ship);
+      }
 			Collections.sort(ships, new Comparator<Ship>() {
 				@Override
 				public int compare(Ship o1, Ship o2) {

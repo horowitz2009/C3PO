@@ -1,5 +1,14 @@
 [
  {
+   "_name": "La Pensee",
+   "_crew": 200,
+   "_capacity": 7,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/LaPensee.bmp"
+ },
+ {
    "_name": "Victoria",
    "_crew": 110,
    "_capacity": 33,
@@ -175,7 +184,7 @@
     "_crew": 90,
     "_capacity": 24,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/GeromeS.bmp"
   },
@@ -184,7 +193,7 @@
     "_crew": 90,
     "_capacity": 24,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/GodisgraceS.bmp"
   },
@@ -193,7 +202,7 @@
     "_crew": 90,
     "_capacity": 24,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/Henry.bmp"
   },
@@ -202,7 +211,7 @@
     "_crew": 80,
     "_capacity": 22,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/MargaretS.bmp"
   },
@@ -220,7 +229,7 @@
     "_crew": 80,
     "_capacity": 21,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/WegizS.bmp"
   },
