@@ -60,6 +60,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -97,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.60";
+	private static String APP_TITLE = "Seaport v0.61";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1969,6 +1970,18 @@ public class MainFrame extends JFrame {
 				service.inProgress(r);
 				LOGGER.info("Reloading protocols...");
 				_shipProtocolManagerUI.reload();
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						// reapplySettings();
+						String sp = _settings.getProperty("ShipProtocol", "DEFAULT");
+						if (!sp.equals(_shipProtocol != null ? _shipProtocol.getName() : "")) {
+							setProtocol(sp);
+						}
+
+					}
+				});
+
+				LOGGER.info("Reloading protocols DONE");
 				service.done(r);
 			}
 		}
@@ -1984,19 +1997,25 @@ public class MainFrame extends JFrame {
 				do {
 					LOGGER.fine("......");
 					try {
-						_settings.loadSettings();
-						reapplySettings();
 						processRequests();
 					} catch (Throwable t) {
 						// hmm
 						t.printStackTrace();
 					}
+
 					try {
-						Thread.sleep(20000);
+						Thread.sleep(10000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 
+					try {
+						_settings.loadSettings();
+						reapplySettings();
+					} catch (Throwable t) {
+						// hmm
+						t.printStackTrace();
+					}
 				} while (!stop);
 			}
 

@@ -233,16 +233,13 @@ public class ShipProtocolManagerUI extends JPanel {
 					List<ShipProtocol> shipProtocols = js.loadShipProtocols();
 					_model.clear();
 
-					// Object selected = _protocolsCB.getSelectedItem();
+					//int index = _protocolsCB.getSelectedIndex();
 					for (ShipProtocol shipProtocol : shipProtocols) {
 						_model.addElement(shipProtocol);
-						// if (shipProtocol.equals(selected)) {
-						// _protocolsCB.setSelectedItem(shipProtocol);
-						//
-						// }
 					}
 
 					revalidate();
+					//_protocolsCB.setSelectedIndex(index);
 
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -371,6 +368,7 @@ public class ShipProtocolManagerUI extends JPanel {
 			if (sp.getName().equals(protocolName)) {
 				index = i;
 				_protocolsCB.setSelectedIndex(index);
+				_protocolsCB.revalidate();
 				break;
 			}
 		}
