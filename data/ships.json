@@ -1,5 +1,23 @@
 [
  {
+   "_name": "Dublin",
+   "_crew": 100,
+   "_capacity": 26,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Dublin.bmp"
+ },
+ {
+   "_name": "Celtic Cross",
+   "_crew": 100,
+   "_capacity": 28,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/CelticCross.bmp"
+ },
+ {
    "_name": "La Pensee",
    "_crew": 200,
    "_capacity": 7,
