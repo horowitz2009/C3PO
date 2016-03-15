@@ -1,5 +1,23 @@
 [
  {
+   "_name": "Squirrel",
+   "_crew": 100,
+   "_capacity": 28,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Squirrel.bmp"
+ },
+ {
+   "_name": "Bona Esperanza",
+   "_crew": 80,
+   "_capacity": 26,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/BonaEsperanza.bmp"
+ },
+ {
    "_name": "Dublin",
    "_crew": 100,
    "_capacity": 26,
