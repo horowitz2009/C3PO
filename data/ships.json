@@ -1,8 +1,17 @@
 [
  {
+   "_name": "Sao Bento",
+   "_crew": 120,
+   "_capacity": 45,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/SaoBento.bmp"
+ },
+ {
    "_name": "Squirrel",
-   "_crew": 100,
-   "_capacity": 28,
+   "_crew": 120,
+   "_capacity": 34,
    "_favorite": true,
    "_active": true,
    
@@ -10,8 +19,8 @@
  },
  {
    "_name": "Bona Esperanza",
-   "_crew": 80,
-   "_capacity": 26,
+   "_crew": 120,
+   "_capacity": 33,
    "_favorite": true,
    "_active": true,
    
