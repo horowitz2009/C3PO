@@ -1003,12 +1003,12 @@ public class ScreenScanner {
 			}
 		}
 
-		if (isHome()) {
-			// fix zoom
-			zoomOut();
-			return checkAndAdjustRock();
-
-		}
+//		if (isHome()) {
+//			// fix zoom
+//			zoomOut();
+//			return checkAndAdjustRock();
+//
+//		}
 
 		return false;
 	}

@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.64";
+	private static String APP_TITLE = "Seaport v0.65";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1548,6 +1548,7 @@ public class MainFrame extends JFrame {
 		deleteOlder("refresh", 5);
 		LOGGER.info("Time to refresh...");
 		_scanner.captureGameArea("refresh ");
+		
 		Pixel p;
 		if (!bookmark) {
 			if (_scanner.isOptimized()) {
@@ -1576,8 +1577,14 @@ public class MainFrame extends JFrame {
 					LOGGER.info("after refresh recovery try " + (i + 1));
 					// LOCATE THE GAME
 					if (_scanner.locateGameArea(false)) {
-						LOGGER.info("Game located successfully!");
-						done = true;
+						_scanner.checkAndAdjustRock();
+						if (_scanner.getRock() != null) {
+						  _mapManager.update();
+						  _buildingManager.update();
+
+						  LOGGER.info("Game located successfully!");
+						  done = true;
+						}
 					} else {
 						processRequests();
 					}
