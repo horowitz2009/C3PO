@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.65";
+	private static String APP_TITLE = "Seaport v0.66";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -2076,7 +2076,9 @@ public class MainFrame extends JFrame {
 			area = new Rectangle(0, 0, screenSize.width, screenSize.height);
 		}
 		writeImage(area, filename + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".jpg");
-		deleteOlder("ping", 8);
+		if (!_settings.getBoolean("ping.keep", false))
+		  deleteOlder("ping", 8);
+		
 	}
 
 	public void writeImage(Rectangle rect, String filename) {
