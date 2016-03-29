@@ -88,7 +88,6 @@ public class ScreenScanner {
 
 	private Pixel _sailorsPos;
 
-
 	public Pixel[] getShipLocations() {
 		return _shipLocations;
 	}
@@ -171,6 +170,7 @@ public class ScreenScanner {
 		_parkingPoint = new Pixel(_br);
 
 		getImageData("ROCK.bmp", _scanArea, 10, 44);
+		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
 		getImageData("pin.bmp", _scanArea, 6, 6);
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
 		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
@@ -351,14 +351,19 @@ public class ScreenScanner {
 
 	public Pixel findRock() throws IOException, AWTException, RobotInterruptedException {
 		Rectangle area = new Rectangle(_tl.x + 350, _tl.y + 43, 860, getGameHeight() - 43);
-
-		Pixel p = scanOne("ROCK.bmp", area, false);
-		// writeImage(area, "admArea1.png");
-		if (p == null) {
-			LOGGER.info("Rock try 2 ...");
-			p = scanOne("ROCK.bmp", getScanArea(), false);
-		}
-		_rock = p;
+		int tries = 0;
+		Pixel p = null;
+		do {
+			tries++;
+			LOGGER.info("looking for rock " + tries);
+			p = scanOne("ROCK.bmp", area, false);
+			// writeImage(area, "admArea1.png");
+			if (p == null) {
+				LOGGER.info("Rock try 2 ...");
+				p = scanOne("ROCK.bmp", getScanArea(), false);
+			}
+			//_rock = p;
+		} while (p == null && tries < 17);
 		return p;
 	}
 
@@ -1003,12 +1008,12 @@ public class ScreenScanner {
 			}
 		}
 
-//		if (isHome()) {
-//			// fix zoom
-//			zoomOut();
-//			return checkAndAdjustRock();
-//
-//		}
+		// if (isHome()) {
+		// // fix zoom
+		// zoomOut();
+		// return checkAndAdjustRock();
+		//
+		// }
 
 		return false;
 	}

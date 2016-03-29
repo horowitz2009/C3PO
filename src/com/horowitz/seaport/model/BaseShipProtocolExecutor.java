@@ -124,77 +124,96 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		_mouse.checkUserMovement();
 		Destination dest = chain.poll();
 		if (dest != null) {
+			boolean good = true;
 
-			Pixel marketPos = _mapManager.getSmallTownPos();
-			if (marketPos == null) {
+			Pixel smallTownPos = _mapManager.getSmallTownPos();
+			if (smallTownPos == null) {
 				_mapManager.ensureMap();
-				marketPos = _mapManager.getSmallTownPos();
+				smallTownPos = _mapManager.getSmallTownPos();
 			}
-			Destination _market = _mapManager.getSmallTown();
 
-			int x = marketPos.x + dest.getRelativePosition().x;
-			int y = marketPos.y + dest.getRelativePosition().y;
-
-			_mouse.click(x, y);
-			_mouse.delay(1000);
-
-			// assume the dialog is open
-			manageContractCases();
-			
-			Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2,
-			    _scanner.getBottomRight().y - 240, 205, 240);
-			Pixel destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
-			if (destButton == null)
-				destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-			if (destButton == null)
-				destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
-			if (destButton == null) {
-				//check for got it button
-				LOGGER.info("CHECK FOR BLUE GOT IT...");
-				buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
-				    _scanner.getBottomRight().y - 240, 205, 240);
-				Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
-				if (gotitButtonBlue != null) {
-					_mouse.click(gotitButtonBlue);
-					LOGGER.info("DESTINATION COMPLETED!");
-					_mouse.delay(1000);
-					return false;
+			int x = smallTownPos.x + dest.getRelativePosition().x;
+			int y = smallTownPos.y + dest.getRelativePosition().y;
+			// what if dest is shipwreck
+			if (dest.getAbbr().equalsIgnoreCase("SW")) {
+				// locate the shipwreck
+				LOGGER.info("LOOKING for shipwreck...");
+				Pixel p = _scanner.scanOne("dest/shipwreck.bmp", null, false);
+				if (p != null) {
+					LOGGER.info("FOUND IT!");
+					x = p.x;
+					y = p.y;
+				} else {
+					LOGGER.info("CAN'T FIND IT!");
+					good = false;
 				}
 			}
-			if (destButton != null) {
-				// nice. we can continue
-				if (dest.getName().startsWith("Market")) {
-					if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
-						// XP
-					} else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
-						// coins
-						Pixel coins = new Pixel(destButton.x - 30 - 90, destButton.y - 6 - 195);// xOff: 30, yOff: 6
-						_mouse.checkUserMovement();
-						_mouse.click(coins);
-						_mouse.delay(650);
+
+			if (good) {
+
+				_mouse.click(x, y);
+				_mouse.delay(1000);
+
+				// assume the dialog is open
+				manageContractCases();
+
+				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2,
+				    _scanner.getBottomRight().y - 240, 205, 240);
+				Pixel destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
+				if (destButton == null)
+					destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
+				if (destButton == null)
+					destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+				if (destButton == null) {
+					// check for got it button
+					LOGGER.info("CHECK FOR BLUE GOT IT...");
+					buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
+					    _scanner.getBottomRight().y - 240, 205, 240);
+					Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+					if (gotitButtonBlue != null) {
+						_mouse.click(gotitButtonBlue);
+						LOGGER.info("DESTINATION COMPLETED!");
+						_mouse.delay(1000);
+						return false;
 					}
 				}
-				_mouse.checkUserMovement();
-				_mouse.click(destButton);
-				_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
-				_mouse.checkUserMovement();
-				_mouse.delay(1500);
-				return true;
-			} else {
-				LOGGER.info(dest.getName() + " can't be done!");
-				boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-				// if (found)
-				_mouse.checkUserMovement();
-				_mouse.delay(1500);
-				// chain.poll();
-				if (chain.isEmpty()) {
-					LOGGER.info("reached the end of chain");
-					// TODO close the map and move on
-					return false;
-				} else
-					return sendShip(chain);
-			}
+				if (destButton != null) {
+					// nice. we can continue
+					if (dest.getName().startsWith("Market")) {
 
+						// FIXME
+						if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
+							// XP
+						} else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
+							// coins
+							Pixel coins = new Pixel(destButton.x - 30 - 90, destButton.y - 6 - 195);// xOff: 30, yOff: 6
+							_mouse.checkUserMovement();
+							_mouse.click(coins);
+							_mouse.delay(650);
+						}
+					}
+					_mouse.checkUserMovement();
+					_mouse.click(destButton);
+					_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+					_mouse.checkUserMovement();
+					_mouse.delay(1500);
+					return true;
+				} else {
+					LOGGER.info(dest.getName() + " can't be done!");
+					boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+					// if (found)
+					_mouse.checkUserMovement();
+					_mouse.delay(1500);
+					// chain.poll();
+					if (chain.isEmpty()) {
+						LOGGER.info("reached the end of chain");
+						// TODO close the map and move on
+						return false;
+					} else
+						return sendShip(chain);
+				}
+			} else
+				return sendShip(chain);
 		}
 		return false;
 	}

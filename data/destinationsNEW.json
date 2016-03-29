@@ -1,5 +1,18 @@
 [
  {
+   "_name": "Shipwreck",
+   "_abbrs":"SW",
+   "_time": 60,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": 41,
+     "y": 45
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
    "_name": "Saint Patrick",
    "_abbrs":"SP",
    "_time": 120,
