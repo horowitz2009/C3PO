@@ -438,9 +438,9 @@ public class MainFrame extends JFrame {
 		// RV
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("RV:"), gbc);
+		panel.add(new JLabel("BB:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("RV", l);
+		_labels.put("BB", l);
 		panel.add(l, gbc2);
 
 		gbc.insets = new Insets(2, 12, 2, 2);
@@ -460,25 +460,25 @@ public class MainFrame extends JFrame {
 		// MC
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("MC:"), gbc);
-		l = new JLabel(" ");
-		_labels.put("MC", l);
-		panel.add(l, gbc2);
-
-		// MX
-		gbc.gridy++;
-		gbc2.gridy++;
 		panel.add(new JLabel("MX:"), gbc);
 		l = new JLabel(" ");
 		_labels.put("MX", l);
 		panel.add(l, gbc2);
 
+		// MX
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("A:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("A", l);
+		panel.add(l, gbc2);
+
 		// JK
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("JK:"), gbc);
+		panel.add(new JLabel("F:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("JK", l);
+		_labels.put("F", l);
 		panel.add(l, gbc2);
 
 		gbc.insets = new Insets(2, 12, 2, 2);
@@ -511,14 +511,40 @@ public class MainFrame extends JFrame {
 		_labels.put("N", l);
 		panel.add(l, gbc2);
 
-		// IM
+
+		gbc.gridx = 7;
+		gbc2.gridx = 8;
+		gbc.gridy = 0;
+		gbc2.gridy = 0;
+
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("FR:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("FR", l);
+		panel.add(l, gbc2);
+
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("RV:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("RV", l);
+		panel.add(l, gbc2);
+
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("RM:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("RM", l);
+		panel.add(l, gbc2);
+		
 		gbc.gridy++;
 		gbc2.gridy++;
 		panel.add(new JLabel("IM:"), gbc);
 		l = new JLabel(" ");
 		_labels.put("IM", l);
 		panel.add(l, gbc2);
-
+		
 		// FAKE
 		gbc2.gridx++;
 		gbc2.gridy++;
