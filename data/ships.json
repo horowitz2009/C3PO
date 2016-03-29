@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Anunciada",
+   "_crew": 100,
+   "_capacity": 28,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Anunciada.bmp"
+ },
+ {
    "_name": "Sao Bento",
    "_crew": 120,
    "_capacity": 45,
