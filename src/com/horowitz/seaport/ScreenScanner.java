@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import Catalano.Core.IntRange;
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Filters.ColorFiltering;
 
+import com.horowitz.commons.DateUtils;
 import com.horowitz.commons.GameLocator;
 import com.horowitz.commons.ImageComparator;
 import com.horowitz.commons.ImageData;
@@ -46,6 +48,7 @@ public class ScreenScanner {
 
 	private static final boolean DEBUG = false;
 
+	private Settings _settings;
 	private ImageComparator _comparator;
 	private TemplateMatcher _matcher;
 	private MouseRobot _mouse;
@@ -88,11 +91,13 @@ public class ScreenScanner {
 
 	private Pixel _sailorsPos;
 
+
 	public Pixel[] getShipLocations() {
 		return _shipLocations;
 	}
 
 	public ScreenScanner(Settings settings) {
+		_settings = settings;
 		_comparator = new SimilarityImageComparator(0.04, 2000);
 		_matcher = new TemplateMatcher();
 		// _matcher.setSimilarityThreshold(.91d);
@@ -171,6 +176,9 @@ public class ScreenScanner {
 
 		getImageData("ROCK.bmp", _scanArea, 10, 44);
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
+		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
+		getImageData("dest/mapNotification.bmp", area, 0, 0);
+		
 		getImageData("pin.bmp", _scanArea, 6, 6);
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
 		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
@@ -382,25 +390,6 @@ public class ScreenScanner {
 			p = findRock();
 		}
 		return p;
-	}
-
-	public void writeArea(Rectangle rect, String filename) {
-		MyImageIO.writeArea(rect, filename);
-	}
-
-	public void writeImage(BufferedImage image, String filename) {
-		MyImageIO.writeImage(image, filename);
-	}
-
-	public void captureGameAreaDT() {
-		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd  HH-mm-ss-SSS");
-		String date = sdf.format(Calendar.getInstance().getTime());
-		String filename = "popup " + date + ".png";
-		captureGameArea(filename);
-	}
-
-	public void captureGameArea(String filename) {
-		writeArea(new Rectangle(new Point(_tl.x, _tl.y), new Dimension(getGameWidth(), getGameHeight())), filename);
 	}
 
 	public Pixel locateImageCoords(String imageName, Rectangle[] area, int xOff, int yOff) throws AWTException,
@@ -1015,7 +1004,7 @@ public class ScreenScanner {
 		//
 		// }
 
-		return false;
+		return home;
 	}
 
 	public Rectangle getLeftNumbersArea() {
@@ -1033,5 +1022,82 @@ public class ScreenScanner {
 	public Pixel scanPrecise(String filename, Rectangle area) throws AWTException, IOException, RobotInterruptedException {
 		return scanPrecise(getImageData(filename), area);
 	}
+	
+	
+	/////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////
+	
+	public void deleteOlder(String prefix, int amountFiles) {
+		File f = new File(".");
+		File[] files = f.listFiles();
+		List<File> targetFiles = new ArrayList<File>(6);
+		int cnt = 0;
+		for (File file : files) {
+			if (!file.isDirectory() && file.getName().startsWith(prefix)) {
+				targetFiles.add(file);
+				cnt++;
+			}
+		}
+
+		if (cnt > amountFiles) {
+			// delete some files
+			Collections.sort(targetFiles, new Comparator<File>() {
+				public int compare(File o1, File o2) {
+					if (o1.lastModified() > o2.lastModified())
+						return 1;
+					else if (o1.lastModified() < o2.lastModified())
+						return -1;
+					return 0;
+				};
+			});
+
+			int c = cnt - 5;
+			for (int i = 0; i < c; i++) {
+				File fd = targetFiles.get(i);
+				fd.delete();
+			}
+		}
+	}
+	
+	public void captureScreen(String filenamePrefix, boolean timestamp) {
+		captureArea(null, filenamePrefix, timestamp);
+	}
+
+	public void captureArea(Rectangle area, String filenamePrefix, boolean timestamp) {
+		if (filenamePrefix == null)
+			filenamePrefix = "ping ";
+		if (area == null) {
+			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			area = new Rectangle(0, 0, screenSize.width, screenSize.height);
+		}
+		String filename = filenamePrefix;
+		if (timestamp)
+			filename +=DateUtils.formatDateForFile(System.currentTimeMillis());
+		filename += ".jpg";
+		writeArea(area, filename);
+		if (!_settings.getBoolean("ping.keep", false))
+		  deleteOlder("ping", 8);
+		
+	}
+
+	public void captureGameAreaDT() {
+		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd  HH-mm-ss-SSS");
+		String date = sdf.format(Calendar.getInstance().getTime());
+		String filename = "popup " + date + ".png";
+		captureGameArea(filename);
+	}
+
+	public void captureGameArea(String filename) {
+		writeArea(new Rectangle(new Point(_tl.x, _tl.y), new Dimension(getGameWidth(), getGameHeight())), filename);
+	}
+	
+	public void writeArea(Rectangle rect, String filename) {
+		MyImageIO.writeArea(rect, filename);
+	}
+	
+	public void writeImage(BufferedImage image, String filename) {
+		MyImageIO.writeImage(image, filename);
+	}
+	
 
 }

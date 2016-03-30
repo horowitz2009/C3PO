@@ -25,6 +25,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	protected MouseRobot _mouse;
 	protected MapManager _mapManager;
 	protected LinkedList<Destination> _destChain;
+	private boolean _shipwreckAvailable;
 
 	private PropertyChangeSupport _support;
 	protected Ship _lastShip;
@@ -43,6 +44,11 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	}
 
 	public boolean preExecute() throws AWTException, IOException, RobotInterruptedException {
+
+		//check are there map notifications
+  	Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
+  	_shipwreckAvailable = p != null;
+	  
 		return _scanner.ensureHome();
 	}
 
@@ -135,12 +141,14 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 			int x = smallTownPos.x + dest.getRelativePosition().x;
 			int y = smallTownPos.y + dest.getRelativePosition().y;
 			// what if dest is shipwreck
-			if (dest.getAbbr().equalsIgnoreCase("SW")) {
+			boolean shipwreck = false;
+			if (dest.getAbbr().equalsIgnoreCase("SW") && _shipwreckAvailable) {
 				// locate the shipwreck
 				LOGGER.info("LOOKING for shipwreck...");
 				Pixel p = _scanner.scanOne("dest/shipwreck.bmp", null, false);
 				if (p != null) {
 					LOGGER.info("FOUND IT!");
+					shipwreck = true;
 					x = p.x;
 					y = p.y;
 				} else {
@@ -194,6 +202,12 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					}
 					_mouse.checkUserMovement();
 					_mouse.click(destButton);
+					
+					if (shipwreck) {
+						//do screenshot
+						_scanner.captureScreen("shipwreck ", true);
+					}
+					  
 					_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
 					_mouse.checkUserMovement();
 					_mouse.delay(1500);

@@ -46,7 +46,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			}
 		});
 	}
-
+	
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
 
 		scanShipName(pin);

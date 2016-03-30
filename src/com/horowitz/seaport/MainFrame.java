@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.68c";
+	private static String APP_TITLE = "Seaport v0.69sw";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1571,7 +1571,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void refresh(boolean bookmark) throws AWTException, IOException, RobotInterruptedException {
-		deleteOlder("refresh", 5);
+		_scanner.deleteOlder("refresh", 5);
 		LOGGER.info("Time to refresh...");
 		_scanner.captureGameArea("refresh ");
 		
@@ -1615,12 +1615,12 @@ public class MainFrame extends JFrame {
 						processRequests();
 					}
 					if (i > 8) {
-						captureScreen("refresh trouble ");
+						_scanner.captureScreen("refresh trouble ", true);
 					}
 				}
 				if (done) {
 					// runMagic();
-					captureScreen("refresh done ");
+					_scanner.captureScreen("refresh done ", true);
 				} else {
 					// blah
 					// try bookmark
@@ -1653,7 +1653,7 @@ public class MainFrame extends JFrame {
 				_mouse.mouseMove(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2, _scanner.getTopLeft().y + 49);
 				_mouse.delay(2000);
 			}
-			captureScreen(null);
+			_scanner.captureScreen(null, true);
 			if (_scanner.getScoreBoard() != null) {
 				_mouse.click(_scanner.getBottomRight().x - 23, _scanner.getTopLeft().y + 70);
 				_mouse.delay(200);
@@ -1670,7 +1670,7 @@ public class MainFrame extends JFrame {
 			_mouse.click(_scanner.getBottomRight().x - 80, _scanner.getBottomRight().y - 53);
 			_mouse.delay(2000);
 
-			captureScreen("ping map ");
+			_scanner.captureScreen("ping map ", true);
 
 			_scanner.scanOneFast("anchor2.bmp", null, true);
 			_lastPing3 = System.currentTimeMillis();
@@ -1709,7 +1709,7 @@ public class MainFrame extends JFrame {
 					carlosArea = new Rectangle(p.x - 47, p.y, 300, 19);
 				else
 					carlosArea = new Rectangle(tr.x - 313, tr.y + 121, 301, 436);
-				captureArea(carlosArea, "carlos ");
+				_scanner.captureArea(carlosArea, "carlos ", true);
 
 				// close the scoreboard
 				_mouse.click(tr.x - 17, tr.y + 68);
@@ -1970,14 +1970,14 @@ public class MainFrame extends JFrame {
 			if (r.startsWith("stop")) {
 				service.inProgress(r);
 				stopMagic();
-				captureScreen(null);
+				_scanner.captureScreen(null, true);
 
 			} else if (r.startsWith("run") || r.startsWith("start")) {
 				service.inProgress(r);
 				stopMagic();
 				_scanner.reset();
 				runMagic();
-				captureScreen(null);
+				_scanner.captureScreen(null, true);
 
 			} else if (r.startsWith("refresh")) {
 				service.inProgress(r);
@@ -1997,7 +1997,7 @@ public class MainFrame extends JFrame {
 			} else if (r.startsWith("ping") || r.startsWith("p")) {
 				service.inProgress(r);
 				LOGGER.info("Ping...");
-				captureScreen(null);
+				_scanner.captureScreen(null, true);
 				service.done(r);
 			} else if (r.startsWith("reload")) {
 				service.inProgress(r);
@@ -2056,79 +2056,6 @@ public class MainFrame extends JFrame {
 
 		requestsThread.start();
 
-	}
-
-	private void deleteOlder(String prefix, int amountFiles) {
-		File f = new File(".");
-		File[] files = f.listFiles();
-		List<File> targetFiles = new ArrayList<File>(6);
-		int cnt = 0;
-		for (File file : files) {
-			if (!file.isDirectory() && file.getName().startsWith(prefix)) {
-				targetFiles.add(file);
-				cnt++;
-			}
-		}
-
-		if (cnt > amountFiles) {
-			// delete some files
-			Collections.sort(targetFiles, new Comparator<File>() {
-				public int compare(File o1, File o2) {
-					if (o1.lastModified() > o2.lastModified())
-						return 1;
-					else if (o1.lastModified() < o2.lastModified())
-						return -1;
-					return 0;
-				};
-			});
-
-			int c = cnt - 5;
-			for (int i = 0; i < c; i++) {
-				File fd = targetFiles.get(i);
-				fd.delete();
-			}
-		}
-	}
-
-	private void captureScreen(String filename) {
-		captureArea(null, filename);
-	}
-
-	private void captureArea(Rectangle area, String filename) {
-		if (filename == null)
-			filename = "ping ";
-		if (area == null) {
-			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			area = new Rectangle(0, 0, screenSize.width, screenSize.height);
-		}
-		writeImage(area, filename + DateUtils.formatDateForFile(System.currentTimeMillis()) + ".jpg");
-		if (!_settings.getBoolean("ping.keep", false))
-		  deleteOlder("ping", 8);
-		
-	}
-
-	public void writeImage(Rectangle rect, String filename) {
-		try {
-			writeImage(new Robot().createScreenCapture(rect), filename);
-		} catch (AWTException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void writeImage(BufferedImage image, String filename) {
-
-		try {
-			int ind = filename.lastIndexOf("/");
-			if (ind > 0) {
-				String path = filename.substring(0, ind);
-				File f = new File(path);
-				f.mkdirs();
-			}
-			File file = new File(filename);
-			MyImageIO.write(image, filename.substring(filename.length() - 3).toUpperCase(), file);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void runMagic() {
