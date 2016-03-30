@@ -28,14 +28,11 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -68,10 +65,8 @@ import Catalano.Core.IntRange;
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Filters.ColorFiltering;
 
-import com.horowitz.commons.DateUtils;
 import com.horowitz.commons.ImageData;
 import com.horowitz.commons.MouseRobot;
-import com.horowitz.commons.MyImageIO;
 import com.horowitz.commons.MyLogger;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
@@ -98,7 +93,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.69sw";
+	private static String APP_TITLE = "Seaport v0.69";
 
 	private Settings _settings;
 	private Stats _stats;

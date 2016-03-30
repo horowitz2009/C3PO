@@ -165,13 +165,18 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				// assume the dialog is open
 				manageContractCases();
 
-				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2,
-				    _scanner.getBottomRight().y - 240, 205, 240);
-				Pixel destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
-				if (destButton == null)
+				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
+				    _scanner.getBottomRight().y - 175, 255, 90);
+				int opt = 2;
+				Pixel destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+				if (destButton == null) {
+					opt = 0;
+					destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
+				}
+				if (destButton == null) {
+					opt = 4;
 					destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-				if (destButton == null)
-					destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+				}
 				if (destButton == null) {
 					// check for got it button
 					LOGGER.info("CHECK FOR BLUE GOT IT...");
@@ -186,15 +191,20 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					}
 				}
 				if (destButton != null) {
+					LOGGER.info("set sail " + opt);
 					// nice. we can continue
 					if (dest.getName().startsWith("Market")) {
 
 						// FIXME
 						if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
 							// XP
+							Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
+							_mouse.checkUserMovement();
+							_mouse.click(pxp);
+							_mouse.delay(650);
 						} else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
 							// coins
-							Pixel coins = new Pixel(destButton.x - 30 - 90, destButton.y - 6 - 195);// xOff: 30, yOff: 6
+							Pixel coins = new Pixel(destButton.x + 282 - 27, destButton.y - 150 - 5);// xOff: 27, yOff: 5
 							_mouse.checkUserMovement();
 							_mouse.click(coins);
 							_mouse.delay(650);
