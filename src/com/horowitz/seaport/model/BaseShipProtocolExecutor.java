@@ -45,10 +45,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 	public boolean preExecute() throws AWTException, IOException, RobotInterruptedException {
 
-		//check are there map notifications
-  	Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
-  	_shipwreckAvailable = p != null;
-	  
+		// check are there map notifications
+		Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
+		_shipwreckAvailable = p != null;
+
 		return _scanner.ensureHome();
 	}
 
@@ -142,18 +142,23 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 			int y = smallTownPos.y + dest.getRelativePosition().y;
 			// what if dest is shipwreck
 			boolean shipwreck = false;
-			if (dest.getAbbr().equalsIgnoreCase("SW") && _shipwreckAvailable) {
-				// locate the shipwreck
-				LOGGER.info("LOOKING for shipwreck...");
-				Pixel p = _scanner.scanOne("dest/shipwreck.bmp", null, false);
-				if (p != null) {
-					LOGGER.info("FOUND IT!");
-					shipwreck = true;
-					x = p.x;
-					y = p.y;
+			if (dest.getAbbr().equalsIgnoreCase("SW")) {
+				good = false;
+				if (_shipwreckAvailable) {
+					LOGGER.info("LOOKING for shipwreck...");
+					// locate the shipwreck
+					Pixel p = _scanner.scanOne("dest/shipwreck.bmp", null, false);
+					if (p != null) {
+						LOGGER.info("FOUND IT!");
+						shipwreck = true;
+						good = true;
+						x = p.x;
+						y = p.y;
+					} else {
+						LOGGER.info("CAN'T FIND IT!");
+					}
 				} else {
-					LOGGER.info("CAN'T FIND IT!");
-					good = false;
+					LOGGER.info("No shipwreck available right now. Moving on...");
 				}
 			}
 
@@ -212,12 +217,12 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					}
 					_mouse.checkUserMovement();
 					_mouse.click(destButton);
-					
+
 					if (shipwreck) {
-						//do screenshot
+						// do screenshot
 						_scanner.captureScreen("shipwreck ", true);
 					}
-					  
+
 					_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
 					_mouse.checkUserMovement();
 					_mouse.delay(1500);
