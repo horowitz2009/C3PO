@@ -201,7 +201,18 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					if (dest.getName().startsWith("Market")) {
 
 						// FIXME
-						if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
+						if ("Hat-XP".equalsIgnoreCase(dest.getOption())) {
+							// XP
+							Pixel phat = new Pixel(destButton.x - 222 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
+							_mouse.checkUserMovement();
+							_mouse.click(phat);
+							_mouse.delay(650);
+							
+							Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
+							_mouse.checkUserMovement();
+							_mouse.click(pxp);
+							_mouse.delay(650);
+						} else if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
 							// XP
 							Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
 							_mouse.checkUserMovement();
