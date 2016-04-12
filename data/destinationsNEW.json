@@ -13,8 +13,8 @@
    "_imageTitle": "dest/SmallTownTitle.bmp"
  },
  {
-   "_name": "Saint Patrick",
-   "_abbrs":"SP",
+   "_name": "EVENT",
+   "_abbrs":"E",
    "_time": 120,
    "_favorite": true,
    "_relativePosition": {
@@ -34,6 +34,19 @@
      "weight": 0,
      "x": 41,
      "y": 45
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
+   "_name": "Pirate Bay",
+   "_abbrs":"PB",
+   "_time": 5,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": 19,
+     "y": 271
    },
    "_image": "dest/small.bmp",
    "_imageTitle": "dest/SmallTownTitle.bmp"
@@ -265,7 +278,7 @@
   },
   {
     "_name": "Amerigo Vespucci",
-    "_abbrs":"A,AV",
+    "_abbrs":"A,CO",
     "_time": 120,
     "_favorite": true,
     "_relativePosition": {
