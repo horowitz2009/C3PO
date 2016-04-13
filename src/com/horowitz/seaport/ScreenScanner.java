@@ -216,6 +216,10 @@ public class ScreenScanner {
 		getImageData("dest/setSail4.bmp", _popupArea, 27, 5);
 		getImageData("dest/setSail.bmp", _popupArea, 27, 5);
 		getImageData("dest/setSail2.bmp", _popupArea, 27, 5);
+		area = generateWindowedArea(228, 495);
+		area.y = _tl.y + 74;
+		area.height = 38;
+		getImageData("dest/MarketTownTitle2.bmp", area, 0, 0);
 
 		ImageData gear2 = getImageData("buildings/gears2.bmp", _popupArea, 0, 0);
 		gear2.setColorToBypass(Color.BLACK);
