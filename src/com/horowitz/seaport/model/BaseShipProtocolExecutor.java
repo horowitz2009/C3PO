@@ -221,7 +221,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
 				    _scanner.getBottomRight().y - 175, 255, 90);
 				int opt = 2;
-				Pixel destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+				Pixel destButton = _scanner.scanOneFast("dest/setSail2.bmp", buttonArea, false);
 				if (destButton == null) {
 					opt = 0;
 					destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
