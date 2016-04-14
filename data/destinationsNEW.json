@@ -13,6 +13,19 @@
    "_imageTitle": "dest/SmallTownTitle.bmp"
  },
  {
+   "_name": "Armory",
+   "_abbrs":"AR",
+   "_time": 120,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": 93,
+     "y": -137
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
    "_name": "EVENT",
    "_abbrs":"E",
    "_time": 120,
@@ -94,9 +107,37 @@
     "_imageTitle": "dest/MarketTownTitle.bmp"
   },
   {
-    "_name": "Market HAT XP",
+    "_name": "Market HAT Coins",
     "_abbrs":"MHC,M12",
     "_option": "Hat-Coins",
+    "_time": 30,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 122,
+      "y": 182
+    },
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
+    "_name": "Market CB XP",
+    "_abbrs":"MCX,M21",
+    "_option": "Cannon-XP",
+    "_time": 30,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 122,
+      "y": 182
+    },
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
+    "_name": "Market HAT Coins",
+    "_abbrs":"MCC,M22",
+    "_option": "Cannon-Coins",
     "_time": 30,
     "_favorite": true,
     "_relativePosition": {

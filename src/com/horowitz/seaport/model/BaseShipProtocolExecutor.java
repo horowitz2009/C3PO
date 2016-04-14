@@ -170,37 +170,48 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				// assume the dialog is open
 				manageContractCases();
 
-				//manage market
+				// manage market
 				if (dest.getName().startsWith("Market")) {
 					Pixel marketTitle = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
 					if (marketTitle != null) {
-						//the hardcoded approach
+						// the hardcoded approach
 						String[] ss = dest.getOption().split("-");
 						String commodity = ss[0];
 						String prize = ss[1];
 						if (commodity.equalsIgnoreCase("hat")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
 							for (int i = 0; i < 13; i++) {
-							  _mouse.wheelDown(-2);//scroll up to the first commodity which is hat
-							  _mouse.delay(150);
+								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
+								_mouse.delay(150);
 							}
-							
+
 							_mouse.delay(33);
 							_mouse.click();
 							_mouse.delay(300);
-							
+
 						} else if (commodity.equalsIgnoreCase("cocoa")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
 							for (int i = 0; i < 13; i++) {
-							  _mouse.wheelDown(2);//scroll down to the last commodity, then click second last, which is cocoa
-							  _mouse.delay(150);
+								_mouse.wheelDown(2);// scroll down to the last commodity, then click second last, which is cocoa
+								_mouse.delay(150);
 							}
 							_mouse.delay(33);
 							_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
 							_mouse.delay(300);
-							
+
+						} else if (commodity.equalsIgnoreCase("cannon")) {
+							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
+							for (int i = 0; i < 13; i++) {
+								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
+								_mouse.delay(150);
+							}
+
+							_mouse.delay(33);
+							_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
+							_mouse.delay(300);
+
 						}
-						
+
 						if (prize.equalsIgnoreCase("XP")) {
 							_mouse.click(marketTitle.x + 312, marketTitle.y + 188);
 							_mouse.delay(300);
@@ -208,16 +219,11 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							_mouse.click(marketTitle.x + 312, marketTitle.y + 266);
 							_mouse.delay(300);
 						}
-						
-						
-						
+
 					}
-					
-					
-					
+
 				}
-				
-				
+
 				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
 				    _scanner.getBottomRight().y - 175, 255, 90);
 				int opt = 2;
@@ -246,34 +252,34 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				if (destButton != null) {
 					LOGGER.info("set sail " + opt);
 					// nice. we can continue
-//					if (dest.getName().startsWith("Market")) {
-//
-//						// FIXME
-//						if ("Hat-XP".equalsIgnoreCase(dest.getOption())) {
-//							// XP
-//							Pixel phat = new Pixel(destButton.x - 222 - 27, destButton.y - 247 - 5);// xOff: 27, yOff: 5
-//							_mouse.checkUserMovement();
-//							_mouse.click(phat);
-//							_mouse.delay(650);
-//							
-//							Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
-//							_mouse.checkUserMovement();
-//							_mouse.click(pxp);
-//							_mouse.delay(650);
-//						} else if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
-//							// XP
-//							Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
-//							_mouse.checkUserMovement();
-//							_mouse.click(pxp);
-//							_mouse.delay(650);
-//						} else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
-//							// coins
-//							Pixel coins = new Pixel(destButton.x + 282 - 27, destButton.y - 150 - 5);// xOff: 27, yOff: 5
-//							_mouse.checkUserMovement();
-//							_mouse.click(coins);
-//							_mouse.delay(650);
-//						}
-//					}
+					// if (dest.getName().startsWith("Market")) {
+					//
+					// // FIXME
+					// if ("Hat-XP".equalsIgnoreCase(dest.getOption())) {
+					// // XP
+					// Pixel phat = new Pixel(destButton.x - 222 - 27, destButton.y - 247 - 5);// xOff: 27, yOff: 5
+					// _mouse.checkUserMovement();
+					// _mouse.click(phat);
+					// _mouse.delay(650);
+					//
+					// Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
+					// _mouse.checkUserMovement();
+					// _mouse.click(pxp);
+					// _mouse.delay(650);
+					// } else if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
+					// // XP
+					// Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
+					// _mouse.checkUserMovement();
+					// _mouse.click(pxp);
+					// _mouse.delay(650);
+					// } else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
+					// // coins
+					// Pixel coins = new Pixel(destButton.x + 282 - 27, destButton.y - 150 - 5);// xOff: 27, yOff: 5
+					// _mouse.checkUserMovement();
+					// _mouse.click(coins);
+					// _mouse.delay(650);
+					// }
+					// }
 					_mouse.checkUserMovement();
 					_mouse.click(destButton);
 
