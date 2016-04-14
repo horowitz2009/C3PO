@@ -117,7 +117,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	protected void manageContractCases() throws IOException, AWTException, RobotInterruptedException {
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 60,
 		    _scanner.getBottomRight().y - 240, 270, 240);
-		Pixel destButton = _scanner.scanPrecise("dest/collect2.bmp", buttonArea);
+		Pixel destButton = _scanner.scanOneFast("dest/collectR.bmp", buttonArea, false);
 		if (destButton != null) {
 			LOGGER.info("MISSION COMPLETED. MOVING ON...");
 			_mouse.click(destButton);
