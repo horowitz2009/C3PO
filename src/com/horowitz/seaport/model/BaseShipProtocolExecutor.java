@@ -69,7 +69,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				try {
 					_mouse.checkUserMovement();
 					_mouse.click(pixel);
-					_mouse.delay(750);
+					_mouse.delay(800);
+					if (_mouse.getMode() == MouseRobot.SLOW)
+						_mouse.delay(1200);
 
 					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
 					// _scanner.writeImage(miniArea, "pin.bmp");
@@ -165,7 +167,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 			if (good) {
 
 				_mouse.click(x, y);
-				_mouse.delay(1000);
+				_mouse.delay(750);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(500);
 
 				// assume the dialog is open
 				manageContractCases();
@@ -188,6 +192,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							_mouse.delay(33);
 							_mouse.click();
 							_mouse.delay(300);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(600);
+
 
 						} else if (commodity.equalsIgnoreCase("cocoa")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
@@ -198,6 +205,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							_mouse.delay(33);
 							_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
 							_mouse.delay(300);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(600);
+
 
 						} else if (commodity.equalsIgnoreCase("cannon")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
@@ -209,6 +219,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							_mouse.delay(33);
 							_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
 							_mouse.delay(300);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(700);
+
 
 						}
 
@@ -218,6 +231,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 						} else if (prize.equalsIgnoreCase("coins")) {
 							_mouse.click(marketTitle.x + 312, marketTitle.y + 266);
 							_mouse.delay(300);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(600);
+
 						}
 
 					}
@@ -245,7 +261,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					if (gotitButtonBlue != null) {
 						_mouse.click(gotitButtonBlue);
 						LOGGER.info("DESTINATION COMPLETED!");
-						_mouse.delay(1000);
+						_mouse.delay(800);
+						if (_mouse.getMode() == MouseRobot.SLOW)
+							_mouse.delay(1000);
+
 						return false;
 					}
 				}
@@ -290,7 +309,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 					_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
 					_mouse.checkUserMovement();
-					_mouse.delay(1500);
+					_mouse.delay(1300);
+					if (_mouse.getMode() == MouseRobot.SLOW)
+						_mouse.delay(1000);
+
 					return true;
 				} else {
 					LOGGER.info(dest.getName() + " can't be done!");

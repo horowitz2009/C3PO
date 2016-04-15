@@ -52,9 +52,15 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		scanShipName(pin);
 
 		_mouse.click(pin);
-		_mouse.delay(550);
+		_mouse.delay(350);
+		if (_mouse.getMode() == MouseRobot.SLOW)
+			_mouse.delay(650);
+
 		_mouse.mouseMove(_scanner.getParkingPoint());
 		_mouse.delay(100);
+		if (_mouse.getMode() == MouseRobot.SLOW)
+			_mouse.delay(500);
+
 
 		Pixel anchor = _scanner.scanOne("anchor2.bmp", null, false);
 		if (anchor != null) {

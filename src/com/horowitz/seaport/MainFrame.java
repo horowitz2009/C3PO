@@ -93,7 +93,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.75s";
+	private static String APP_TITLE = "Seaport v0.76";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -130,6 +130,7 @@ public class MainFrame extends JFrame {
 	private boolean _testMode;
 
 	private JToggleButton _autoRefreshToggle;
+	private JToggleButton _slowToggle;
 
 	private JLabel _shipSentLabel;
 
@@ -506,7 +507,6 @@ public class MainFrame extends JFrame {
 		_labels.put("N", l);
 		panel.add(l, gbc2);
 
-
 		gbc.gridx = 7;
 		gbc2.gridx = 8;
 		gbc.gridy = 0;
@@ -532,14 +532,14 @@ public class MainFrame extends JFrame {
 		l = new JLabel(" ");
 		_labels.put("RM", l);
 		panel.add(l, gbc2);
-		
+
 		gbc.gridy++;
 		gbc2.gridy++;
 		panel.add(new JLabel("IM:"), gbc);
 		l = new JLabel(" ");
 		_labels.put("IM", l);
 		panel.add(l, gbc2);
-		
+
 		// FAKE
 		gbc2.gridx++;
 		gbc2.gridy++;
@@ -981,9 +981,32 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			toolbar.add(_autoSailorsToggle);
+			// toolbar.add(_autoSailorsToggle);
 
-			_pingToggle = new JToggleButton("Ping");
+			// /////////////
+
+			_slowToggle = new JToggleButton("SL");
+			_slowToggle.addItemListener(new ItemListener() {
+
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					if (b)
+						_mouse.setMode(MouseRobot.SLOW);
+					else
+						_mouse.setMode(MouseRobot.NORMAL);
+
+					LOGGER.info("Slow mode: " + (b ? "on" : "off"));
+					_settings.setProperty("slow", "" + b);
+					_settings.saveSettingsSorted();
+				}
+			});
+			// _slowToggle.setSelected(false);
+			toolbar.add(_slowToggle);
+
+			// /////////////
+
+			_pingToggle = new JToggleButton("P1");
 			// _autoSailorsToggle.setSelected(false);
 			_pingToggle.addItemListener(new ItemListener() {
 
@@ -1013,7 +1036,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			toolbar.add(_ping2Toggle);
+			// toolbar.add(_ping2Toggle);
 
 			_ping3Toggle = new JToggleButton("P3");
 			// _autoSailorsToggle.setSelected(false);
@@ -1514,8 +1537,9 @@ public class MainFrame extends JFrame {
 				}
 
 				// 3. REFRESH
-				LOGGER.info("refresh ? " + _autoRefreshToggle.isSelected() + " - " + mandatoryRefresh + " < " + (now - fstart));
-				if (_autoRefreshToggle.isSelected() && mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
+				LOGGER.fine("refresh ? " + _settings.getBoolean("autoRefresh", false) + " - " + mandatoryRefresh + " < "
+				    + (now - fstart));
+				if (_settings.getBoolean("autoRefresh", false) && mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
 					LOGGER.info("refresh time...");
 					try {
 						refresh(false);
@@ -1569,7 +1593,7 @@ public class MainFrame extends JFrame {
 		_scanner.deleteOlder("refresh", 5);
 		LOGGER.info("Time to refresh...");
 		_scanner.captureGameArea("refresh ");
-		
+
 		Pixel p;
 		if (!bookmark) {
 			if (_scanner.isOptimized()) {
@@ -1600,11 +1624,11 @@ public class MainFrame extends JFrame {
 					if (_scanner.locateGameArea(false)) {
 						_scanner.checkAndAdjustRock();
 						if (_scanner.getRock() != null) {
-						  _mapManager.update();
-						  _buildingManager.update();
+							_mapManager.update();
+							_buildingManager.update();
 
-						  LOGGER.info("Game located successfully!");
-						  done = true;
+							LOGGER.info("Game located successfully!");
+							done = true;
 						}
 					} else {
 						processRequests();
@@ -1886,9 +1910,19 @@ public class MainFrame extends JFrame {
 			_industriesToggle.setSelected(industries);
 		}
 
-		boolean slow = "true".equalsIgnoreCase(_settings.getProperty("autoRefresh"));
+		boolean ar = "true".equalsIgnoreCase(_settings.getProperty("autoRefresh"));
+		if (ar != _autoRefreshToggle.isSelected()) {
+			_autoRefreshToggle.setSelected(ar);
+		}
+
+		boolean slow = "true".equalsIgnoreCase(_settings.getProperty("slow"));
+		if (slow)
+			_mouse.setMode(MouseRobot.SLOW);
+		else
+			_mouse.setMode(MouseRobot.NORMAL);
+
 		if (slow != _autoRefreshToggle.isSelected()) {
-			_autoRefreshToggle.setSelected(slow);
+			_slowToggle.setSelected(slow);
 		}
 
 		boolean autoSailors = "true".equalsIgnoreCase(_settings.getProperty("autoSailors"));
