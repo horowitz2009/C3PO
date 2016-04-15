@@ -93,7 +93,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.76";
+	private static String APP_TITLE = "Seaport v0.76b";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1515,28 +1515,21 @@ public class MainFrame extends JFrame {
 
 			_mouse.saveCurrentPosition();
 			long fstart = System.currentTimeMillis();
+			int turn = 0;
+
 			do {
+
+				turn++;
+				if (turn == 4)
+					turn = 1;
 				long mandatoryRefresh = _settings.getInt("autoRefresh.mandatoryRefresh", 45) * 60 * 1000;
 				long now = System.currentTimeMillis();
 				_mouse.checkUserMovement();
 				// 1. SCAN
-				handlePopups(false);
+				if (turn % 3 == 0)
+					handlePopups(false);
 
-				// 2. PING
-				_mouse.checkUserMovement();
-				if (_pingToggle.isSelected()) {
-					ping();
-				}
-
-				if (_ping2Toggle.isSelected()) {
-					ping2();
-				}
-
-				if (_ping3Toggle.isSelected()) {
-					ping3();
-				}
-
-				// 3. REFRESH
+				// 2. REFRESH
 				LOGGER.fine("refresh ? " + _settings.getBoolean("autoRefresh", false) + " - " + mandatoryRefresh + " < "
 				    + (now - fstart));
 				if (_settings.getBoolean("autoRefresh", false) && mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
@@ -1556,7 +1549,7 @@ public class MainFrame extends JFrame {
 					scanSailors();
 				// recalcPositions(false, 1);
 
-				// 2. DO TASKS
+				// 3. DO TASKS
 				// long now = System.currentTimeMillis();
 				// if (now - start > 11*60000) {
 				for (Task task : _tasks) {
@@ -1573,8 +1566,22 @@ public class MainFrame extends JFrame {
 						}
 					}
 				}
-				// start = System.currentTimeMillis();
-				// }
+				
+				// 4. PING
+				if (turn % 3 == 0) {
+					_mouse.checkUserMovement();
+					if (_pingToggle.isSelected()) {
+						ping();
+					}
+
+					if (_ping2Toggle.isSelected()) {
+						ping2();
+					}
+
+					if (_ping3Toggle.isSelected()) {
+						ping3();
+					}
+				}
 
 				_mouse.mouseMove(_scanner.getParkingPoint());
 
