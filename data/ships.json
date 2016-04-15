@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Charles",
+   "_crew": 100,
+   "_capacity": 30,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Charles.bmp"
+ },
+ {
    "_name": "Blanco",
    "_crew": 100,
    "_capacity": 26,
