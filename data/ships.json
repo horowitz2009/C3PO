@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Elizabeth",
+   "_crew": 140,
+   "_capacity": 40,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Elizabeth.bmp"
+ },
+ {
    "_name": "Adventure",
    "_crew": 120,
    "_capacity": 34,
