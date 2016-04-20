@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Santiago",
+   "_crew": 120,
+   "_capacity": 35,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Santiago.bmp"
+ },
+ {
    "_name": "Elizabeth",
    "_crew": 140,
    "_capacity": 40,
