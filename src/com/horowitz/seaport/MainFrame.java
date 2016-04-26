@@ -77,6 +77,7 @@ import com.horowitz.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
+import com.horowitz.seaport.model.BarrelsProtocol;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
@@ -93,7 +94,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.76s3";
+	private static String APP_TITLE = "Seaport v0.77";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -117,6 +118,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton _shipsToggle;
 
 	private JToggleButton _industriesToggle;
+	private JToggleButton _barrelsAToggle;
+	private JToggleButton _barrelsSToggle;
 	// private JToggleButton _xpToggle;
 
 	private List<Task> _tasks;
@@ -126,6 +129,7 @@ public class MainFrame extends JFrame {
 	private Task _shipsTask;
 
 	private Task _buildingsTask;
+	private Task _barrelsTask;
 
 	private boolean _testMode;
 
@@ -230,10 +234,16 @@ public class MainFrame extends JFrame {
 
 			// BUILDING TASK
 			_buildingsTask = new Task("Buildings", 1);
+
 			ManualBuildingsProtocol buildingsProtocol = new ManualBuildingsProtocol(_scanner, _mouse, _buildingManager);
 			_buildingsTask.setProtocol(buildingsProtocol);
 			_tasks.add(_buildingsTask);
 
+			_barrelsTask = new Task("Barrels", 1);
+			BarrelsProtocol barrelsProtocol = new BarrelsProtocol(_scanner, _mouse);
+			_barrelsTask.setProtocol(barrelsProtocol);
+			_tasks.add(_barrelsTask);
+			
 			_stopAllThreads = false;
 
 		} catch (IOException e1) {
@@ -257,6 +267,7 @@ public class MainFrame extends JFrame {
 		_settings.setProperty("industries", "true");
 		_settings.setProperty("slow", "false");
 		_settings.setProperty("autoSailors", "false");
+		_settings.setProperty("barrelsS", "false");
 		_settings.setProperty("Buildings.SawMill1", "false");
 		_settings.setProperty("Buildings.SawMill2", "true");
 		_settings.setProperty("Buildings.Quarry", "true");
@@ -919,7 +930,7 @@ public class MainFrame extends JFrame {
 					_settings.saveSettingsSorted();
 				}
 			});
-			toolbar.add(_fishToggle);
+			// toolbar.add(_fishToggle);
 
 			// SHIPS
 			_shipsToggle = new JToggleButton("Ships");
@@ -948,7 +959,39 @@ public class MainFrame extends JFrame {
 
 				}
 			});
-			toolbar.add(_industriesToggle);
+			// toolbar.add(_industriesToggle);
+
+			// BARRELS
+			_barrelsSToggle = new JToggleButton("BS");
+			// _industriesToggle.setSelected(true);
+			_barrelsSToggle.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					if (b && _barrelsAToggle.isSelected())
+						_barrelsAToggle.setSelected(false);
+					
+					_barrelsTask.setEnabled(b);
+					_settings.setProperty("barrelsS", "" + b);
+					_settings.saveSettingsSorted();
+
+				}
+			});
+			toolbar.add(_barrelsSToggle);
+			_barrelsAToggle = new JToggleButton("BA");
+			// _industriesToggle.setSelected(true);
+			_barrelsAToggle.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					if (b && _barrelsSToggle.isSelected())
+						_barrelsSToggle.setSelected(false);
+					_settings.setProperty("barrelsA", "" + b);
+					_settings.saveSettingsSorted();
+
+				}
+			});
+			toolbar.add(_barrelsAToggle);
 
 			_autoRefreshToggle = new JToggleButton("AR");
 			_autoRefreshToggle.addItemListener(new ItemListener() {
@@ -1566,7 +1609,7 @@ public class MainFrame extends JFrame {
 						}
 					}
 				}
-				
+
 				// 4. PING
 				if (turn % 3 == 0) {
 					_mouse.checkUserMovement();
@@ -1917,6 +1960,16 @@ public class MainFrame extends JFrame {
 			_industriesToggle.setSelected(industries);
 		}
 
+		boolean barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsS"));
+		if (barrels != _barrelsSToggle.isSelected()) {
+			_barrelsSToggle.setSelected(barrels);
+		}
+		
+		barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsA"));
+		if (barrels != _barrelsAToggle.isSelected()) {
+			_barrelsAToggle.setSelected(barrels);
+		}
+		
 		boolean ar = "true".equalsIgnoreCase(_settings.getProperty("autoRefresh"));
 		if (ar != _autoRefreshToggle.isSelected()) {
 			_autoRefreshToggle.setSelected(ar);

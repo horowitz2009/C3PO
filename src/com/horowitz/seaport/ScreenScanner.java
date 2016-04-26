@@ -91,6 +91,8 @@ public class ScreenScanner {
 
 	private Pixel _sailorsPos;
 
+	private Rectangle _barrelsArea;
+
 
 	public Pixel[] getShipLocations() {
 		return _shipLocations;
@@ -158,6 +160,13 @@ public class ScreenScanner {
 		xx = (getGameWidth() - _labelWidth) / 2;
 		_labelArea = new Rectangle(_tl.x + xx, _tl.y + 71, _labelWidth, 66);
 		_levelArea = new Rectangle(_tl.x + xx, _tl.y + 360, _labelWidth, 35);
+		
+		area = new Rectangle();
+		area.width = (getGameWidth() / 2) + 80 - 28;
+		area.x = getBottomRight().x - area.width - 28;
+		area.y = getTopLeft().y + 40;
+		area.height = 300;//TODO to be calibrated
+		_barrelsArea = new Rectangle(area);
 
 		// _popupArea = generateWindowedArea(324, 516);
 		_popupArea = generateWindowedArea(328, 520);
@@ -245,6 +254,10 @@ public class ScreenScanner {
 		 * 
 		 * area = new Rectangle(_br.x - 264, _tl.y, 264, 35); getImageData("populationRed.bmp", area, 0, 0); getImageData("populationBlue.bmp", area, 0, 0);
 		 */
+	}
+
+	public Rectangle getBarrelsArea() {
+		return _barrelsArea;
 	}
 
 	public Pixel[] getBuildingLocations() {
@@ -349,7 +362,7 @@ public class ScreenScanner {
 			}
 		}
 
-		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 93 + 50, _tl.y + 219);
+		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 0, _tl.y + 219);
 
 		if (Math.abs(_rock.x - goodRock.x) > 22 || Math.abs(_rock.y - goodRock.y) > 22) {
 			// need adjusting
