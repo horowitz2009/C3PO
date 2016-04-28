@@ -39,10 +39,6 @@ public class BarrelsProtocol implements GameProtocol {
 
 	private int cnt;
 
-	private Rectangle _barrelsArea;
-
-	private FastBitmap _landFB;
-
 	public BarrelsProtocol(ScreenScanner scanner, MouseRobot mouse) throws IOException {
 		_scanner = scanner;
 		_mouse = mouse;
@@ -60,51 +56,33 @@ public class BarrelsProtocol implements GameProtocol {
 	@Override
 	public void execute() throws RobotInterruptedException {
 		// TODO HUNT BARRELS
-
+		boolean debug = false;
 		try {
 
+			BufferedImage image = _scanner.getImageData("LAND5.bmp").getImage();
+
 			Pixel rock = _scanner.getRock();
-			Rectangle area = new Rectangle();
 			int x1 = rock.x - 114;
 			int x2 = _scanner.getBottomRight().x - 28;
-
-			int y1 = rock.y - 225;
-			int y1a = _scanner.getTopLeft().y;
+			int y1 = rock.y - 225 + 32;
+			int y1a = _scanner.getTopLeft().y + 32;
 			y1 = Math.max(y1, y1a);
 
-			area.width = x2 - x1;
-			area.x = x1;
-			area.y = y1;
-			area.height = 350;
-			_barrelsArea = new Rectangle(area);
+			Rectangle area = new Rectangle(x1, y1, Math.min(764, x2 - x1), 318);
 
-			int rockOffset = rock.y - y1;
-
-			BufferedImage image = ImageIO.read(ImageManager.getImageURL("LAND4.bmp"));
-
-			int xx = 166 - 114;
-			int yy = 263 - rockOffset;
-			image = image.getSubimage(xx, yy, area.width, area.height);
-
-			_landFB = new FastBitmap(image);
-			if (_landFB.isRGB())
-				_landFB.toGrayscale();
-			//_landFB.saveAsBMP("LANDCUT.BMP");
+			FastBitmap landFB = new FastBitmap(image.getSubimage(0, 263 - rock.y + y1, area.width, area.height));
+			if (landFB.isRGB())
+				landFB.toGrayscale();
+			if (debug)
+				landFB.saveAsBMP("LANDCUT.BMP");
 
 			LOGGER.info("Barrels...");
-			area = new Rectangle(_barrelsArea);
-			//_scanner.captureArea(_barrelsArea, "barrelsArea.png", false);
+			// _scanner.captureArea(_barrelsArea, "barrelsArea.png", false);
 
-			Robot r = new Robot();
-			List<BufferedImage> bis = new ArrayList<BufferedImage>(3);
-			for (int i = 0; i < 1; i++) {
-				bis.add(r.createScreenCapture(area));
-				//Thread.sleep(750);
-			}
+			FastBitmap fb = new FastBitmap(new Robot().createScreenCapture(area));
 
-			FastBitmap fb = new FastBitmap(bis.get(0));
-
-			//fb.saveAsPNG("IMAGE.PNG");
+			if (debug)
+				fb.saveAsPNG("IMAGE.PNG");
 
 			// FILTER BROWN
 			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 250), new IntRange(65, 175), new IntRange(0,
@@ -116,7 +94,8 @@ public class BarrelsProtocol implements GameProtocol {
 			Threshold thr = new Threshold(70);// was 80
 			thr.applyInPlace(fb);
 
-			//fb.saveAsPNG("IMAGE2.png");
+			if (debug)
+				fb.saveAsPNG("IMAGE2.png");
 
 			// //
 
@@ -125,56 +104,62 @@ public class BarrelsProtocol implements GameProtocol {
 			bd.setMinArea(20 * 20);
 			bd.setMaxArea(28 * 32);
 
-			// // BLUR
-			// Blur blur = new Blur();
-			// blur.applyInPlace(fb);
-			// fb.saveAsPNG("IMAGE2blurred.png");
-			// // //
-
 			// OR
-			// FastBitmap fbLand = new FastBitmap(ImageIO.read(ImageManager.getImageURL("LAND.bmp")));
-			// _landFB.toGrayscale();
-			Or or = new Or(_landFB);
+			Or or = new Or(landFB);
 			or.applyInPlace(fb);
-			//fb.saveAsPNG("IMAGE2OR.png");
+			if (debug)
+				fb.saveAsPNG("IMAGE2OR.png");
 			// //
 
 			Threshold th = new Threshold(10);
 			th.applyInPlace(fb);
-			//fb.saveAsPNG("IMAGE2blurredTH.png");
+			if (debug)
+				fb.saveAsPNG("IMAGE2blurredTH.png");
 
-			Xor xor = new Xor(_landFB);
+			Xor xor = new Xor(landFB);
 			xor.applyInPlace(fb);
-			//fb.saveAsPNG("IMAGE2blurredTHXOR.png");
+			if (debug)
+				fb.saveAsPNG("IMAGE2blurredTHXOR.png");
 
 			// BLUR
 			Blur blur = new Blur();
 			blur.applyInPlace(fb);
-			//fb.saveAsPNG("IMAGE2blurredTHXORRRRRRRRRR.png");
+			if (debug)
+				fb.saveAsPNG("IMAGE2blurredTHXORRRRRRRRRR.png");
 			// //
 			th = new Threshold(10);
 			th.applyInPlace(fb);
-			//fb.saveAsPNG("IMAGE2blurredTHHHHHHHHHHHHH.png");
+			if (debug)
+				fb.saveAsPNG("IMAGE2blurredTHHHHHHHHHHHHH.png");
 
-			System.out.println("111111111111");
 			List<Blob> blobs = bd.ProcessImage(fb);
 			for (Blob blob : blobs) {
 				cnt++;
 				IntPoint c = blob.getCenter();
 				System.out.println(c);
 				Pixel p = new Pixel(c.y + area.x + 0, c.x + area.y + 0);
-				// Pixel p = new Pixel(c.y + area.x + _scanner.getTopLeft().x, c.x + area.y + _scanner.getTopLeft().y );
-				// Pixel p = new Pixel(c.y + _scanner.getTopLeft().x, c.x + _scanner.getTopLeft().y );
 				LOGGER.info("BARREL: " + p);
 				_mouse.click(p);
-				_mouse.delay(300);
+				_mouse.delay(50);
+
+				p.x += 6;
+				p.y += 6;
+				_mouse.click(p);
+				_mouse.delay(50);
+
+				p.x -= 12;
+				p.y -= 6;
+				_mouse.click(p);
+				_mouse.delay(200);
+
 			}
 			LOGGER.info("BARRELS CNT: " + cnt);
 
-			LOGGER.info("DONE......");
-		} catch (Throwable t) {
+		} catch (RobotInterruptedException e) {
+			throw new RobotInterruptedException();
+		} catch (Exception e) {
 			LOGGER.severe("something went wrong in Barrels protocol...");
-			t.printStackTrace();
+			e.printStackTrace();
 
 		}
 
