@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Revenge",
+   "_crew": 150,
+   "_capacity": 50,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Revenge.bmp"
+ },
+ {
    "_name": "Santiago",
    "_crew": 120,
    "_capacity": 35,
