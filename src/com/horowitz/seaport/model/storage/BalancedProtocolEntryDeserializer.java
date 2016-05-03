@@ -16,10 +16,12 @@ import com.horowitz.seaport.model.Ship;
 public class BalancedProtocolEntryDeserializer implements Deserializer {
 
 	private MapManager _mapManager;
+	private Ship _ship;
 
-	public BalancedProtocolEntryDeserializer(MapManager mapManager) {
+	public BalancedProtocolEntryDeserializer(MapManager mapManager, Ship ship) {
 		super();
 		_mapManager = mapManager;
+		_ship = ship;
 	}
 
 	@Override
@@ -44,7 +46,7 @@ public class BalancedProtocolEntryDeserializer implements Deserializer {
 				}
 			}
 			de.setGoal(goal);
-			de.setShip(entry.getShipName());
+			de.setShip(_ship.getName());
 
 			des.add(de);
 		}
@@ -67,11 +69,19 @@ public class BalancedProtocolEntryDeserializer implements Deserializer {
 		entry.setChain(chain);
 		
 		
-		if (entry.getShipName().startsWith("<")) {
-			entry.setShip(new Ship(entry.getShipName()));
-		} else {
-			entry.setShip(_mapManager.getShip(entry.getShipName()));
-		}
+		try {
+			entry.setShip((Ship)_ship.clone());//do I need clone?
+//			
+//			
+//	    if (entry.getShipName().startsWith("<")||entry.getShipName().startsWith("[")) {
+//	    	entry.setShip((Ship)_ship.clone());//do I need clone?
+//	    } else {
+//	    	entry.setShip(_mapManager.getShip(entry.getShipName()));
+//	    }
+    } catch (CloneNotSupportedException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+    }
 
 	}
 

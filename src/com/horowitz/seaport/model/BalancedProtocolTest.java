@@ -37,7 +37,7 @@ public class BalancedProtocolTest {
 			pe.setChainStr("MX-22.2,S-106.82");
 			pe.setShipName("<ALL>");
 
-			pe.deserialize(new BalancedProtocolEntryDeserializer(mapManager));
+			pe.deserialize(new BalancedProtocolEntryDeserializer(mapManager, new Ship("[C 27] 1")));
 			entries.add(pe);
 
 			List<DispatchEntry> des = pe.getDispatchEntries();
@@ -81,7 +81,7 @@ public class BalancedProtocolTest {
 			pe.setChainStr("MX,S");
 			pe.setShipName("<ALL>");
 			
-			pe.deserialize(new BalancedProtocolEntryDeserializer(mapManager));
+			pe.deserialize(new BalancedProtocolEntryDeserializer(mapManager, new Ship("[C 27] 1")));
 			entries.add(pe);
 			
 			List<DispatchEntry> des = pe.getDispatchEntries();
@@ -125,7 +125,7 @@ public class BalancedProtocolTest {
 			pe.setChainStr("MX-22.2,S-106.82");
 			pe.setShipName("<ALL>");
 
-			pe.deserialize(new BalancedProtocolEntryDeserializer(mapManager));
+			pe.deserialize(new BalancedProtocolEntryDeserializer(mapManager, new Ship("[C 27] 1")));
 			entries.add(pe);
 
 			List<DispatchEntry> des = pe.getDispatchEntries();

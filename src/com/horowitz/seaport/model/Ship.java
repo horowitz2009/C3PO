@@ -3,6 +3,8 @@ package com.horowitz.seaport.model;
 public class Ship extends GameUnit {
 	private static final long serialVersionUID = -1237748489318461109L;
 	private int _capacity;
+	private int _crew;
+
 	private boolean _active;
 	private boolean _favorite;
 
@@ -46,7 +48,14 @@ public class Ship extends GameUnit {
 
 	@Override
 	public String toString() {
-		return getName() + (_capacity > 0 ? " " + _capacity: "");
+		return getName() + (_capacity > 0 ? " " + _capacity : "");
 	}
 
+	public void setCrew(int crew) {
+		_crew = crew;
+	}
+
+	public int getCrew() {
+		return _crew;
+	}
 }

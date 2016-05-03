@@ -44,6 +44,10 @@ public class ProtocolEntry implements Serializable, Cloneable, Deserializable {
 		_chainStr = chainStr;
 	}
 
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	public Ship getShip() {
 		return _ship;
 	}

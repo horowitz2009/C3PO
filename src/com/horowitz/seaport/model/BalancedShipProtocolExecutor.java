@@ -46,7 +46,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			}
 		});
 	}
-	
+
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
 
 		scanShipName(pin);
@@ -60,7 +60,6 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		_mouse.delay(100);
 		if (_mouse.getMode() == MouseRobot.SLOW)
 			_mouse.delay(500);
-
 
 		Pixel anchor = _scanner.scanOne("anchor2.bmp", null, false);
 		if (anchor != null) {
@@ -80,7 +79,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 				// do what you gotta do with pe
 				// end product: _destChain
 
-				pe.deserialize(new BalancedProtocolEntryDeserializer(_mapManager));
+				pe.deserialize(new BalancedProtocolEntryDeserializer(_mapManager, ship));
 
 				// TODO NOT GOOD _destChain = pe.getChain();
 				List<DispatchEntry> des = pe.getDispatchEntries();
@@ -132,17 +131,66 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		}
 	}
 
+	public static void main(String[] args) {
+		String ss = "[C 27] 1";
+		String sss[] = ss.split(" ");
+		ss = ss.substring(1, ss.length() - 1);
+		String sc = sss[0].substring(1, 2);
+		ss = sss[1].replace("]", "");
+		if (sc.equalsIgnoreCase("c")) {
+			// capacity
+
+		} else {
+			// sailors crew
+		}
+
+		System.out.println(sc);
+		System.out.println(ss);
+	}
+
 	private ProtocolEntry findSuitableProtocolEntry(Ship ship, List<ProtocolEntry> entries) {
 		ProtocolEntry pe = null;
 		assert ship != null;
 		// get the corresponfing protocolEntry, including <Unknown>
+
+		// 1
 		for (ProtocolEntry protocolEntry : entries) {
-			if (protocolEntry.getShipName().equals(ship.getName()) || protocolEntry.getShipName().equals("<ALL>")) {
+			if (protocolEntry.getShipName().startsWith("[")) {
+				String ss = protocolEntry.getShipName();
+
+				String sss[] = ss.split(" ");
+				String sc = sss[0].substring(1, 2);
+				ss = sss[1].replace("]", "");
+
+				int n = Integer.parseInt(ss);
+				if (sc.equalsIgnoreCase("c")) {
+					// capacity
+					if (ship.getCapacity() == n)
+						pe = protocolEntry;
+				} else {
+					// sailors crew
+					if (ship.getCrew() == n)
+						pe = protocolEntry;
+				}
+
 				pe = protocolEntry;
 				break;
 			}
 		}
 
+		// 2
+		if (pe == null) {
+
+			for (ProtocolEntry protocolEntry : entries) {
+				if (protocolEntry.getShipName().equals(ship.getName()) || protocolEntry.getShipName().equals("<ALL>")) {
+					pe = protocolEntry;
+					break;
+				}
+			}
+
+		}
+
+		// 3
 		if (pe == null) {
 			// find rest
 			for (ProtocolEntry protocolEntry : entries) {

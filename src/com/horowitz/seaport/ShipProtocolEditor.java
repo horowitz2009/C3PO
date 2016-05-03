@@ -12,7 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -62,26 +67,26 @@ public class ShipProtocolEditor extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
-		//gbc.gridwidth = 4;
+		// gbc.gridwidth = 4;
 		gbc.insets = new Insets(3, 3, 2, 2);
 
 		headerPanel.add(_titleTF, gbc);
 
-		//gbc.gridx++;
+		// gbc.gridx++;
 		gbc.gridy = 1;
-		//gbc.gridheight = 2;
-		//gbc.gridwidth = 1;
+		// gbc.gridheight = 2;
+		// gbc.gridwidth = 1;
 		JLabel agenda = new JLabel(
 		    "<html>S - Small Town  C - Coastline   G - Gulf<br>CP - Cocoa Plant   MC - Market COINS   MX - Market COINS</html>");
 		agenda.setFont(agenda.getFont().deriveFont(9f));
 		headerPanel.add(agenda, gbc);
 
-//		// fake label
-//		gbc.gridy++;
-//		gbc.gridx++;
-//		gbc.weightx = 1.0;
-//		gbc.weighty = 1.0;
-//		headerPanel.add(new JLabel(""), gbc);
+		// // fake label
+		// gbc.gridy++;
+		// gbc.gridx++;
+		// gbc.weightx = 1.0;
+		// gbc.weighty = 1.0;
+		// headerPanel.add(new JLabel(""), gbc);
 		mainRoot.add(headerPanel, BorderLayout.NORTH);
 
 		// //////////
@@ -217,28 +222,59 @@ public class ShipProtocolEditor extends JPanel {
 			add(removeButton);
 			add(Box.createHorizontalStrut(6));
 			// ship
-			
-			//ONLY ACTIVE SHIPS
+
+			// ONLY ACTIVE SHIPS
 			List<Ship> ships = new ArrayList<Ship>();
 			for (Ship ship : _mapManager.getShips()) {
-	      if (ship.isActive())
-	      	ships.add(ship);
-      }
+				if (ship.isActive())
+					ships.add(ship);
+			}
 			Collections.sort(ships, new Comparator<Ship>() {
 				@Override
 				public int compare(Ship o1, Ship o2) {
 					return new CompareToBuilder().append(o2.getCapacity(), o1.getCapacity()).toComparison();
 				}
 			});
-			//Ship select = new Ship("-- choose ship --");
+
+			Map<Integer, Integer> capsMap = new Hashtable<Integer, Integer>();
+			Map<Integer, Integer> crewsMap = new Hashtable<Integer, Integer>();
+
+			for (Ship ship : ships) {
+				if (capsMap.containsKey(ship.getCapacity())) {
+					capsMap.put(ship.getCapacity(), capsMap.get(ship.getCapacity()) + 1);
+				} else {
+					capsMap.put(ship.getCapacity(), 1);
+				}
+				
+				if (crewsMap.containsKey(ship.getCrew())) {
+					crewsMap.put(ship.getCrew(), crewsMap.get(ship.getCrew()) + 1);
+				} else {
+					crewsMap.put(ship.getCrew(), 1);
+				}
+			}
+			
+			List<Integer> capsList = new ArrayList<Integer>(capsMap.keySet());
+			Collections.sort(capsList, Collections.reverseOrder());
+			
+			for (Integer capN : capsList) {
+				ships.add(new Ship("[C " + capN + "] " + capsMap.get(capN)));
+      }
+			
+			List<Integer> crewsList = new ArrayList<Integer>(crewsMap.keySet());
+			Collections.sort(crewsList, Collections.reverseOrder());
+			for (Integer crewN : crewsList) {
+				ships.add(new Ship("[S " + crewN + "] " + crewsMap.get(crewN)));
+			}
+			
+			// Ship select = new Ship("-- choose ship --");
 			Ship all = new Ship("<ALL>");
 			Ship rest = new Ship("<Rest>");
 			Ship unknown = new Ship("<Unknown>");
 			ships.add(0, all);
-			//ships.add(0, select);
-			
-			ships.add(rest);
-			ships.add(unknown);
+			ships.add(1, rest);
+			ships.add(2, unknown);
+			// ships.add(0, select);
+
 			_shipFieldCB = new JComboBox<Ship>(ships.toArray(new Ship[0]));
 			shrinkFont(_shipFieldCB, -1);
 			add(_shipFieldCB);
