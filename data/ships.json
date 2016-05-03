@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Mars",
+   "_crew": 90,
+   "_capacity": 29,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Mars.bmp"
+ },
+ {
    "_name": "Revenge",
    "_crew": 150,
    "_capacity": 50,
@@ -19,8 +28,8 @@
  },
  {
    "_name": "Elizabeth",
-   "_crew": 140,
-   "_capacity": 40,
+   "_crew": 120,
+   "_capacity": 35,
    "_favorite": true,
    "_active": true,
    
@@ -64,7 +73,7 @@
  },
  {
    "_name": "Anne Gallant",
-   "_crew": 110,
+   "_crew": 100,
    "_capacity": 30,
    "_favorite": true,
    "_active": true,
@@ -247,7 +256,7 @@
    "_crew": 90,
    "_capacity": 26,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/AdlerVonLubeckS.bmp"
  },
@@ -256,7 +265,7 @@
    "_crew": 90,
    "_capacity": 26,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/MaryRoseS.bmp"
  },
@@ -265,7 +274,7 @@
     "_crew": 90,
     "_capacity": 26,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/LillyS.bmp"
   },
@@ -274,7 +283,7 @@
     "_crew": 90,
     "_capacity": 26,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/TrinidadS.bmp"
   },
@@ -283,7 +292,7 @@
     "_crew": 90,
     "_capacity": 26,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/OlifantS.bmp"
   },
@@ -292,7 +301,7 @@
     "_crew": 90,
     "_capacity": 26,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/HorseS.bmp"
   },
@@ -301,7 +310,7 @@
     "_crew": 90,
     "_capacity": 25,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/CristofurS.bmp"
   },
@@ -310,7 +319,7 @@
     "_crew": 90,
     "_capacity": 25,
     "_favorite": true,
-    "_active": true,
+    "_active": false,
     
     "_imageTitle": "ships/BarlamewS.bmp"
   },
