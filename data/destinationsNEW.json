@@ -1,5 +1,18 @@
 [
  {
+   "_name": "EXPLORATION2",
+   "_abbrs":"EX2",
+   "_time": 240,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": -232,
+     "y": 297
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
    "_name": "Shipwreck",
    "_abbrs":"SW",
    "_time": 60,

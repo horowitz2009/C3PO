@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Meag Delight",
+   "_crew": 100,
+   "_capacity": 32,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/MeagDelight.bmp"
+ },
+ {
    "_name": "Mars",
    "_crew": 90,
    "_capacity": 29,
