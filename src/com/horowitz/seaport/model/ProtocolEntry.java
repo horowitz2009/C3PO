@@ -52,6 +52,10 @@ public class ProtocolEntry implements Serializable, Cloneable, Deserializable {
 		return _ship;
 	}
 
+	/**
+	 * @deprecated
+	 * @param ship
+	 */
 	public void setShip(Ship ship) {
 		_ship = ship;
 		_shipName = ship.getName();

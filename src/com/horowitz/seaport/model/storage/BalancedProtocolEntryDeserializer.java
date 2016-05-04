@@ -69,19 +69,19 @@ public class BalancedProtocolEntryDeserializer implements Deserializer {
 		entry.setChain(chain);
 		
 		
-		try {
-			entry.setShip((Ship)_ship.clone());//do I need clone?
-//			
-//			
-//	    if (entry.getShipName().startsWith("<")||entry.getShipName().startsWith("[")) {
-//	    	entry.setShip((Ship)_ship.clone());//do I need clone?
-//	    } else {
-//	    	entry.setShip(_mapManager.getShip(entry.getShipName()));
-//	    }
-    } catch (CloneNotSupportedException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-    }
+//		try {
+//			entry.setShip((Ship)_ship.clone());//do I need clone?
+////			
+////			
+////	    if (entry.getShipName().startsWith("<")||entry.getShipName().startsWith("[")) {
+////	    	entry.setShip((Ship)_ship.clone());//do I need clone?
+////	    } else {
+////	    	entry.setShip(_mapManager.getShip(entry.getShipName()));
+////	    }
+//    } catch (CloneNotSupportedException e) {
+//	    // TODO Auto-generated catch block
+//	    e.printStackTrace();
+//    }
 
 	}
 

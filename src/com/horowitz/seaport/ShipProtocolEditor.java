@@ -164,7 +164,7 @@ public class ShipProtocolEditor extends JPanel {
 			Ship ship = (Ship) pev._shipFieldCB.getSelectedItem();
 			String destChainStr = pev._destField.getText();
 			ProtocolEntry pe = new ProtocolEntry();
-			pe.setShip(ship);
+			pe.setShipName(ship.getName());
 			pe.setChainStr(destChainStr);
 			entries.add(pe);
 		}

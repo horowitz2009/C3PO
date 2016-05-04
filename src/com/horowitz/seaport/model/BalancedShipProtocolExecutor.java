@@ -32,7 +32,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				// TODO Auto-generated method stub
-				// _support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+		    // _support.firePropertyChange("SHIP_SENT", dest, _lastShip);
 				if (evt.getPropertyName().equals("SHIP_SENT")) {
 					Destination dest = (Destination) evt.getOldValue();
 					Ship ship = (Ship) evt.getNewValue();
@@ -165,20 +165,37 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 				int n = Integer.parseInt(ss);
 				if (sc.equalsIgnoreCase("c")) {
 					// capacity
-					if (ship.getCapacity() == n)
+					if (ship.getCapacity() == n) {
 						pe = protocolEntry;
-				} else {
-					// sailors crew
-					if (ship.getCrew() == n)
-						pe = protocolEntry;
+						break;
+					}
 				}
-
-				pe = protocolEntry;
-				break;
 			}
 		}
 
 		// 2
+		if (pe == null) {
+			for (ProtocolEntry protocolEntry : entries) {
+				if (protocolEntry.getShipName().startsWith("[")) {
+					String ss = protocolEntry.getShipName();
+
+					String sss[] = ss.split(" ");
+					String sc = sss[0].substring(1, 2);
+					ss = sss[1].replace("]", "");
+
+					int n = Integer.parseInt(ss);
+					if (sc.equalsIgnoreCase("s")) {
+						// sailors crew
+						if (ship.getCrew() == n) {
+							pe = protocolEntry;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		// 3
 		if (pe == null) {
 
 			for (ProtocolEntry protocolEntry : entries) {
@@ -190,7 +207,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 		}
 
-		// 3
+		// 4
 		if (pe == null) {
 			// find rest
 			for (ProtocolEntry protocolEntry : entries) {
