@@ -10,8 +10,8 @@
  },
  {
    "_name": "Mars",
-   "_crew": 90,
-   "_capacity": 29,
+   "_crew": 100,
+   "_capacity": 32,
    "_favorite": true,
    "_active": true,
    

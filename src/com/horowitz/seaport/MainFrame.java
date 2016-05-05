@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.78su";
+	private static String APP_TITLE = "Seaport v0.79";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -240,10 +240,12 @@ public class MainFrame extends JFrame {
 			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
-			BarrelsProtocol barrelsProtocol = new BarrelsProtocol(_scanner, _mouse);
-			_barrelsTask.setProtocol(barrelsProtocol);
+			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse);
+			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
+			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
+			_barrelsTask.setProtocol(_barrelsProtocol);
 			_tasks.add(_barrelsTask);
-			
+
 			_stopAllThreads = false;
 
 		} catch (IOException e1) {
@@ -970,7 +972,7 @@ public class MainFrame extends JFrame {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					if (b && _barrelsAToggle.isSelected())
 						_barrelsAToggle.setSelected(false);
-					
+
 					_barrelsTask.setEnabled(b);
 					_settings.setProperty("barrelsS", "" + b);
 					_settings.saveSettingsSorted();
@@ -1791,6 +1793,8 @@ public class MainFrame extends JFrame {
 
 	private Long _speedTime = null;
 
+	private BarrelsProtocol _barrelsProtocol;
+
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
 		if (sailorsPos != null) {
@@ -1964,12 +1968,12 @@ public class MainFrame extends JFrame {
 		if (barrels != _barrelsSToggle.isSelected()) {
 			_barrelsSToggle.setSelected(barrels);
 		}
-		
+
 		barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsA"));
 		if (barrels != _barrelsAToggle.isSelected()) {
 			_barrelsAToggle.setSelected(barrels);
 		}
-		
+
 		boolean ar = "true".equalsIgnoreCase(_settings.getProperty("autoRefresh"));
 		if (ar != _autoRefreshToggle.isSelected()) {
 			_autoRefreshToggle.setSelected(ar);
@@ -2026,6 +2030,9 @@ public class MainFrame extends JFrame {
 		if (!sp.equals(_shipProtocol != null ? _shipProtocol.getName() : "")) {
 			setProtocol(sp);
 		}
+
+		_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
+		_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
 
 	}
 

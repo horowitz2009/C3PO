@@ -4,19 +4,9 @@ import java.awt.AWTException;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-
-import javax.imageio.ImageIO;
-
-import com.horowitz.commons.ImageManager;
-import com.horowitz.commons.MouseRobot;
-import com.horowitz.commons.Pixel;
-import com.horowitz.commons.RobotInterruptedException;
-import com.horowitz.seaport.ScreenScanner;
 
 import Catalano.Core.IntPoint;
 import Catalano.Core.IntRange;
@@ -29,6 +19,11 @@ import Catalano.Imaging.Filters.Xor;
 import Catalano.Imaging.Tools.Blob;
 import Catalano.Imaging.Tools.BlobDetection;
 
+import com.horowitz.commons.MouseRobot;
+import com.horowitz.commons.Pixel;
+import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.seaport.ScreenScanner;
+
 public class BarrelsProtocol implements GameProtocol {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
@@ -38,8 +33,12 @@ public class BarrelsProtocol implements GameProtocol {
 	private MouseRobot _mouse;
 
 	private int cnt;
+	private int blobMin;
+	private int blobMax;
 
 	public BarrelsProtocol(ScreenScanner scanner, MouseRobot mouse) throws IOException {
+		blobMin = 15 * 20;
+		blobMax = 28 * 32;
 		_scanner = scanner;
 		_mouse = mouse;
 	}
@@ -76,7 +75,7 @@ public class BarrelsProtocol implements GameProtocol {
 			if (debug)
 				landFB.saveAsBMP("LANDCUT.BMP");
 
-			LOGGER.info("Barrels...");
+			LOGGER.info("Barrels..." + blobMin + " - " + blobMax);
 			// _scanner.captureArea(_barrelsArea, "barrelsArea.png", false);
 
 			FastBitmap fb = new FastBitmap(new Robot().createScreenCapture(area));
@@ -101,8 +100,8 @@ public class BarrelsProtocol implements GameProtocol {
 
 			BlobDetection bd = new BlobDetection(BlobDetection.Algorithm.EightWay);
 			bd.setFilterBlob(true);
-			bd.setMinArea(20 * 20);
-			bd.setMaxArea(28 * 32);
+			bd.setMinArea(blobMin);
+			bd.setMaxArea(blobMax);
 
 			// OR
 			Or or = new Or(landFB);
@@ -164,4 +163,21 @@ public class BarrelsProtocol implements GameProtocol {
 		}
 
 	}
+
+	public int getBlobMin() {
+		return blobMin;
+	}
+
+	public void setBlobMin(int blobMin) {
+		this.blobMin = blobMin;
+	}
+
+	public int getBlobMax() {
+		return blobMax;
+	}
+
+	public void setBlobMax(int blobMax) {
+		this.blobMax = blobMax;
+	}
+
 }
