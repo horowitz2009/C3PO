@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.79";
+	private static String APP_TITLE = "Seaport v0.79b";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1743,7 +1743,7 @@ public class MainFrame extends JFrame {
 
 			_scanner.captureScreen("ping map ", true);
 
-			_scanner.scanOneFast("anchor2.bmp", null, true);
+			_scanner.scanOne(_scanner.getAnchorButton(), null, true);
 			_lastPing3 = System.currentTimeMillis();
 		}
 
@@ -1864,7 +1864,7 @@ public class MainFrame extends JFrame {
 				_mouse.click(_scanner.getSafePoint());
 				_mouse.delay(130);
 			}
-			found = _scanner.scanOneFast("anchor2.bmp", null, true) != null;
+			found = _scanner.scanOneFast(_scanner.getAnchorButton(), null, true) != null;
 
 			if (found) {
 				return;
@@ -1930,7 +1930,7 @@ public class MainFrame extends JFrame {
 			t3 = now - t3;
 			_mouse.delay(150);
 			t4 = now = System.currentTimeMillis();
-			found = _scanner.scanOneFast("anchor.bmp", null, true) != null;
+			found = _scanner.scanOne(_scanner.getAnchorButton(), null, true) != null;
 			now = System.currentTimeMillis();
 			t4 = now - t4;
 			if (found)

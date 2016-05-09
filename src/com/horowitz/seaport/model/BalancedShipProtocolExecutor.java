@@ -61,7 +61,13 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		if (_mouse.getMode() == MouseRobot.SLOW)
 			_mouse.delay(500);
 
-		Pixel anchor = _scanner.scanOne("anchor2.bmp", null, false);
+		Pixel anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
+		if (anchor == null && _mouse.getMode() == MouseRobot.SLOW) {
+			_mouse.delay(1000);
+			//try again
+			anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
+		}
+		
 		if (anchor != null) {
 			// MAP IS OPEN
 			boolean isOK = _mapManager.ensureMap();
@@ -119,7 +125,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 				// use this chain
 				boolean sent = sendShip(new LinkedList<Destination>(chainList));
 				if (!sent) {
-					_scanner.scanOne("anchor2.bmp", null, true);
+					_scanner.scanOne(_scanner.getAnchorButton(), null, true);
 				}
 
 			} else {
@@ -128,6 +134,8 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 				_mouse.click(anchor);
 				_mouse.delay(1000);
 			}
+		} else {
+			LOGGER.info("anchor not found...");
 		}
 	}
 
