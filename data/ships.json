@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Great Michael",
+   "_crew": 100,
+   "_capacity": 30,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Gr.bmp"
+ },
+ {
    "_name": "Meag Delight",
    "_crew": 110,
    "_capacity": 34,
