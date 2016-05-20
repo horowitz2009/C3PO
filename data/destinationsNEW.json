@@ -1,5 +1,18 @@
 [
  {
+   "_name": "SMITHY",
+   "_abbrs":"SM,SH",
+   "_time": 120,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": 18,
+     "y": 271
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
    "_name": "EXPLORATION2",
    "_abbrs":"EX2",
    "_time": 240,
