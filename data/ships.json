@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Leidangskip",
+   "_crew": 100,
+   "_capacity": 29,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Leidangskip.bmp"
+ },
+ {
    "_name": "Great Michael",
    "_crew": 110,
    "_capacity": 32,
