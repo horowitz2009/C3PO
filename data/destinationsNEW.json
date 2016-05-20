@@ -13,6 +13,32 @@
    "_imageTitle": "dest/SmallTownTitle.bmp"
  },
  {
+   "_name": "CAVE",
+   "_abbrs":"CA,CAVE",
+   "_time": 60,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": -236,
+     "y": 304
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
+   "_name": "ISABELA",
+   "_abbrs":"ISA,IS",
+   "_time": 120,
+   "_favorite": true,
+   "_relativePosition": {
+     "weight": 0,
+     "x": -113,
+     "y": 331
+   },
+   "_image": "dest/small.bmp",
+   "_imageTitle": "dest/SmallTownTitle.bmp"
+ },
+ {
    "_name": "EXPLORATION2",
    "_abbrs":"EX2",
    "_time": 240,

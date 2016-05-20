@@ -220,12 +220,12 @@ public class MainFrame extends JFrame {
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
 					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
-					// JLabel l = _labels.get(de.getDest());
-					// if (l != null) {
-					// //l.setText("" + de.getTimes());
-					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-					// }
-					//
+			    // JLabel l = _labels.get(de.getDest());
+			    // if (l != null) {
+			    // //l.setText("" + de.getTimes());
+			    // //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+			    // }
+			    //
 				}
 			});
 
@@ -331,40 +331,40 @@ public class MainFrame extends JFrame {
 					LOGGER.info("scan for " + _findThisTF.getText());
 					final String filename = _findThisTF.getText();
 					new Thread(new Runnable() {
-						public void run() {
-							try {
+				    public void run() {
+					    try {
 
-								_scanner.getImageData(filename);
-								Pixel p = _scanner.scanOneFast(filename, null, true);
-								if (p != null) {
-									LOGGER.info("found it: " + p);
-								} else {
-									LOGGER.info(filename + " not found");
-									LOGGER.info("trying with redused threshold");
-									double old = _matcher.getSimilarityThreshold();
-									_matcher.setSimilarityThreshold(0.91d);
-									p = _scanner.scanOne(filename, null, true);
-									if (p != null) {
-										LOGGER.info("found it: " + p);
-									} else {
-										LOGGER.info(filename + " not found");
-									}
-									_matcher.setSimilarityThreshold(old);
+						    _scanner.getImageData(filename);
+						    Pixel p = _scanner.scanOneFast(filename, null, true);
+						    if (p != null) {
+							    LOGGER.info("found it: " + p);
+						    } else {
+							    LOGGER.info(filename + " not found");
+							    LOGGER.info("trying with redused threshold");
+							    double old = _matcher.getSimilarityThreshold();
+							    _matcher.setSimilarityThreshold(0.91d);
+							    p = _scanner.scanOne(filename, null, true);
+							    if (p != null) {
+								    LOGGER.info("found it: " + p);
+							    } else {
+								    LOGGER.info(filename + " not found");
+							    }
+							    _matcher.setSimilarityThreshold(old);
 
-								}
-							} catch (RobotInterruptedException e) {
-								LOGGER.log(Level.WARNING, e.getMessage());
-								e.printStackTrace();
-							} catch (IOException e) {
-								LOGGER.log(Level.WARNING, e.getMessage());
-								e.printStackTrace();
-							} catch (AWTException e) {
-								LOGGER.log(Level.WARNING, e.getMessage());
-								e.printStackTrace();
-							}
+						    }
+					    } catch (RobotInterruptedException e) {
+						    LOGGER.log(Level.WARNING, e.getMessage());
+						    e.printStackTrace();
+					    } catch (IOException e) {
+						    LOGGER.log(Level.WARNING, e.getMessage());
+						    e.printStackTrace();
+					    } catch (AWTException e) {
+						    LOGGER.log(Level.WARNING, e.getMessage());
+						    e.printStackTrace();
+					    }
 
-						}
-					}).start();
+				    }
+			    }).start();
 
 				}
 			});
@@ -807,15 +807,15 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("Scan") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								scan();
-							} catch (RobotInterruptedException e) {
-								e.printStackTrace();
-							}
-						}
-					});
+				    @Override
+				    public void run() {
+					    try {
+						    scan();
+					    } catch (RobotInterruptedException e) {
+						    e.printStackTrace();
+					    }
+				    }
+			    });
 
 					myThread.start();
 				}
@@ -838,12 +838,12 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
 
-						@Override
-						public void run() {
-							LOGGER.info("Stopping BB Gun");
-							_stopAllThreads = true;
-						}
-					});
+				    @Override
+				    public void run() {
+					    LOGGER.info("Stopping BB Gun");
+					    _stopAllThreads = true;
+				    }
+			    });
 
 					myThread.start();
 				}
@@ -856,11 +856,11 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("R") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							record();
-						}
-					});
+				    @Override
+				    public void run() {
+					    record();
+				    }
+			    });
 
 					myThread.start();
 				}
@@ -873,34 +873,34 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("Reset") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							// //clearBuildings();
-							// try {
-							// if (!_scanner.isOptimized()) {
-							// scan();
-							// }
-							//
-							// if (_scanner.isOptimized()) {
-							// _mouse.savePosition();
-							// locateIndustries();
-							// _mouse.restorePosition();
-							// } else {
-							// LOGGER.info("I need to know where the game is!");
-							// }
-							// } catch (RobotInterruptedException e) {
-							// LOGGER.log(Level.WARNING, e.getMessage());
-							// e.printStackTrace();
-							// } catch (IOException e) {
-							// LOGGER.log(Level.WARNING, e.getMessage());
-							// e.printStackTrace();
-							// } catch (AWTException e) {
-							// LOGGER.log(Level.WARNING, e.getMessage());
-							// e.printStackTrace();
-							// }
-						}
+				    @Override
+				    public void run() {
+					    // //clearBuildings();
+			        // try {
+			        // if (!_scanner.isOptimized()) {
+			        // scan();
+			        // }
+			        //
+			        // if (_scanner.isOptimized()) {
+			        // _mouse.savePosition();
+			        // locateIndustries();
+			        // _mouse.restorePosition();
+			        // } else {
+			        // LOGGER.info("I need to know where the game is!");
+			        // }
+			        // } catch (RobotInterruptedException e) {
+			        // LOGGER.log(Level.WARNING, e.getMessage());
+			        // e.printStackTrace();
+			        // } catch (IOException e) {
+			        // LOGGER.log(Level.WARNING, e.getMessage());
+			        // e.printStackTrace();
+			        // } catch (AWTException e) {
+			        // LOGGER.log(Level.WARNING, e.getMessage());
+			        // e.printStackTrace();
+			        // }
+				    }
 
-					});
+			    });
 
 					myThread.start();
 				}
@@ -1255,25 +1255,25 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							LOGGER.info("Testing...");
-							if (!_scanner.isOptimized()) {
-								try {
-									scan();
-								} catch (RobotInterruptedException e) {
-									e.printStackTrace();
-								}
-							}
+				    @Override
+				    public void run() {
+					    LOGGER.info("Testing...");
+					    if (!_scanner.isOptimized()) {
+						    try {
+							    scan();
+						    } catch (RobotInterruptedException e) {
+							    e.printStackTrace();
+						    }
+					    }
 
-							if (_scanner.isOptimized()) {
-								// DO THE JOB
-								test();
-							} else {
-								LOGGER.info("I need to know where the game is!");
-							}
-						}
-					});
+					    if (_scanner.isOptimized()) {
+						    // DO THE JOB
+						    test();
+					    } else {
+						    LOGGER.info("I need to know where the game is!");
+					    }
+				    }
+			    });
 
 					myThread.start();
 				}
@@ -1332,7 +1332,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-							// " (" + e.getX() + ", " + e.getY() + ")");
+			        // " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1349,7 +1349,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-						// e.getX() + ", " + e.getY() + ")");
+			      // e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -2075,6 +2075,9 @@ public class MainFrame extends JFrame {
 				runMagic();
 				_scanner.captureScreen(null, true);
 
+			} else if (r.startsWith("click")) {
+				service.inProgress(r);
+				processClick(r);
 			} else if (r.startsWith("refresh")) {
 				service.inProgress(r);
 				try {
@@ -2116,6 +2119,21 @@ public class MainFrame extends JFrame {
 		}
 
 		// service.purgeOld(1000 * 60 * 60);// 1 hour old
+	}
+
+	private void processClick(String r) {
+		try {
+			String[] ss = r.split("_");
+			int x = Integer.parseInt(ss[1]);
+			int y = Integer.parseInt(ss[2]);
+			_mouse.click(x, y);
+			try {
+				_mouse.delay(1000);
+			} catch (RobotInterruptedException e) {
+			}
+		} finally {
+			new Service().done(r);
+		}
 	}
 
 	private void runSettingsListener() {

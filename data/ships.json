@@ -1,8 +1,8 @@
 [
  {
    "_name": "Great Michael",
-   "_crew": 100,
-   "_capacity": 30,
+   "_crew": 110,
+   "_capacity": 32,
    "_favorite": true,
    "_active": true,
    
@@ -10,8 +10,8 @@
  },
  {
    "_name": "Meag Delight",
-   "_crew": 110,
-   "_capacity": 34,
+   "_crew": 120,
+   "_capacity": 36,
    "_favorite": true,
    "_active": true,
    
