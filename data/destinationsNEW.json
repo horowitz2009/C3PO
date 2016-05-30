@@ -159,6 +159,20 @@
     "_imageTitle": "dest/MarketTownTitle.bmp"
   },
   {
+    "_name": "Market SHIELD XP",
+    "_abbrs":"MSHX,M11",
+    "_option": "1-XP",
+    "_time": 30,
+    "_favorite": true,
+    "_relativePosition": {
+      "weight": 0,
+      "x": 122,
+      "y": 182
+    },
+    "_image": "dest/MarketTown.bmp",
+    "_imageTitle": "dest/MarketTownTitle.bmp"
+  },
+  {
     "_name": "Market HAT Coins",
     "_abbrs":"MHC,M12",
     "_option": "Hat-Coins",

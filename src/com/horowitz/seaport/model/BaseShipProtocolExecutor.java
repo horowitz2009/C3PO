@@ -178,11 +178,11 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				if (dest.getName().startsWith("Market")) {
 					Pixel marketTitle = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
 					if (marketTitle != null) {
-						// the hardcoded approach
+						//FIXME the hardcoded approach
 						String[] ss = dest.getOption().split("-");
 						String commodity = ss[0];
 						String prize = ss[1];
-						if (commodity.equalsIgnoreCase("hat")) {
+						if (commodity.equalsIgnoreCase("hat")||commodity.equalsIgnoreCase("1")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
 							for (int i = 0; i < 13; i++) {
 								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
