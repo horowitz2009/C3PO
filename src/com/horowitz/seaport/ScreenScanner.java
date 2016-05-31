@@ -367,11 +367,11 @@ public class ScreenScanner {
 			}
 		}
 
-		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 0, _tl.y + 219);
+		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 0, _tl.y + 219);//was 219
 
-		if (Math.abs(_rock.x - goodRock.x) > 22 || Math.abs(_rock.y - goodRock.y) > 22) {
+		if (Math.abs(_rock.x - goodRock.x) > 32 || Math.abs(_rock.y - goodRock.y) > 7) {
 			// need adjusting
-			_mouse.drag2(_rock.x, _rock.y, goodRock.x, goodRock.y);
+			_mouse.drag4(_rock.x, _rock.y, goodRock.x, goodRock.y, true, true);
 			_mouse.delay(1200);
 			_rock = findRockAgain(goodRock);
 			needRecalc = true;

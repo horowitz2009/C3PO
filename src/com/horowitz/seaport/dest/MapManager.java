@@ -260,7 +260,7 @@ public class MapManager {
 				else
 					yyy -= 15;
 				
-			  _scanner.getMouse().drag2(_smallTownPos.x + 40, _smallTownPos.y - 36, _smallTownPos.x + xxx, _smallTownPos.y + yyy - 36);
+			  _scanner.getMouse().drag4(_smallTownPos.x + 40, _smallTownPos.y - 36, _smallTownPos.x + xxx, _smallTownPos.y + yyy - 36, true, true);
 			  _scanner.getMouse().delay(1200);
 			  _smallTownPos.x += xxx;
 			  _smallTownPos.y += yyy;
