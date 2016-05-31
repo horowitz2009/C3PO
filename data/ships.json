@@ -1,5 +1,23 @@
 [
  {
+   "_name": "Don De Dieu",
+   "_crew": 100,
+   "_capacity": 31,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/DonDeDieu.bmp"
+ },
+ {
+   "_name": "Dainty",
+   "_crew": 120,
+   "_capacity": 37,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Dainty.bmp"
+ },
+ {
    "_name": "Leidangskip",
    "_crew": 100,
    "_capacity": 29,
@@ -11,7 +29,7 @@
  {
    "_name": "Great Michael",
    "_crew": 110,
-   "_capacity": 32,
+   "_capacity": 39,
    "_favorite": true,
    "_active": true,
    
