@@ -46,4 +46,8 @@ public class Stats {
 		return cnt;
 	}
 
+	public void clear() {
+	  _map.clear();
+  }
+
 }

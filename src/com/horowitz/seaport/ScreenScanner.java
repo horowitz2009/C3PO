@@ -367,12 +367,13 @@ public class ScreenScanner {
 			}
 		}
 
-		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 0, _tl.y + 219);//was 219
+		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 0, _tl.y + 219 + 3);//was 219
 
-		if (Math.abs(_rock.x - goodRock.x) > 32 || Math.abs(_rock.y - goodRock.y) > 7) {
+		if (Math.abs(_rock.x - goodRock.x) > 52 || Math.abs(_rock.y - goodRock.y) > 8) {
 			// need adjusting
 			_mouse.drag4(_rock.x, _rock.y, goodRock.x, goodRock.y, true, true);
-			_mouse.delay(1200);
+			LOGGER.info("waiting 5s...");
+			_mouse.delay(5000);
 			_rock = findRockAgain(goodRock);
 			needRecalc = true;
 		}
@@ -404,13 +405,15 @@ public class ScreenScanner {
 		if (oldRock != null) {
 			int x = oldRock.x - rockData.get_xOff();
 			int y = oldRock.y - rockData.get_yOff();
-			area = new Rectangle(x - 20, y - 20, 31 + 40, 28 + 40);
+			area = new Rectangle(x - 50, y - 50, 31 + 140, 28 + 140);
 		}
 		Pixel p = scanOne("ROCK.bmp", area, false);
 		if (p == null) {
 			LOGGER.info("Rock not found in the same place.");
 			LOGGER.info("Looking again for the rock...");
 			p = findRock();
+		} else {
+			LOGGER.info("Rock found again :)");
 		}
 		return p;
 	}

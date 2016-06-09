@@ -1,8 +1,35 @@
 [
  {
-   "_name": "Don De Dieu",
+   "_name": "San Buena Ventura",
    "_crew": 100,
-   "_capacity": 31,
+   "_capacity": 34,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/BuenaVentura.bmp"
+ },
+ {
+   "_name": "San Martin",
+   "_crew": 100,
+   "_capacity": 33,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/SanMartin.bmp"
+ },
+ {
+   "_name": "Friesland",
+   "_crew": 150,
+   "_capacity": 55,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Friesland.bmp"
+ },
+ {
+   "_name": "Don De Dieu",
+   "_crew": 120,
+   "_capacity": 39,
    "_favorite": true,
    "_active": true,
    
@@ -22,13 +49,13 @@
    "_crew": 100,
    "_capacity": 29,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/Leidangskip.bmp"
  },
  {
    "_name": "Great Michael",
-   "_crew": 110,
+   "_crew": 140,
    "_capacity": 39,
    "_favorite": true,
    "_active": true,
@@ -94,7 +121,7 @@
    "_crew": 100,
    "_capacity": 30,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/Charles.bmp"
  },
@@ -103,7 +130,7 @@
    "_crew": 100,
    "_capacity": 26,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/Blanco.bmp"
  },
@@ -175,7 +202,7 @@
    "_crew": 100,
    "_capacity": 26,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/Dublin.bmp"
  },
@@ -184,7 +211,7 @@
    "_crew": 100,
    "_capacity": 28,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/CelticCross.bmp"
  },
@@ -238,7 +265,7 @@
    "_crew": 100,
    "_capacity": 28,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/Ming.bmp"
  },
@@ -256,7 +283,7 @@
    "_crew": 90,
    "_capacity": 28,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/Katren.bmp"
  },
@@ -274,7 +301,7 @@
    "_crew": 90,
    "_capacity": 27,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/GoldenHindS.bmp"
  },
@@ -292,7 +319,7 @@
    "_crew": 90,
    "_capacity": 27,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/SaintIve.bmp"
  },

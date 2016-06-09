@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.81";
+	private static String APP_TITLE = "Seaport v0.82";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -135,8 +135,6 @@ public class MainFrame extends JFrame {
 
 	private JToggleButton _autoRefreshToggle;
 	private JToggleButton _slowToggle;
-
-	private JLabel _shipSentLabel;
 
 	private ShipProtocolManagerUI _shipProtocolManagerUI;
 
@@ -444,7 +442,7 @@ public class MainFrame extends JFrame {
 		_labels.put("G", l);
 		panel.add(l, gbc2);
 
-		// RV
+		// BB
 		gbc.gridy++;
 		gbc2.gridy++;
 		panel.add(new JLabel("BB:"), gbc);
@@ -458,15 +456,23 @@ public class MainFrame extends JFrame {
 		gbc.gridy = 0;
 		gbc2.gridy = 0;
 
-		// CP
+		// BS
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("CP:"), gbc);
+		panel.add(new JLabel("BS:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("CP", l);
+		_labels.put("BS", l);
 		panel.add(l, gbc2);
 
-		// MC
+		// CA
+		gbc.gridy++;
+		gbc2.gridy++;
+		panel.add(new JLabel("CA:"), gbc);
+		l = new JLabel(" ");
+		_labels.put("CA", l);
+		panel.add(l, gbc2);
+
+		// MX
 		gbc.gridy++;
 		gbc2.gridy++;
 		panel.add(new JLabel("MX:"), gbc);
@@ -474,15 +480,7 @@ public class MainFrame extends JFrame {
 		_labels.put("MX", l);
 		panel.add(l, gbc2);
 
-		// MX
-		gbc.gridy++;
-		gbc2.gridy++;
-		panel.add(new JLabel("A:"), gbc);
-		l = new JLabel(" ");
-		_labels.put("A", l);
-		panel.add(l, gbc2);
-
-		// JK
+		// F
 		gbc.gridy++;
 		gbc2.gridy++;
 		panel.add(new JLabel("F:"), gbc);
@@ -496,28 +494,28 @@ public class MainFrame extends JFrame {
 		gbc.gridy = 0;
 		gbc2.gridy = 0;
 
-		// BS
+		// E
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("BS:"), gbc);
+		panel.add(new JLabel("E:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("BS", l);
+		_labels.put("E", l);
 		panel.add(l, gbc2);
 
-		// RB
+		// IS
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("R:"), gbc);
+		panel.add(new JLabel("IS:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("R", l);
+		_labels.put("IS", l);
 		panel.add(l, gbc2);
 
-		// NH
+		// A
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("N:"), gbc);
+		panel.add(new JLabel("A:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("N", l);
+		_labels.put("A", l);
 		panel.add(l, gbc2);
 
 		gbc.gridx = 7;
@@ -527,31 +525,31 @@ public class MainFrame extends JFrame {
 
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("FR:"), gbc);
+		panel.add(new JLabel("R:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("FR", l);
+		_labels.put("R", l);
 		panel.add(l, gbc2);
 
 		gbc.gridy++;
 		gbc2.gridy++;
-		panel.add(new JLabel("RV:"), gbc);
+		panel.add(new JLabel("N:"), gbc);
 		l = new JLabel(" ");
-		_labels.put("RV", l);
+		_labels.put("N", l);
 		panel.add(l, gbc2);
 
-		gbc.gridy++;
-		gbc2.gridy++;
-		panel.add(new JLabel("RM:"), gbc);
-		l = new JLabel(" ");
-		_labels.put("RM", l);
-		panel.add(l, gbc2);
-
-		gbc.gridy++;
-		gbc2.gridy++;
-		panel.add(new JLabel("IM:"), gbc);
-		l = new JLabel(" ");
-		_labels.put("IM", l);
-		panel.add(l, gbc2);
+//		gbc.gridy++;
+//		gbc2.gridy++;
+//		panel.add(new JLabel("RM:"), gbc);
+//		l = new JLabel(" ");
+//		_labels.put("RM", l);
+//		panel.add(l, gbc2);
+//
+//		gbc.gridy++;
+//		gbc2.gridy++;
+//		panel.add(new JLabel("IM:"), gbc);
+//		l = new JLabel(" ");
+//		_labels.put("IM", l);
+//		panel.add(l, gbc2);
 
 		// FAKE
 		gbc2.gridx++;
@@ -675,7 +673,46 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 	}
+	
+	private void reload() {
+		LOGGER.info("Reloading data...");
+		
+		try {
+      _mapManager.loadData();
+      _mapManager.update();
+      _buildingManager.loadData();
+    } catch (IOException | RobotInterruptedException e) {
+    	LOGGER.warning("Error loading data: " + e.getMessage());
+    	e.printStackTrace();
+    }
 
+		_shipProtocolManagerUI.reload();
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				// reapplySettings();
+				String sp = _settings.getProperty("ShipProtocol", "DEFAULT");
+				if (!sp.equals(_shipProtocol != null ? _shipProtocol.getName() : "")) {
+					setProtocol(sp);
+				}
+
+			}
+		});
+
+		LOGGER.info("Reloading protocols DONE");
+
+	}
+	
+	private void reset() {
+		try {
+			_stats.clear();
+			_mapManager.resetDispatchEntries();
+			loadStats();
+		} catch (IOException e1) {
+			LOGGER.info("Failed to reset entries!");
+		}
+		
+	}
+	
 	private void record() {
 		try {
 			LOGGER.info("Recording the mouse movement (for now)");
@@ -728,12 +765,6 @@ public class MainFrame extends JFrame {
 				_stats.registerShip(ship);
 				_stats.registerDestination(dest);
 				LOGGER.info("SHIPS SENT: " + _stats.getTotalShipsSent());
-				Calendar now = Calendar.getInstance();
-				DateFormat sdf = SimpleDateFormat.getDateTimeInstance();
-				String dateStr = sdf.format(now.getTime());
-				LOGGER.info("" + dateStr);
-				_shipSentLabel.setText("Ships: " + _stats.getTotalShipsSent() + " at " + dateStr);
-
 			}
 
 		}
@@ -853,12 +884,12 @@ public class MainFrame extends JFrame {
 
 		// RECORD
 		{
-			AbstractAction action = new AbstractAction("R") {
+			AbstractAction action = new AbstractAction("Reload") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
 				    @Override
 				    public void run() {
-					    record();
+					    reload();
 				    }
 			    });
 
@@ -875,29 +906,7 @@ public class MainFrame extends JFrame {
 					Thread myThread = new Thread(new Runnable() {
 				    @Override
 				    public void run() {
-					    // //clearBuildings();
-			        // try {
-			        // if (!_scanner.isOptimized()) {
-			        // scan();
-			        // }
-			        //
-			        // if (_scanner.isOptimized()) {
-			        // _mouse.savePosition();
-			        // locateIndustries();
-			        // _mouse.restorePosition();
-			        // } else {
-			        // LOGGER.info("I need to know where the game is!");
-			        // }
-			        // } catch (RobotInterruptedException e) {
-			        // LOGGER.log(Level.WARNING, e.getMessage());
-			        // e.printStackTrace();
-			        // } catch (IOException e) {
-			        // LOGGER.log(Level.WARNING, e.getMessage());
-			        // e.printStackTrace();
-			        // } catch (AWTException e) {
-			        // LOGGER.log(Level.WARNING, e.getMessage());
-			        // e.printStackTrace();
-			        // }
+				    	reset();
 				    }
 
 			    });
@@ -908,8 +917,6 @@ public class MainFrame extends JFrame {
 			mainToolbar1.add(action);
 		}
 
-		_shipSentLabel = new JLabel(" ");
-		mainToolbar1.add(_shipSentLabel);
 		return mainToolbar1;
 	}
 
@@ -1448,7 +1455,10 @@ public class MainFrame extends JFrame {
 
 			List<DispatchEntry> des = new JsonStorage().loadDispatchEntries();
 			for (DispatchEntry de : des) {
-				JLabel l = _labels.get(de.getDest());
+				String dest = de.getDest();
+				if (dest.startsWith("M"))
+					dest = "MX";
+				JLabel l = _labels.get(dest);
 				if (l != null) {
 					l.setText("" + (Integer.parseInt(l.getText()) + de.getTimes()));
 				}
@@ -2100,20 +2110,11 @@ public class MainFrame extends JFrame {
 				service.done(r);
 			} else if (r.startsWith("reload")) {
 				service.inProgress(r);
-				LOGGER.info("Reloading protocols...");
-				_shipProtocolManagerUI.reload();
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						// reapplySettings();
-						String sp = _settings.getProperty("ShipProtocol", "DEFAULT");
-						if (!sp.equals(_shipProtocol != null ? _shipProtocol.getName() : "")) {
-							setProtocol(sp);
-						}
-
-					}
-				});
-
-				LOGGER.info("Reloading protocols DONE");
+				reload();
+				service.done(r);
+			} else if (r.startsWith("reset")) {
+				service.inProgress(r);
+				reset();
 				service.done(r);
 			}
 		}
