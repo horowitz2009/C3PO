@@ -152,8 +152,7 @@ public class BarrelsProtocol implements GameProtocol {
 				_mouse.click(p);
 				_mouse.delay(150);
 				if (_capture) {
-				  area = new Rectangle(p.x - 21, p.y - 120, 51, 120);
-				  _scanner.captureArea(area, "barrels/barrels", true);
+				  _scanner.captureArea(new Rectangle(p.x - 21, p.y - 120, 51, 120), "barrels/barrels", true);
 				}
 
 			}
