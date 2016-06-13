@@ -29,6 +29,7 @@ public class BarrelsProtocol implements GameProtocol {
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
 	private ScreenScanner _scanner;
+	private boolean _capture = true;
 
 	private MouseRobot _mouse;
 
@@ -149,7 +150,11 @@ public class BarrelsProtocol implements GameProtocol {
 				p.x -= 12;
 				p.y -= 6;
 				_mouse.click(p);
-				_mouse.delay(200);
+				_mouse.delay(150);
+				if (_capture) {
+				  area = new Rectangle(p.x - 21, p.y - 120, 51, 120);
+				  _scanner.captureArea(area, "barrels/barrels", true);
+				}
 
 			}
 			LOGGER.info("BARRELS CNT: " + cnt);
@@ -162,6 +167,14 @@ public class BarrelsProtocol implements GameProtocol {
 
 		}
 
+	}
+
+	public boolean isCapture() {
+		return _capture;
+	}
+
+	public void setCapture(boolean capture) {
+		_capture = capture;
 	}
 
 	public int getBlobMin() {

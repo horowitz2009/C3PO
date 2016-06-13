@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.82a";
+	private static String APP_TITLE = "Seaport v0.83";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1081,6 +1081,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					_barrelsProtocol.setCapture(b);
 					LOGGER.info("Ping2: " + (b ? "on" : "off"));
 					_settings.setProperty("ping2", "" + b);
 					_settings.saveSettingsSorted();
@@ -1088,7 +1089,7 @@ public class MainFrame extends JFrame {
 				}
 			});
 
-			// toolbar.add(_ping2Toggle);
+			toolbar.add(_ping2Toggle);
 
 			_ping3Toggle = new JToggleButton("P3");
 			// _autoSailorsToggle.setSelected(false);
