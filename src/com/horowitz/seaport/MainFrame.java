@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.82";
+	private static String APP_TITLE = "Seaport v0.82a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -680,7 +680,7 @@ public class MainFrame extends JFrame {
 		try {
       _mapManager.loadData();
       _mapManager.update();
-      _buildingManager.loadData();
+      //_buildingManager.loadData();
     } catch (IOException | RobotInterruptedException e) {
     	LOGGER.warning("Error loading data: " + e.getMessage());
     	e.printStackTrace();
@@ -1219,28 +1219,32 @@ public class MainFrame extends JFrame {
 
 		// BUILDINGS GO HERE
 
-		for (final Building b : _buildingManager.getBuildings()) {
-			final JToggleButton toggle = new JToggleButton(b.getName());
-			toggle.setActionCommand(b.getName().replace(" ", ""));
+		try {
+	    for (final Building b : _buildingManager.getBuildings()) {
+	    	final JToggleButton toggle = new JToggleButton(b.getName());
+	    	toggle.setActionCommand(b.getName().replace(" ", ""));
 
-			toggle.addItemListener(new ItemListener() {
+	    	toggle.addItemListener(new ItemListener() {
 
-				@Override
-				public void itemStateChanged(ItemEvent e) {
+	    		@Override
+	    		public void itemStateChanged(ItemEvent e) {
 
-					boolean val = e.getStateChange() == ItemEvent.SELECTED;
-					b.setEnabled(val);
-					LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
+	    			boolean val = e.getStateChange() == ItemEvent.SELECTED;
+	    			b.setEnabled(val);
+	    			LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
 
-					_settings.setProperty("Buildings." + toggle.getActionCommand(), "" + val);
-					_settings.saveSettingsSorted();
+	    			_settings.setProperty("Buildings." + toggle.getActionCommand(), "" + val);
+	    			_settings.saveSettingsSorted();
 
-				}
-			});
-			//
-			// toggle.setSelected(b.isEnabled());
-			_buildingsToolbar.add(toggle);
-		}
+	    		}
+	    	});
+	    	//
+	    	// toggle.setSelected(b.isEnabled());
+	    	_buildingsToolbar.add(toggle);
+	    }
+    } catch (IOException e) {
+    	LOGGER.warning("Failed to load buildings");
+    }
 		return _buildingsToolbar;
 	}
 

@@ -13,7 +13,7 @@ public class BuildingManager {
 
   private ScreenScanner _scanner;
 
-  private List<Building> _buildings;
+  private List<Building> _buildings = null;
 
   public BuildingManager(ScreenScanner scanner) {
     super();
@@ -28,7 +28,9 @@ public class BuildingManager {
     _buildings = new JsonStorage().loadBuildings();
   }
 
-  public List<Building> getBuildings() {
+  public List<Building> getBuildings() throws IOException {
+  	if (_buildings == null || _buildings.isEmpty())
+  		loadBuildings();
     return _buildings;
   }
 

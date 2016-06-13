@@ -1,8 +1,8 @@
 [
  {
    "_name": "San Buena Ventura",
-   "_crew": 100,
-   "_capacity": 34,
+   "_crew": 110,
+   "_capacity": 36,
    "_favorite": true,
    "_active": true,
    
@@ -10,8 +10,8 @@
  },
  {
    "_name": "San Martin",
-   "_crew": 100,
-   "_capacity": 33,
+   "_crew": 110,
+   "_capacity": 35,
    "_favorite": true,
    "_active": true,
    

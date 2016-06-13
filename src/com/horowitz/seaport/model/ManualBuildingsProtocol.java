@@ -26,7 +26,7 @@ public class ManualBuildingsProtocol implements GameProtocol {
 		_scanner = scanner;
 		_mouse = mouse;
 		_buildingManager = buildinghManager;
-		_buildingManager.loadBuildings();
+		//_buildingManager.loadBuildings();
 	}
 
 	@Override
@@ -36,32 +36,40 @@ public class ManualBuildingsProtocol implements GameProtocol {
 
 	@Override
 	public void update() {
-		Pixel rock = _scanner.getRock();
-		List<Building> buildings = _buildingManager.getBuildings();
-	
-		for (Building b : buildings) {
-			Pixel absPos = new Pixel(rock.x + b.getRelativePosition().x, rock.y + b.getRelativePosition().y);
-			b.setPosition(absPos);
-		}
+		try {
+	    Pixel rock = _scanner.getRock();
+	    List<Building> buildings = _buildingManager.getBuildings();
+
+	    for (Building b : buildings) {
+	    	Pixel absPos = new Pixel(rock.x + b.getRelativePosition().x, rock.y + b.getRelativePosition().y);
+	    	b.setPosition(absPos);
+	    }
+    } catch (IOException e) {
+    	LOGGER.warning("Failed to load buildings");
+    }
 	
 	}
 
 	@Override
 	public void execute() throws RobotInterruptedException {
-		List<Building> buildings = _buildingManager.getBuildings();
-		for (Building b : buildings) {
-			if (b.isEnabled()) {
-				try {
-					_mouse.checkUserMovement();
-					doBuilding(b);
+		try {
+	    List<Building> buildings = _buildingManager.getBuildings();
+	    for (Building b : buildings) {
+	    	if (b.isEnabled()) {
+	    		try {
+	    			_mouse.checkUserMovement();
+	    			doBuilding(b);
 
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (AWTException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+	    		} catch (IOException e) {
+	    			e.printStackTrace();
+	    		} catch (AWTException e) {
+	    			e.printStackTrace();
+	    		}
+	    	}
+	    }
+    } catch (IOException e) {
+    	LOGGER.warning("Failed to load buildings");
+    }
 	}
 
 	private void doBuilding(Building b) throws IOException, AWTException, RobotInterruptedException {
