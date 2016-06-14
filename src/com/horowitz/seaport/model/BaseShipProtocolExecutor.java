@@ -116,15 +116,21 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		return _lastShip;
 	}
 
-	protected void manageContractCases() throws IOException, AWTException, RobotInterruptedException {
+	protected boolean manageContractCases(Destination dest) throws IOException, AWTException, RobotInterruptedException {
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 60,
 		    _scanner.getBottomRight().y - 240, 270, 240);
-		Pixel destButton = _scanner.scanOne("dest/collectR.bmp", buttonArea, false);
+		String imageName = "dest/collect_contract.bmp";
+		if (dest.getAbbr().equalsIgnoreCase("F")) {
+			imageName = "dest/collect_friend.bmp";
+		}
+		Pixel destButton = _scanner.scanOneFast(imageName, buttonArea, false);
 		if (destButton != null) {
-			LOGGER.info("MISSION COMPLETED. MOVING ON...");
+			LOGGER.info("CONTRACT COMPLETED. MOVING ON...");
 			_mouse.click(destButton);
 			_mouse.delay(1000);
+			return true;
 		}
+		return false;
 	}
 
 	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException {
@@ -172,7 +178,13 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					_mouse.delay(500);
 
 				// assume the dialog is open
-				manageContractCases();
+				if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
+					//if friend and collected, need to click again
+					_mouse.click(x, y);
+					_mouse.delay(750);
+					if (_mouse.getMode() == MouseRobot.SLOW)
+						_mouse.delay(500);
+				}
 
 				// manage market
 				if (dest.getName().startsWith("Market")) {
@@ -242,15 +254,15 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
 				    _scanner.getBottomRight().y - 175, 255, 90);
-				int opt = 2;
-				Pixel destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+				int opt = 4;
+				Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
 				if (destButton == null) {
 					opt = 0;
 					destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
 				}
 				if (destButton == null) {
-					opt = 4;
-					destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
+					opt = 2;
+					destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
 				}
 				if (destButton == null) {
 					// check for got it button
