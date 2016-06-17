@@ -1,5 +1,14 @@
 [
  {
+   "_name": "Mauritius",
+   "_crew": 90,
+   "_capacity": 33,
+   "_favorite": true,
+   "_active": true,
+   
+   "_imageTitle": "ships/Mauritius.bmp"
+ },
+ {
    "_name": "San Buena Ventura",
    "_crew": 110,
    "_capacity": 36,
@@ -292,7 +301,7 @@
    "_crew": 100,
    "_capacity": 30,
    "_favorite": true,
-   "_active": true,
+   "_active": false,
    
    "_imageTitle": "ships/Engelen.bmp"
  },

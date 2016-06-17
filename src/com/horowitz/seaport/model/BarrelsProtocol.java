@@ -29,7 +29,7 @@ public class BarrelsProtocol implements GameProtocol {
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
 	private ScreenScanner _scanner;
-	private boolean _capture = true;
+	private boolean _capture = false;
 
 	private MouseRobot _mouse;
 
