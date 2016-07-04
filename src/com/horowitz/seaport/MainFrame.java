@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.83f";
+	private static String APP_TITLE = "Seaport v0.84a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -863,6 +863,17 @@ public class MainFrame extends JFrame {
 			};
 			mainToolbar1.add(action);
 		}
+		// SCAN AND RUN MAGIC
+		{
+			AbstractAction action = new AbstractAction("SRun") {
+				public void actionPerformed(ActionEvent e) {
+					_scanner.reset();
+					runMagic();
+				}
+				
+			};
+			mainToolbar1.add(action);
+		}
 		// STOP MAGIC
 		{
 			AbstractAction action = new AbstractAction("Stop") {
@@ -879,7 +890,7 @@ public class MainFrame extends JFrame {
 					myThread.start();
 				}
 			};
-			mainToolbar1.add(action);
+			//mainToolbar1.add(action);
 		}
 
 		// RECORD

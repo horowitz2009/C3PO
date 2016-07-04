@@ -372,8 +372,9 @@ public class ScreenScanner {
 		if (Math.abs(_rock.x - goodRock.x) > 52 || Math.abs(_rock.y - goodRock.y) > 8) {
 			// need adjusting
 			_mouse.drag4(_rock.x, _rock.y, goodRock.x, goodRock.y, true, true);
-			LOGGER.info("waiting 5s...");
-			_mouse.delay(5000);
+			_mouse.click();
+			LOGGER.info("waiting 1s...");
+			_mouse.delay(1000);
 			_rock = findRockAgain(goodRock);
 			needRecalc = true;
 		}

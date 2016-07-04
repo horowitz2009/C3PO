@@ -119,11 +119,15 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	protected boolean manageContractCases(Destination dest) throws IOException, AWTException, RobotInterruptedException {
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 60,
 		    _scanner.getBottomRight().y - 240, 270, 240);
-		String imageName = "dest/collect_contract.bmp";
+		Pixel destButton = null;
 		if (dest.getAbbr().equalsIgnoreCase("F")) {
-			imageName = "dest/collect_friend.bmp";
+			destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
+		} else {
+			destButton = _scanner.scanOneFast("dest/collect_contract2.bmp", buttonArea, false);
+			if (destButton == null) {
+			  destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
+			}
 		}
-		Pixel destButton = _scanner.scanOneFast(imageName, buttonArea, false);
 		if (destButton != null) {
 			LOGGER.info("CONTRACT COMPLETED. MOVING ON...");
 			_mouse.click(destButton);
