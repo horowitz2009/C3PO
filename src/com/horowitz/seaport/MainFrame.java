@@ -28,12 +28,14 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +96,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.84e";
+	private static String APP_TITLE = "Seaport v0.85";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -174,6 +176,14 @@ public class MainFrame extends JFrame {
 
 		try {
 
+			_filesTracked = new Hashtable<String, Long>();
+			File f = new File("data/destinationsNEW.json");
+			_filesTracked.put("data/destinationsNEW.json", f.lastModified());
+			f = new File("data/ships.json");
+			_filesTracked.put("data/ships.json", f.lastModified());
+			f = new File("data/shipProtocols.json");
+			_filesTracked.put("data/shipProtocols.json", f.lastModified());
+			
 			_ocr = new OCRB("ocr/digit");
 			_ocr.setErrors(1);
 
@@ -2174,6 +2184,9 @@ public class MainFrame extends JFrame {
 					}
 
 					try {
+						if (filesChanged()) {
+							LOGGER.info("DETECTED FILE CHANGES! RELOADING...");
+						  reload();}
 						_settings.loadSettings();
 						reapplySettings();
 					} catch (Throwable t) {
@@ -2188,6 +2201,23 @@ public class MainFrame extends JFrame {
 		requestsThread.start();
 
 	}
+
+	private Map<String,Long> _filesTracked;
+	
+	protected boolean filesChanged() {
+		boolean changed = false;
+	  for (String key : _filesTracked.keySet()) {
+	  	File f = new File(key);
+	  	long lastModified = f.lastModified();
+	  	
+	  	if (_filesTracked.get(key) != lastModified) {
+	  		changed = true;
+	  		_filesTracked.put(key, lastModified);
+	  	}
+    } 
+	  
+	  return changed;
+  }
 
 	private void runMagic() {
 		Thread myThread = new Thread(new Runnable() {
