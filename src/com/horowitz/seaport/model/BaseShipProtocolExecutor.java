@@ -120,14 +120,15 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 60,
 		    _scanner.getBottomRight().y - 240, 270, 240);
 		Pixel destButton = null;
-		if (dest.getAbbr().equalsIgnoreCase("F")) {
-			destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
-		} else {
-			destButton = _scanner.scanOneFast("dest/collect_contract2.bmp", buttonArea, false);
-			if (destButton == null) {
-			  destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
-			}
-		}
+//		if (dest.getAbbr().equalsIgnoreCase("F")) {
+//			destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
+//		} else if (dest.isContract()) {
+			
+			destButton = _scanner.scanContractButton("dest/collect_contract_new.bmp", buttonArea);
+//			if (destButton == null) {
+//			  destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
+//			}
+//		}
 		if (destButton != null) {
 			LOGGER.info("CONTRACT COMPLETED. MOVING ON...");
 			_mouse.click(destButton);
@@ -198,6 +199,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 						String[] ss = dest.getOption().split("-");
 						String commodity = ss[0];
 						String prize = ss[1];
+						
 						if (commodity.equalsIgnoreCase("hat")||commodity.equalsIgnoreCase("1")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
 							for (int i = 0; i < 13; i++) {
@@ -225,7 +227,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 								_mouse.delay(600);
 
 
-						} else if (commodity.equalsIgnoreCase("cannon")) {
+						} else if (commodity.equalsIgnoreCase("cannon")||commodity.equalsIgnoreCase("2")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
 							for (int i = 0; i < 13; i++) {
 								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
@@ -241,16 +243,15 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 						}
 
-						if (prize.equalsIgnoreCase("XP")) {
+						if (prize.equalsIgnoreCase("XP") || prize.equalsIgnoreCase("1")) {
 							_mouse.click(marketTitle.x + 312, marketTitle.y + 188);
 							_mouse.delay(300);
-						} else if (prize.equalsIgnoreCase("coins")) {
+						} else if (prize.equalsIgnoreCase("coins") || prize.equalsIgnoreCase("2")) {
 							_mouse.click(marketTitle.x + 312, marketTitle.y + 266);
 							_mouse.delay(300);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(600);
-
 						}
+						if (_mouse.getMode() == MouseRobot.SLOW)
+							_mouse.delay(600);
 
 					}
 
@@ -273,7 +274,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					LOGGER.info("CHECK FOR BLUE GOT IT...");
 					buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
 					    _scanner.getBottomRight().y - 240, 205, 240);
-					Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+					Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
+					if (gotitButtonBlue == null) {
+						gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+					}
 					if (gotitButtonBlue != null) {
 						_mouse.click(gotitButtonBlue);
 						LOGGER.info("DESTINATION COMPLETED!");

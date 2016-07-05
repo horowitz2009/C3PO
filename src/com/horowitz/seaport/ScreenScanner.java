@@ -27,6 +27,7 @@ import javax.imageio.ImageIO;
 import Catalano.Core.IntRange;
 import Catalano.Imaging.FastBitmap;
 import Catalano.Imaging.Filters.ColorFiltering;
+import Catalano.Imaging.Filters.Threshold;
 
 import com.horowitz.commons.DateUtils;
 import com.horowitz.commons.GameLocator;
@@ -855,6 +856,30 @@ public class ScreenScanner {
 		return pixel;
 	}
 
+	public Pixel scanContractButton(String filename, Rectangle area) throws RobotInterruptedException,
+	IOException, AWTException {
+		ImageData imageData = getImageData(filename);
+		assert imageData == null;
+		assert area != null;
+		
+		BufferedImage screen = new Robot().createScreenCapture(area);
+		long start = System.currentTimeMillis();
+		FastBitmap fb = new FastBitmap(screen);
+		fb.toGrayscale();
+	  Threshold t = new Threshold(255);
+	  t.applyInPlace(fb);
+	  fb.toRGB();
+	  screen = fb.toBufferedImage();
+	  
+		Pixel pixel = _comparator.findImage(imageData.getImage(), screen, imageData.getColorToBypass());
+		if (pixel != null) {
+			pixel.x += (area.x + imageData.get_xOff());
+			pixel.y += (area.y + imageData.get_yOff());
+			LOGGER.fine("found: " + imageData.getName() + pixel + " " + (System.currentTimeMillis() - start));
+		}
+		return pixel;
+	}
+	
 	public TemplateMatcher getMatcher() {
 		return _matcher;
 	}

@@ -8,6 +8,7 @@ public class Destination extends GameUnit {
 	private int _time;
 	private String _option;
 	private boolean _favorite;
+	private boolean _contract;
 	private Pixel _relativePosition;
 	public transient int x;
 	public transient int y;
@@ -35,6 +36,14 @@ public class Destination extends GameUnit {
 
 	public void setFavorite(boolean favorite) {
 		_favorite = favorite;
+	}
+
+	public boolean isContract() {
+		return _contract;
+	}
+
+	public void setContract(boolean contract) {
+		_contract = contract;
 	}
 
 	public Pixel getRelativePosition() {

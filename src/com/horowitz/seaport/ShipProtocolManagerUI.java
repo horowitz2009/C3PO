@@ -231,15 +231,17 @@ public class ShipProtocolManagerUI extends JPanel {
 				try {
 					JsonStorage js = new JsonStorage();
 					List<ShipProtocol> shipProtocols = js.loadShipProtocols();
+					int index = _protocolsCB.getSelectedIndex();
+					
 					_model.clear();
 
-					//int index = _protocolsCB.getSelectedIndex();
 					for (ShipProtocol shipProtocol : shipProtocols) {
 						_model.addElement(shipProtocol);
 					}
 
 					revalidate();
-					//_protocolsCB.setSelectedIndex(index);
+					
+					_protocolsCB.setSelectedIndex(index);
 
 				} catch (IOException e) {
 					e.printStackTrace();

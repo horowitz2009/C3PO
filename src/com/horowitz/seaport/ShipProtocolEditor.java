@@ -12,12 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -96,7 +93,9 @@ public class ShipProtocolEditor extends JPanel {
 		mainRoot.add(root, BorderLayout.CENTER);
 
 		_box = Box.createVerticalBox();
-
+		DragMouseAdapter dmAdapter = new DragMouseAdapter(JFrame.getFrames()[0]);
+		_box.addMouseListener(dmAdapter);
+    _box.addMouseMotionListener(dmAdapter);
 		root.add(_box, BorderLayout.NORTH);
 
 		// ADD BUTTON
@@ -219,7 +218,10 @@ public class ShipProtocolEditor extends JPanel {
 			JButton removeButton = new JButton(_removeAction);
 			shrinkFont(removeButton, -1);
 			removeButton.setMargin(new Insets(2, 2, 2, 2));
-			add(removeButton);
+			JLabel l =new JLabel("►");
+			shrinkFont(l, -1);
+      add(l);
+      add(removeButton);
 			add(Box.createHorizontalStrut(6));
 			// ship
 
