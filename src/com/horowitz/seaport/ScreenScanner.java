@@ -1132,7 +1132,7 @@ public class ScreenScanner {
 		filename += ".jpg";
 		writeArea(area, filename);
 		if (!_settings.getBoolean("ping.keep", false))
-		  deleteOlder("ping", 8);
+		  deleteOlder("ping", _settings.getInt("ping.cnt", 12));
 		
 	}
 

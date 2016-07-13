@@ -96,7 +96,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.85a";
+	private static String APP_TITLE = "Seaport v0.86";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1778,6 +1778,29 @@ public class MainFrame extends JFrame {
 			_mouse.delay(2000);
 
 			_scanner.captureScreen("ping map ", true);
+			
+			//contractors
+			String contractors = _settings.getProperty("ping3.contractors", "");
+			String[] s = contractors.split(",");
+			for (String abbr : s) {
+	      Destination dest = _mapManager.getDestinationByAbbr(abbr);
+	      if (dest != null) {
+	  			Pixel smallTownPos = _mapManager.getSmallTownPos();
+	  			if (smallTownPos == null) {
+	  				_mapManager.ensureMap();
+	  				smallTownPos = _mapManager.getSmallTownPos();
+	  			}
+
+	  			int x = smallTownPos.x + dest.getRelativePosition().x;
+	  			int y = smallTownPos.y + dest.getRelativePosition().y;
+					_mouse.click(x, y);
+					_mouse.delay(750);
+					_scanner.captureScreen("ping " + dest.getAbbr() + " ", true);
+					
+					if (_scanner.scanOneFast("buildings/x.bmp", null, true) != null)
+						_mouse.delay(200);
+	      }
+      }
 
 			_scanner.scanOne(_scanner.getAnchorButton(), null, true);
 			_lastPing3 = System.currentTimeMillis();

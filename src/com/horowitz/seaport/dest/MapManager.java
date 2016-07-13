@@ -300,6 +300,10 @@ public class MapManager {
 
 	private Rectangle _mapArea;
 
+	public void amendShipProtocol(Ship ship, Destination dest) throws IOException {
+	  //TODO	
+	}
+	
 	public void registerTrip(Ship ship, Destination dest) throws IOException {
 		JsonStorage jsonStorage = new JsonStorage();
 		List<DispatchEntry> des = jsonStorage.loadDispatchEntries();
