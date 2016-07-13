@@ -96,7 +96,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.85";
+	private static String APP_TITLE = "Seaport v0.85a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1924,6 +1924,16 @@ public class MainFrame extends JFrame {
 						LOGGER.info("RELOAD2...");
 					}
 
+					now = System.currentTimeMillis();
+					t2 = now - t2;
+				}
+				
+				if (p == null) {
+					p = _scanner.scanOneFast("connect.bmp", area, false);
+					if (p != null) {
+						LOGGER.info("CONNECT...");
+					}
+					
 					now = System.currentTimeMillis();
 					t2 = now - t2;
 				}
