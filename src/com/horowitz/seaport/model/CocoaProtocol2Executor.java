@@ -9,6 +9,7 @@ import java.util.List;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
@@ -19,8 +20,8 @@ public class CocoaProtocol2Executor extends BaseShipProtocolExecutor {
 
 	private String _sellingShip;
 
-	public CocoaProtocol2Executor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
-		super(scanner, mouse, mapManager);
+	public CocoaProtocol2Executor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings) throws IOException {
+		super(scanner, mouse, mapManager, settings);
 
 		_cocoaShips = new ArrayList<>();
 		_cocoaShips.add("Golden Hind");

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
@@ -14,8 +15,8 @@ public class CocoaProtocol1Executor extends BaseShipProtocolExecutor {
 
 	private String _noCocoaShip;
 
-	public CocoaProtocol1Executor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
-		super(scanner, mouse, mapManager);
+	public CocoaProtocol1Executor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings) throws IOException {
+		super(scanner, mouse, mapManager, settings);
 		_noCocoaShip = "Mary Rose";
 
 	}

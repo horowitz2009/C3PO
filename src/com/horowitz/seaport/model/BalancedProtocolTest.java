@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.storage.BalancedProtocolEntryDeserializer;
@@ -25,11 +26,12 @@ public class BalancedProtocolTest {
 	@Test
 	public void test() {
 		try {
+			Settings settings = Settings.createSettings("seaport.properties");
 			ScreenScanner scanner = new ScreenScanner(null);
 			MouseRobot mouse = scanner.getMouse();
 			MapManager mapManager = new MapManager(scanner);
 			mapManager.loadData();
-			BalancedShipProtocolExecutor shipProtocolExecutor = new BalancedShipProtocolExecutor(scanner, mouse, mapManager);
+			BalancedShipProtocolExecutor shipProtocolExecutor = new BalancedShipProtocolExecutor(scanner, mouse, mapManager, settings);
 			ShipProtocol shipProtocol = new ShipProtocol("TEST");
 			List<ProtocolEntry> entries = new ArrayList<ProtocolEntry>();
 			ProtocolEntry pe = new ProtocolEntry();
@@ -69,11 +71,12 @@ public class BalancedProtocolTest {
 	@Test
 	public void test2() {
 		try {
+			Settings settings = Settings.createSettings("seaport.properties");
 			ScreenScanner scanner = new ScreenScanner(null);
 			MouseRobot mouse = scanner.getMouse();
 			MapManager mapManager = new MapManager(scanner);
 			mapManager.loadData();
-			BalancedShipProtocolExecutor shipProtocolExecutor = new BalancedShipProtocolExecutor(scanner, mouse, mapManager);
+			BalancedShipProtocolExecutor shipProtocolExecutor = new BalancedShipProtocolExecutor(scanner, mouse, mapManager, settings);
 			ShipProtocol shipProtocol = new ShipProtocol("TEST");
 			List<ProtocolEntry> entries = new ArrayList<ProtocolEntry>();
 			ProtocolEntry pe = new ProtocolEntry();
@@ -113,11 +116,12 @@ public class BalancedProtocolTest {
 	@Test
 	public void test3() {
 		try {
+			Settings settings = Settings.createSettings("seaport.properties");
 			ScreenScanner scanner = new ScreenScanner(null);
 			MouseRobot mouse = scanner.getMouse();
 			MapManager mapManager = new MapManager(scanner);
 			mapManager.loadData();
-			BalancedShipProtocolExecutor shipProtocolExecutor = new BalancedShipProtocolExecutor(scanner, mouse, mapManager);
+			BalancedShipProtocolExecutor shipProtocolExecutor = new BalancedShipProtocolExecutor(scanner, mouse, mapManager, settings);
 			ShipProtocol shipProtocol = new ShipProtocol("TEST");
 			List<ProtocolEntry> entries = new ArrayList<ProtocolEntry>();
 			ProtocolEntry pe = new ProtocolEntry();

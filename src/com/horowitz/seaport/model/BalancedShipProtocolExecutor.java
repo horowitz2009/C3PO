@@ -14,6 +14,7 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.storage.BalancedProtocolEntryDeserializer;
@@ -23,9 +24,9 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 	private ShipProtocol _shipProtocol;
 
-	public BalancedShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager)
+	public BalancedShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings)
 	    throws IOException {
-		super(scanner, mouse, mapManager);
+		super(scanner, mouse, mapManager, settings);
 
 		addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -47,14 +48,24 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		});
 	}
 
+	private int _doShipDelay = 350;
+	private int _doShipDelaySlow = 650;
+	
+	@Override
+	public void update() {
+		super.update();
+		_doShipDelay = _settings.getInt("shipProtocol.doShipDelay", 350);
+		_doShipDelaySlow = _settings.getInt("shipProtocol.doShipDelaySlow", 650);
+	}
+	
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
 
 		scanShipName(pin);
 
 		_mouse.click(pin);
-		_mouse.delay(350);
+		_mouse.delay(_doShipDelay);
 		if (_mouse.getMode() == MouseRobot.SLOW)
-			_mouse.delay(650);
+			_mouse.delay(_doShipDelaySlow);
 
 		_mouse.mouseMove(_scanner.getParkingPoint());
 		_mouse.delay(100);

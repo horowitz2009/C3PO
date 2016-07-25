@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
@@ -26,19 +27,23 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	protected MapManager _mapManager;
 	protected LinkedList<Destination> _destChain;
 	private boolean _shipwreckAvailable;
+	private int _shipLocationDelay = 800;
+	private int _shipLocationDelaySlow = 1200;
 
 	private PropertyChangeSupport _support;
 	protected Ship _lastShip;
+
+	protected Settings _settings;
 
 	public BaseShipProtocolExecutor() {
 		super();
 	}
 
-	public BaseShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
+	public BaseShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings) throws IOException {
 		_scanner = scanner;
 		_mouse = mouse;
 		_mapManager = mapManager;
-
+		_settings = settings;
 		_support = new PropertyChangeSupport(this);
 		_destChain = new LinkedList<Destination>();
 	}
@@ -61,6 +66,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				Pixel goodP = new Pixel(r.x + p.x, r.y + p.y);
 				_shipLocations.add(goodP);
 			}
+		_shipLocationDelay = _settings.getInt("shipProtocol.shipLocationDelay", 800);
+		_shipLocationDelaySlow = _settings.getInt("shipProtocol.shipLocationDelay.slow", 1200);
 	}
 
 	public void execute() throws RobotInterruptedException {
@@ -69,9 +76,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				try {
 					_mouse.checkUserMovement();
 					_mouse.click(pixel);
-					_mouse.delay(800);
+					_mouse.delay(_shipLocationDelay);
 					if (_mouse.getMode() == MouseRobot.SLOW)
-						_mouse.delay(1200);
+						_mouse.delay(_shipLocationDelaySlow);
 
 					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
 					// _scanner.writeImage(miniArea, "pin.bmp");

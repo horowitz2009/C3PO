@@ -96,7 +96,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.86";
+	private static String APP_TITLE = "Seaport v0.87";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -220,7 +220,7 @@ public class MainFrame extends JFrame {
 			// SHIPS TASK
 			_shipsTask = new Task("Ships", 2);
 			_shipsTask.setEnabled(true);
-			_shipProtocolExecutor = new BalancedShipProtocolExecutor(_scanner, _mouse, _mapManager);
+			_shipProtocolExecutor = new BalancedShipProtocolExecutor(_scanner, _mouse, _mapManager, _settings);
 			_shipProtocolExecutor.addPropertyChangeListener(new StatsListener());
 			_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
 

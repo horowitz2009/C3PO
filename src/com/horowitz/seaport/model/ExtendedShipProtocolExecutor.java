@@ -8,6 +8,7 @@ import java.util.List;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.storage.ProtocolEntryDeserializer;
@@ -16,8 +17,8 @@ public class ExtendedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 	private ShipProtocol _shipProtocol;
 
-	public ExtendedShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager) throws IOException {
-		super(scanner, mouse, mapManager);
+	public ExtendedShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings) throws IOException {
+		super(scanner, mouse, mapManager, settings);
 	}
 
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
