@@ -19,6 +19,7 @@ import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.GameUnitDeserializer;
 import com.horowitz.seaport.model.storage.JsonStorage;
+import com.horowitz.seaport.model.storage.TripLogger;
 
 public class MapManager {
 
@@ -327,6 +328,7 @@ public class MapManager {
 		assert theDE != null;
 
 		jsonStorage.saveDispatchEntries(des);
+		new TripLogger().log2(ship, dest);
 		_support.firePropertyChange("TRIP_REGISTERED", null, theDE);
 
 	}
