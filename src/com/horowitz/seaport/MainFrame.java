@@ -37,6 +37,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -85,6 +86,7 @@ import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
+import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
@@ -96,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.88";
+	private static String APP_TITLE = "Seaport v0.89";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -183,7 +185,7 @@ public class MainFrame extends JFrame {
 			_filesTracked.put("data/ships.json", f.lastModified());
 			f = new File("data/shipProtocols.json");
 			_filesTracked.put("data/shipProtocols.json", f.lastModified());
-			
+
 			_ocr = new OCRB("ocr/digit");
 			_ocr.setErrors(1);
 
@@ -228,12 +230,12 @@ public class MainFrame extends JFrame {
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
 					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
-			    // JLabel l = _labels.get(de.getDest());
-			    // if (l != null) {
-			    // //l.setText("" + de.getTimes());
-			    // //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-			    // }
-			    //
+					// JLabel l = _labels.get(de.getDest());
+					// if (l != null) {
+					// //l.setText("" + de.getTimes());
+					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+					// }
+					//
 				}
 			});
 
@@ -339,40 +341,40 @@ public class MainFrame extends JFrame {
 					LOGGER.info("scan for " + _findThisTF.getText());
 					final String filename = _findThisTF.getText();
 					new Thread(new Runnable() {
-				    public void run() {
-					    try {
+						public void run() {
+							try {
 
-						    _scanner.getImageData(filename);
-						    Pixel p = _scanner.scanOneFast(filename, null, true);
-						    if (p != null) {
-							    LOGGER.info("found it: " + p);
-						    } else {
-							    LOGGER.info(filename + " not found");
-							    LOGGER.info("trying with redused threshold");
-							    double old = _matcher.getSimilarityThreshold();
-							    _matcher.setSimilarityThreshold(0.91d);
-							    p = _scanner.scanOne(filename, null, true);
-							    if (p != null) {
-								    LOGGER.info("found it: " + p);
-							    } else {
-								    LOGGER.info(filename + " not found");
-							    }
-							    _matcher.setSimilarityThreshold(old);
+								_scanner.getImageData(filename);
+								Pixel p = _scanner.scanOneFast(filename, null, true);
+								if (p != null) {
+									LOGGER.info("found it: " + p);
+								} else {
+									LOGGER.info(filename + " not found");
+									LOGGER.info("trying with redused threshold");
+									double old = _matcher.getSimilarityThreshold();
+									_matcher.setSimilarityThreshold(0.91d);
+									p = _scanner.scanOne(filename, null, true);
+									if (p != null) {
+										LOGGER.info("found it: " + p);
+									} else {
+										LOGGER.info(filename + " not found");
+									}
+									_matcher.setSimilarityThreshold(old);
 
-						    }
-					    } catch (RobotInterruptedException e) {
-						    LOGGER.log(Level.WARNING, e.getMessage());
-						    e.printStackTrace();
-					    } catch (IOException e) {
-						    LOGGER.log(Level.WARNING, e.getMessage());
-						    e.printStackTrace();
-					    } catch (AWTException e) {
-						    LOGGER.log(Level.WARNING, e.getMessage());
-						    e.printStackTrace();
-					    }
+								}
+							} catch (RobotInterruptedException e) {
+								LOGGER.log(Level.WARNING, e.getMessage());
+								e.printStackTrace();
+							} catch (IOException e) {
+								LOGGER.log(Level.WARNING, e.getMessage());
+								e.printStackTrace();
+							} catch (AWTException e) {
+								LOGGER.log(Level.WARNING, e.getMessage());
+								e.printStackTrace();
+							}
 
-				    }
-			    }).start();
+						}
+					}).start();
 
 				}
 			});
@@ -547,19 +549,19 @@ public class MainFrame extends JFrame {
 		_labels.put("N", l);
 		panel.add(l, gbc2);
 
-//		gbc.gridy++;
-//		gbc2.gridy++;
-//		panel.add(new JLabel("RM:"), gbc);
-//		l = new JLabel(" ");
-//		_labels.put("RM", l);
-//		panel.add(l, gbc2);
-//
-//		gbc.gridy++;
-//		gbc2.gridy++;
-//		panel.add(new JLabel("IM:"), gbc);
-//		l = new JLabel(" ");
-//		_labels.put("IM", l);
-//		panel.add(l, gbc2);
+		// gbc.gridy++;
+		// gbc2.gridy++;
+		// panel.add(new JLabel("RM:"), gbc);
+		// l = new JLabel(" ");
+		// _labels.put("RM", l);
+		// panel.add(l, gbc2);
+		//
+		// gbc.gridy++;
+		// gbc2.gridy++;
+		// panel.add(new JLabel("IM:"), gbc);
+		// l = new JLabel(" ");
+		// _labels.put("IM", l);
+		// panel.add(l, gbc2);
 
 		// FAKE
 		gbc2.gridx++;
@@ -582,6 +584,8 @@ public class MainFrame extends JFrame {
 	private JToggleButton _pingToggle;
 	private JToggleButton _ping2Toggle;
 	private JToggleButton _ping3Toggle;
+
+	public long _lastTime;
 
 	private JPanel createShipProtocolManagerPanel() {
 		_shipProtocolManagerUI = new ShipProtocolManagerUI(_mapManager);
@@ -683,18 +687,18 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void reload() {
 		LOGGER.info("Reloading data...");
-		
+
 		try {
-      _mapManager.loadData();
-      _mapManager.update();
-      //_buildingManager.loadData();
-    } catch (IOException | RobotInterruptedException e) {
-    	LOGGER.warning("Error loading data: " + e.getMessage());
-    	e.printStackTrace();
-    }
+			_mapManager.loadData();
+			_mapManager.update();
+			// _buildingManager.loadData();
+		} catch (IOException | RobotInterruptedException e) {
+			LOGGER.warning("Error loading data: " + e.getMessage());
+			e.printStackTrace();
+		}
 
 		_shipProtocolManagerUI.reload();
 		SwingUtilities.invokeLater(new Runnable() {
@@ -711,7 +715,7 @@ public class MainFrame extends JFrame {
 		LOGGER.info("Reloading protocols DONE");
 
 	}
-	
+
 	private void reset() {
 		try {
 			_stats.clear();
@@ -720,9 +724,9 @@ public class MainFrame extends JFrame {
 		} catch (IOException e1) {
 			LOGGER.info("Failed to reset entries!");
 		}
-		
+
 	}
-	
+
 	private void record() {
 		try {
 			LOGGER.info("Recording the mouse movement (for now)");
@@ -774,6 +778,8 @@ public class MainFrame extends JFrame {
 				Ship ship = (Ship) evt.getNewValue();
 				_stats.registerShip(ship);
 				_stats.registerDestination(dest);
+
+				_lastTime = System.currentTimeMillis();
 				LOGGER.info("SHIPS SENT: " + _stats.getTotalShipsSent());
 			}
 
@@ -848,15 +854,15 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("Scan") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-				    @Override
-				    public void run() {
-					    try {
-						    scan();
-					    } catch (RobotInterruptedException e) {
-						    e.printStackTrace();
-					    }
-				    }
-			    });
+						@Override
+						public void run() {
+							try {
+								scan();
+							} catch (RobotInterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+					});
 
 					myThread.start();
 				}
@@ -880,7 +886,7 @@ public class MainFrame extends JFrame {
 					_scanner.reset();
 					runMagic();
 				}
-				
+
 			};
 			mainToolbar1.add(action);
 		}
@@ -890,17 +896,17 @@ public class MainFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
 
-				    @Override
-				    public void run() {
-					    LOGGER.info("Stopping BB Gun");
-					    _stopAllThreads = true;
-				    }
-			    });
+						@Override
+						public void run() {
+							LOGGER.info("Stopping BB Gun");
+							_stopAllThreads = true;
+						}
+					});
 
 					myThread.start();
 				}
 			};
-			//mainToolbar1.add(action);
+			// mainToolbar1.add(action);
 		}
 
 		// RECORD
@@ -908,11 +914,11 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("Reload") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-				    @Override
-				    public void run() {
-					    reload();
-				    }
-			    });
+						@Override
+						public void run() {
+							reload();
+						}
+					});
 
 					myThread.start();
 				}
@@ -925,12 +931,12 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("Reset") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-				    @Override
-				    public void run() {
-				    	reset();
-				    }
+						@Override
+						public void run() {
+							reset();
+						}
 
-			    });
+					});
 
 					myThread.start();
 				}
@@ -1242,31 +1248,31 @@ public class MainFrame extends JFrame {
 		// BUILDINGS GO HERE
 
 		try {
-	    for (final Building b : _buildingManager.getBuildings()) {
-	    	final JToggleButton toggle = new JToggleButton(b.getName());
-	    	toggle.setActionCommand(b.getName().replace(" ", ""));
+			for (final Building b : _buildingManager.getBuildings()) {
+				final JToggleButton toggle = new JToggleButton(b.getName());
+				toggle.setActionCommand(b.getName().replace(" ", ""));
 
-	    	toggle.addItemListener(new ItemListener() {
+				toggle.addItemListener(new ItemListener() {
 
-	    		@Override
-	    		public void itemStateChanged(ItemEvent e) {
+					@Override
+					public void itemStateChanged(ItemEvent e) {
 
-	    			boolean val = e.getStateChange() == ItemEvent.SELECTED;
-	    			b.setEnabled(val);
-	    			LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
+						boolean val = e.getStateChange() == ItemEvent.SELECTED;
+						b.setEnabled(val);
+						LOGGER.info("Building " + b.getName() + " is now " + (b.isEnabled() ? "on" : "off"));
 
-	    			_settings.setProperty("Buildings." + toggle.getActionCommand(), "" + val);
-	    			_settings.saveSettingsSorted();
+						_settings.setProperty("Buildings." + toggle.getActionCommand(), "" + val);
+						_settings.saveSettingsSorted();
 
-	    		}
-	    	});
-	    	//
-	    	// toggle.setSelected(b.isEnabled());
-	    	_buildingsToolbar.add(toggle);
-	    }
-    } catch (IOException e) {
-    	LOGGER.warning("Failed to load buildings");
-    }
+					}
+				});
+				//
+				// toggle.setSelected(b.isEnabled());
+				_buildingsToolbar.add(toggle);
+			}
+		} catch (IOException e) {
+			LOGGER.warning("Failed to load buildings");
+		}
 		return _buildingsToolbar;
 	}
 
@@ -1288,25 +1294,25 @@ public class MainFrame extends JFrame {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
-				    @Override
-				    public void run() {
-					    LOGGER.info("Testing...");
-					    if (!_scanner.isOptimized()) {
-						    try {
-							    scan();
-						    } catch (RobotInterruptedException e) {
-							    e.printStackTrace();
-						    }
-					    }
+						@Override
+						public void run() {
+							LOGGER.info("Testing...");
+							if (!_scanner.isOptimized()) {
+								try {
+									scan();
+								} catch (RobotInterruptedException e) {
+									e.printStackTrace();
+								}
+							}
 
-					    if (_scanner.isOptimized()) {
-						    // DO THE JOB
-						    test();
-					    } else {
-						    LOGGER.info("I need to know where the game is!");
-					    }
-				    }
-			    });
+							if (_scanner.isOptimized()) {
+								// DO THE JOB
+								test();
+							} else {
+								LOGGER.info("I need to know where the game is!");
+							}
+						}
+					});
 
 					myThread.start();
 				}
@@ -1365,7 +1371,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-			        // " (" + e.getX() + ", " + e.getY() + ")");
+							// " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1382,7 +1388,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-			      // e.getX() + ", " + e.getY() + ")");
+						// e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -1596,6 +1602,7 @@ public class MainFrame extends JFrame {
 
 			_mouse.saveCurrentPosition();
 			long fstart = System.currentTimeMillis();
+			_lastTime = fstart;
 			int turn = 0;
 
 			do {
@@ -1603,8 +1610,10 @@ public class MainFrame extends JFrame {
 				turn++;
 				if (turn == 4)
 					turn = 1;
+
 				long mandatoryRefresh = _settings.getInt("autoRefresh.mandatoryRefresh", 45) * 60 * 1000;
 				long now = System.currentTimeMillis();
+
 				_mouse.checkUserMovement();
 				// 1. SCAN
 				if (turn % 3 == 0)
@@ -1613,16 +1622,29 @@ public class MainFrame extends JFrame {
 				// 2. REFRESH
 				LOGGER.fine("refresh ? " + _settings.getBoolean("autoRefresh", false) + " - " + mandatoryRefresh + " < "
 				    + (now - fstart));
-				if (_settings.getBoolean("autoRefresh", false) && mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
-					LOGGER.info("refresh time...");
-					try {
-						refresh(false);
-					} catch (AWTException e) {
-						LOGGER.info("FAILED TO refresh: " + e.getMessage());
-					} catch (IOException e) {
-						LOGGER.info("FAILED TO refresh: " + e.getMessage());
+				long minTime = getInactivityTimeAllowed();
+				LOGGER.info("time since no ship sent: " + ((now - _lastTime) / 60000) + " < " + minTime / 60000);
+
+				if (_settings.getBoolean("autoRefresh", false)) {
+
+					boolean r = false;
+					if (mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
+						LOGGER.info("mandatory refresh time...");
+						r = true;
+					} else if (now - _lastTime >= minTime) {
+						LOGGER.info("INACTIVITY REFRESH...");
+						r = true;
 					}
-					fstart = System.currentTimeMillis();
+					if (r) {
+						try {
+							refresh(false);
+						} catch (AWTException e) {
+							LOGGER.info("FAILED TO refresh: " + e.getMessage());
+						} catch (IOException e) {
+							LOGGER.info("FAILED TO refresh: " + e.getMessage());
+						}
+						fstart = System.currentTimeMillis();
+					}
 				}
 
 				_mouse.checkUserMovement();
@@ -1656,7 +1678,7 @@ public class MainFrame extends JFrame {
 					}
 
 					if (_ping2Toggle.isSelected()) {
-						//ping2();
+						// ping2();
 					}
 
 					if (_ping3Toggle.isSelected()) {
@@ -1778,29 +1800,29 @@ public class MainFrame extends JFrame {
 			_mouse.delay(2000);
 
 			_scanner.captureScreen("ping map ", true);
-			
-			//contractors
+
+			// contractors
 			String contractors = _settings.getProperty("ping3.contractors", "");
 			String[] s = contractors.split(",");
 			for (String abbr : s) {
-	      Destination dest = _mapManager.getDestinationByAbbr(abbr);
-	      if (dest != null) {
-	  			Pixel smallTownPos = _mapManager.getSmallTownPos();
-	  			if (smallTownPos == null) {
-	  				_mapManager.ensureMap();
-	  				smallTownPos = _mapManager.getSmallTownPos();
-	  			}
+				Destination dest = _mapManager.getDestinationByAbbr(abbr);
+				if (dest != null) {
+					Pixel smallTownPos = _mapManager.getSmallTownPos();
+					if (smallTownPos == null) {
+						_mapManager.ensureMap();
+						smallTownPos = _mapManager.getSmallTownPos();
+					}
 
-	  			int x = smallTownPos.x + dest.getRelativePosition().x;
-	  			int y = smallTownPos.y + dest.getRelativePosition().y;
+					int x = smallTownPos.x + dest.getRelativePosition().x;
+					int y = smallTownPos.y + dest.getRelativePosition().y;
 					_mouse.click(x, y);
 					_mouse.delay(750);
 					_scanner.captureScreen("ping " + dest.getAbbr() + " ", true);
-					
+
 					if (_scanner.scanOneFast("buildings/x.bmp", null, true) != null)
 						_mouse.delay(200);
-	      }
-      }
+				}
+			}
 
 			_scanner.scanOne(_scanner.getAnchorButton(), null, true);
 			_lastPing3 = System.currentTimeMillis();
@@ -1950,13 +1972,13 @@ public class MainFrame extends JFrame {
 					now = System.currentTimeMillis();
 					t2 = now - t2;
 				}
-				
+
 				if (p == null) {
 					p = _scanner.scanOneFast("connect.bmp", area, false);
 					if (p != null) {
 						LOGGER.info("CONNECT...");
 					}
-					
+
 					now = System.currentTimeMillis();
 					t2 = now - t2;
 				}
@@ -2219,7 +2241,8 @@ public class MainFrame extends JFrame {
 					try {
 						if (filesChanged()) {
 							LOGGER.info("DETECTED FILE CHANGES! RELOADING...");
-						  reload();}
+							reload();
+						}
 						_settings.loadSettings();
 						reapplySettings();
 					} catch (Throwable t) {
@@ -2235,22 +2258,22 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private Map<String,Long> _filesTracked;
-	
+	private Map<String, Long> _filesTracked;
+
 	protected boolean filesChanged() {
 		boolean changed = false;
-	  for (String key : _filesTracked.keySet()) {
-	  	File f = new File(key);
-	  	long lastModified = f.lastModified();
-	  	
-	  	if (_filesTracked.get(key) != lastModified) {
-	  		changed = true;
-	  		_filesTracked.put(key, lastModified);
-	  	}
-    } 
-	  
-	  return changed;
-  }
+		for (String key : _filesTracked.keySet()) {
+			File f = new File(key);
+			long lastModified = f.lastModified();
+
+			if (_filesTracked.get(key) != lastModified) {
+				changed = true;
+				_filesTracked.put(key, lastModified);
+			}
+		}
+
+		return changed;
+	}
 
 	private void runMagic() {
 		Thread myThread = new Thread(new Runnable() {
@@ -2281,6 +2304,38 @@ public class MainFrame extends JFrame {
 		}, "MAGIC");
 
 		myThread.start();
+	}
+
+	public long getInactivityTimeAllowed() {
+		long result = 20; // in minutes
+
+		// Find the min time of current ship protocol
+		if (_shipProtocol != null) {
+			int minTime = 10 * 60; // 10hours
+			for (ProtocolEntry entry : _shipProtocol.getEntries()) {
+				
+				String s = entry.getChainStr().toUpperCase();
+				String[] ss = s.split(",");
+
+				for (String ds : ss) {
+					if (ds.indexOf("-") > 0) {
+						ds = ds.split("-")[0];
+					}
+
+					Destination dest = _mapManager.getDestinationByAbbr(ds.trim());
+					if (dest != null) {
+						if (minTime > dest.getTime())
+							minTime = dest.getTime();
+					}
+				}
+			}
+			result = minTime;
+		}
+
+		// convert it to milliseconds
+		result *= 60000;
+
+		return result;
 	}
 
 }

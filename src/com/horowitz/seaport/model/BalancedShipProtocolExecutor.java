@@ -33,7 +33,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				// TODO Auto-generated method stub
-		    // _support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+				// _support.firePropertyChange("SHIP_SENT", dest, _lastShip);
 				if (evt.getPropertyName().equals("SHIP_SENT")) {
 					Destination dest = (Destination) evt.getOldValue();
 					Ship ship = (Ship) evt.getNewValue();
@@ -50,14 +50,14 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 	private int _doShipDelay = 350;
 	private int _doShipDelaySlow = 650;
-	
+
 	@Override
 	public void update() {
 		super.update();
 		_doShipDelay = _settings.getInt("shipProtocol.doShipDelay", 350);
 		_doShipDelaySlow = _settings.getInt("shipProtocol.doShipDelaySlow", 650);
 	}
-	
+
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
 
 		scanShipName(pin);
@@ -75,10 +75,10 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		Pixel anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
 		if (anchor == null && _mouse.getMode() == MouseRobot.SLOW) {
 			_mouse.delay(1000);
-			//try again
+			// try again
 			anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
 		}
-		
+
 		if (anchor != null) {
 			// MAP IS OPEN
 			boolean isOK = _mapManager.ensureMap();
@@ -247,5 +247,6 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 	public void setShipProtocol(ShipProtocol shipProtocol) {
 		_shipProtocol = shipProtocol;
 	}
+
 
 }
