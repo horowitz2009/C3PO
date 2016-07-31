@@ -220,11 +220,22 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							if (_mouse.getMode() == MouseRobot.SLOW)
 								_mouse.delay(600);
 
-
-						} else if (commodity.equalsIgnoreCase("cocoa")) {
-							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
+						} else if (commodity.equalsIgnoreCase("cocoa") || commodity.equalsIgnoreCase("7")) {
+							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
 							for (int i = 0; i < 13; i++) {
 								_mouse.wheelDown(2);// scroll down to the last commodity, then click second last, which is cocoa
+								_mouse.delay(150);
+							}
+							_mouse.delay(33);
+							_mouse.click(marketTitle.x - 182, marketTitle.y + 171);
+							_mouse.delay(300);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(600);
+
+						} else if (commodity.equalsIgnoreCase("8")) {
+							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
+							for (int i = 0; i < 13; i++) {
+								_mouse.wheelDown(2);// scroll down to the last commodity, then click second last
 								_mouse.delay(150);
 							}
 							_mouse.delay(33);
@@ -233,6 +244,17 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							if (_mouse.getMode() == MouseRobot.SLOW)
 								_mouse.delay(600);
 
+						} else if (commodity.equalsIgnoreCase("9")) {
+							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
+							for (int i = 0; i < 13; i++) {
+								_mouse.wheelDown(2);// scroll down to the last commodity, then click the LAST
+								_mouse.delay(150);
+							}
+							_mouse.delay(33);
+							_mouse.click(marketTitle.x - 182, marketTitle.y + 349);
+							_mouse.delay(300);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(600);
 
 						} else if (commodity.equalsIgnoreCase("cannon")||commodity.equalsIgnoreCase("2")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
@@ -246,7 +268,6 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							_mouse.delay(300);
 							if (_mouse.getMode() == MouseRobot.SLOW)
 								_mouse.delay(700);
-
 
 						}
 
