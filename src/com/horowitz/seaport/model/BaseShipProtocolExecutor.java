@@ -283,6 +283,22 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 					}
 
+				} else if (dest.getName().startsWith("Merchant")) {
+					Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
+					if (merchantTitle != null) {
+  					int option = Integer.parseInt(dest.getOption());
+  					Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
+  					
+  					//click the 'go back' button first
+  					_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
+  					_mouse.delay(250);
+  					
+  					//click the desired commodity
+  					_mouse.click(commodityP);
+  					_mouse.delay(250);
+  					
+  					//look for send button
+					}					
 				}
 
 				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
