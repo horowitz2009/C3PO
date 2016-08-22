@@ -235,6 +235,7 @@ public class ScreenScanner {
 		area.y = _tl.y + 74;
 		area.height = 38;
 		getImageData("dest/MarketTownTitle2.bmp", area, 0, 0);
+		getImageData("dest/MerchantTitle.bmp", area, 0, 0);
 
 		ImageData gear2 = getImageData("buildings/gears2.bmp", _popupArea, 0, 0);
 		gear2.setColorToBypass(Color.BLACK);
