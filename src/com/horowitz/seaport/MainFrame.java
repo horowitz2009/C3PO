@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.92";
+	private static String APP_TITLE = "Seaport v0.92a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1633,7 +1633,7 @@ public class MainFrame extends JFrame {
 						r = true;
 					} else if (now - _lastTime >= minTime) {
 						LOGGER.info("INACTIVITY REFRESH...");
-						_scanner.captureGameArea("INACTIVITY ");
+						_scanner.captureScreen("INACTIVITY ", true);
 						r = true;
 					}
 					if (r) {
@@ -1703,7 +1703,6 @@ public class MainFrame extends JFrame {
 	private void refresh(boolean bookmark) throws AWTException, IOException, RobotInterruptedException {
 		_scanner.deleteOlder("refresh", 5);
 		LOGGER.info("Time to refresh...");
-		_scanner.captureGameArea("refresh ");
 
 		Pixel p;
 		if (!bookmark) {
@@ -1994,7 +1993,7 @@ public class MainFrame extends JFrame {
 				}
 
 				LOGGER.info("Game crashed. Reloading...");
-				_scanner.captureGameArea("CRASH ");
+				_scanner.captureScreen("CRASH ", true);
 				refresh(false);
 
 			}
