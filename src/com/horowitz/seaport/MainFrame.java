@@ -1643,7 +1643,7 @@ public class MainFrame extends JFrame {
 						} catch (IOException e) {
 							LOGGER.info("FAILED TO refresh: " + e.getMessage());
 						}
-						fstart = System.currentTimeMillis();
+						_lastTime = fstart = System.currentTimeMillis();
 					}
 				}
 
@@ -1728,7 +1728,7 @@ public class MainFrame extends JFrame {
 				_scanner.reset();
 
 				boolean done = false;
-				for (int i = 0; i < 20 && !done; i++) {
+				for (int i = 0; i < 25 && !done; i++) {
 					LOGGER.info("after refresh recovery try " + (i + 1));
 					// LOCATE THE GAME
 					if (_scanner.locateGameArea(false)) {
@@ -1991,27 +1991,11 @@ public class MainFrame extends JFrame {
 						LOGGER.info("Logged somewhere else. I'm done here!");
 						_stopAllThreads = true;
 						throw new RobotInterruptedException();
-					} else {
-						_mouse.click(p);
 					}
 
 					LOGGER.info("Game crashed. Reloading...");
-					_mouse.delay(15000);
-					boolean recovered = false;
-					for (int i = 0; i < 15; i++) {
-						scan();
-						if (_scanner.isOptimized()) {
-							recovered = true;
-							break;
-						}
-						_mouse.delay(3000);
-					}
-					if (!recovered) {
-						LOGGER.info("===========================");
-						LOGGER.info("Game failed to recover!!!");
-						LOGGER.info("===========================");
-						return;
-					}
+					refresh(false);
+					
 				}
 			}
 
