@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.91";
+	private static String APP_TITLE = "Seaport v0.92";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -230,12 +230,12 @@ public class MainFrame extends JFrame {
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
 					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
-					// JLabel l = _labels.get(de.getDest());
-					// if (l != null) {
-					// //l.setText("" + de.getTimes());
-					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-					// }
-					//
+			    // JLabel l = _labels.get(de.getDest());
+			    // if (l != null) {
+			    // //l.setText("" + de.getTimes());
+			    // //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+			    // }
+			    //
 				}
 			});
 
@@ -674,7 +674,7 @@ public class MainFrame extends JFrame {
 				}
 			} else {
 				LOGGER.info("CAN'T FIND THE ROCK!!!");
-				handlePopups(false);
+				handlePopups();
 				if (attempt <= 2)
 					recalcPositions(false, ++attempt);
 				else
@@ -1371,7 +1371,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-							// " (" + e.getX() + ", " + e.getY() + ")");
+			        // " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1388,7 +1388,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-						// e.getX() + ", " + e.getY() + ")");
+			      // e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -1518,7 +1518,7 @@ public class MainFrame extends JFrame {
 		setTitle(APP_TITLE + " testing");
 
 		try {
-			handlePopups(true);
+			handlePopups();
 			recalcPositions(false, 1);
 
 			Pixel mapP = _scanner.scanOneFast("mapButton.bmp", null, true);
@@ -1617,7 +1617,7 @@ public class MainFrame extends JFrame {
 				_mouse.checkUserMovement();
 				// 1. SCAN
 				if (turn % 3 == 0)
-					handlePopups(false);
+					handlePopups();
 
 				// 2. REFRESH
 				LOGGER.fine("refresh ? " + _settings.getBoolean("autoRefresh", false) + " - " + mandatoryRefresh + " < "
@@ -1633,6 +1633,7 @@ public class MainFrame extends JFrame {
 						r = true;
 					} else if (now - _lastTime >= minTime) {
 						LOGGER.info("INACTIVITY REFRESH...");
+						_scanner.captureGameArea("INACTIVITY ");
 						r = true;
 					}
 					if (r) {
@@ -1936,7 +1937,7 @@ public class MainFrame extends JFrame {
 		_shipProtocolManagerUI.setShipProtocol(shipProtocolName);
 	}
 
-	private void handlePopups(boolean fast) throws RobotInterruptedException {
+	private void handlePopups() throws RobotInterruptedException {
 		try {
 			LOGGER.info("Popups...");
 			boolean found = false;
@@ -1953,50 +1954,49 @@ public class MainFrame extends JFrame {
 			// reload
 			long start = System.currentTimeMillis();
 			long now, t1 = 0, t2 = 0, t3, t4;
-			if (!fast) {
-				Rectangle area = _scanner.generateWindowedArea(412, 550);
-				p = _scanner.scanOneFast("reload.bmp", area, false);
+			Rectangle area = _scanner.generateWindowedArea(412, 550);
+			p = _scanner.scanOneFast("reload.bmp", area, false);
+			if (p != null) {
+				LOGGER.info("RELOAD1...");
+			}
+			now = System.currentTimeMillis();
+
+			t1 = now - start;
+			t2 = now;
+			if (p == null) {
+				p = _scanner.scanOneFast("reload2.bmp", area, false);
 				if (p != null) {
-					LOGGER.info("RELOAD1...");
+					LOGGER.info("RELOAD2...");
 				}
+
 				now = System.currentTimeMillis();
+				t2 = now - t2;
+			}
 
-				t1 = now - start;
-				t2 = now;
-				if (p == null) {
-					p = _scanner.scanOneFast("reload2.bmp", area, false);
-					if (p != null) {
-						LOGGER.info("RELOAD2...");
-					}
-
-					now = System.currentTimeMillis();
-					t2 = now - t2;
+			if (p == null) {
+				p = _scanner.scanOneFast("connect.bmp", area, false);
+				if (p != null) {
+					LOGGER.info("CONNECT...");
 				}
 
-				if (p == null) {
-					p = _scanner.scanOneFast("connect.bmp", area, false);
-					if (p != null) {
-						LOGGER.info("CONNECT...");
-					}
+				now = System.currentTimeMillis();
+				t2 = now - t2;
+			}
 
-					now = System.currentTimeMillis();
-					t2 = now - t2;
+			found = p != null;
+			if (found) {
+				// check is this 'logged twice' message
+				Pixel pp = _scanner.scanOne("accountLoggedTwice.bmp", area, false);
+				if (pp != null) {
+					LOGGER.info("Logged somewhere else. I'm done here!");
+					_stopAllThreads = true;
+					throw new RobotInterruptedException();
 				}
 
-				found = p != null;
-				if (found) {
-					// check is this 'logged twice' message
-					Pixel pp = _scanner.scanOne("accountLoggedTwice.bmp", area, false);
-					if (pp != null) {
-						LOGGER.info("Logged somewhere else. I'm done here!");
-						_stopAllThreads = true;
-						throw new RobotInterruptedException();
-					}
+				LOGGER.info("Game crashed. Reloading...");
+				_scanner.captureGameArea("CRASH ");
+				refresh(false);
 
-					LOGGER.info("Game crashed. Reloading...");
-					refresh(false);
-					
-				}
 			}
 
 			t3 = now = System.currentTimeMillis();
@@ -2297,7 +2297,7 @@ public class MainFrame extends JFrame {
 		if (_shipProtocol != null) {
 			int minTime = 10 * 60; // 10hours
 			for (ProtocolEntry entry : _shipProtocol.getEntries()) {
-				
+
 				String s = entry.getChainStr().toUpperCase();
 				String[] ss = s.split(",");
 
