@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.92a";
+	private static String APP_TITLE = "Seaport v0.92";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -230,12 +230,12 @@ public class MainFrame extends JFrame {
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
 					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
-			    // JLabel l = _labels.get(de.getDest());
-			    // if (l != null) {
-			    // //l.setText("" + de.getTimes());
-			    // //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-			    // }
-			    //
+					// JLabel l = _labels.get(de.getDest());
+					// if (l != null) {
+					// //l.setText("" + de.getTimes());
+					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+					// }
+					//
 				}
 			});
 
@@ -1371,7 +1371,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-			        // " (" + e.getX() + ", " + e.getY() + ")");
+							// " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1388,7 +1388,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-			      // e.getX() + ", " + e.getY() + ")");
+						// e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -1700,73 +1700,65 @@ public class MainFrame extends JFrame {
 		}
 	}
 
-	private void refresh(boolean bookmark) throws AWTException, IOException, RobotInterruptedException {
+	private boolean refresh(boolean bookmark) throws AWTException, IOException, RobotInterruptedException {
 		_scanner.deleteOlder("refresh", 5);
 		LOGGER.info("Time to refresh...");
 
 		Pixel p;
-		if (!bookmark) {
-			if (_scanner.isOptimized()) {
-				p = _scanner.getBottomRight();
-				p.x -= 10;
-				p.y += 3;
-			} else {
-				p = _scanner.scanOne("seaportBookmark.bmp", null, false);
-			}
-			if (p != null) {
-				_mouse.click(p.x, p.y);
-				try {
-					Robot robot = new Robot();
-					robot.keyPress(KeyEvent.VK_F5);
-					robot.keyRelease(KeyEvent.VK_F5);
-				} catch (AWTException e) {
-				}
-				try {
-					Thread.sleep(15000);
-				} catch (InterruptedException e) {
-				}
-				_scanner.reset();
-
-				boolean done = false;
-				for (int i = 0; i < 25 && !done; i++) {
-					LOGGER.info("after refresh recovery try " + (i + 1));
-					// LOCATE THE GAME
-					if (_scanner.locateGameArea(false)) {
-						_scanner.checkAndAdjustRock();
-						if (_scanner.getRock() != null) {
-							_mapManager.update();
-							_buildingManager.update();
-
-							LOGGER.info("Game located successfully!");
-							done = true;
-						}
-					} else {
-						processRequests();
-					}
-					if (i > 8) {
-						_scanner.captureScreen("refresh trouble ", true);
-					}
-				}
-				if (done) {
-					// runMagic();
-					_scanner.captureScreen("refresh done ", true);
-				} else {
-					// blah
-					// try bookmark
-					if (!bookmark)
-						refresh(true);
-				}
-			}
-			// not sure why shipsTasks gets off after refresh
-			reapplySettings();
-
+		if (bookmark || !_scanner.isOptimized()) {
+			p = _scanner.scanOne("seaportBookmark.bmp", null, false);
 		} else {
-			// try {
-			// p = _scanner.generateImageData("tsFavicon2.bmp", 8, 7).findImage(new Rectangle(0, 30, 400, 200));
-			// _mouse.click(p.x, p.y);
-			// } catch (IOException e) {
-			// }
+			p = _scanner.getBottomRight();
+			p.x -= 10;
+			p.y += 3;
 		}
+		if (p != null) {
+			_mouse.click(p.x, p.y);
+			try {
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_F5);
+				robot.keyRelease(KeyEvent.VK_F5);
+			} catch (AWTException e) {
+			}
+			try {
+				Thread.sleep(15000);
+			} catch (InterruptedException e) {
+			}
+			_scanner.reset();
+
+			boolean done = false;
+			for (int i = 0; i < 25 && !done; i++) {
+				LOGGER.info("after refresh recovery try " + (i + 1));
+				// LOCATE THE GAME
+				if (_scanner.locateGameArea(false)) {
+					_scanner.checkAndAdjustRock();
+					if (_scanner.getRock() != null) {
+						_mapManager.update();
+						_buildingManager.update();
+
+						LOGGER.info("Game located successfully!");
+						done = true;
+					}
+				} else {
+					processRequests();
+				}
+				if (i > 8) {
+					_scanner.captureScreen("refresh trouble ", true);
+				}
+			}
+			if (done) {
+				// runMagic();
+				_scanner.captureScreen("refresh done ", true);
+				// not sure why shipsTasks gets off after refresh
+				reapplySettings();
+				return true;
+			} else {
+				// try bookmark
+				if (!bookmark)
+					return refresh(true);
+			}
+		}
+		return false;
 	}
 
 	private Long _lastPing = System.currentTimeMillis();
@@ -1994,8 +1986,18 @@ public class MainFrame extends JFrame {
 
 				LOGGER.info("Game crashed. Reloading...");
 				_scanner.captureScreen("CRASH ", true);
-				refresh(false);
-
+				boolean success = false;
+				do {
+				  success = refresh(false);
+				  if (!success) {
+				  	LOGGER.info("REFRESH FAILED. SLEEPING 30s...");
+				  	_scanner.captureScreen("DAMN ", true);
+				  	try {
+	            Thread.sleep(30000);
+            } catch (InterruptedException e) {
+            }
+				  }
+				} while (!success);
 			}
 
 			t3 = now = System.currentTimeMillis();
