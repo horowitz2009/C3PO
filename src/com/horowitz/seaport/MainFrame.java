@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.92";
+	private static String APP_TITLE = "Seaport v0.93";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1977,7 +1977,10 @@ public class MainFrame extends JFrame {
 			found = p != null;
 			if (found) {
 				// check is this 'logged twice' message
-				Pixel pp = _scanner.scanOne("accountLoggedTwice.bmp", area, false);
+				Pixel pp = _scanner.scanOne("accountLoggedTwice2.bmp", area, false);
+				if (pp == null) {
+					pp = _scanner.scanOne("accountLoggedTwice.bmp", area, false);
+				}
 				if (pp != null) {
 					LOGGER.info("Logged somewhere else. I'm done here!");
 					_stopAllThreads = true;
