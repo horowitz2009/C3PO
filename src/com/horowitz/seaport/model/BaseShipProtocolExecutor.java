@@ -51,9 +51,12 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	public boolean preExecute() throws AWTException, IOException, RobotInterruptedException {
 
 		// check are there map notifications
-		Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
-		_shipwreckAvailable = p != null;
-
+		boolean check = _settings.getBoolean("checkMapNotification", false);
+		if (check) {
+		  Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
+		  _shipwreckAvailable = p != null;
+	  } else
+	  	_shipwreckAvailable = true;
 		return _scanner.ensureHome();
 	}
 
