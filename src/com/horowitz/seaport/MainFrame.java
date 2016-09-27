@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.93";
+	private static String APP_TITLE = "Seaport v0.95";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1945,19 +1945,21 @@ public class MainFrame extends JFrame {
 			// reload
 			long start = System.currentTimeMillis();
 			long now, t1 = 0, t2 = 0, t3, t4;
-			Rectangle area = _scanner.generateWindowedArea(412, 550);
-			p = _scanner.scanOneFast("reload.bmp", area, false);
+			Rectangle area = _scanner.generateWindowedArea(402, 550);
+			area.y = _scanner.getBottomRight().y - 175;
+			area.height = 50;
+			p = _scanner.scanOneFast("reload2.bmp", area, false);
 			if (p != null) {
-				LOGGER.info("RELOAD1...");
+				LOGGER.info("RELOAD2...");
 			}
 			now = System.currentTimeMillis();
 
 			t1 = now - start;
 			t2 = now;
 			if (p == null) {
-				p = _scanner.scanOneFast("reload2.bmp", area, false);
+				p = _scanner.scanOneFast("reload.bmp", area, false);
 				if (p != null) {
-					LOGGER.info("RELOAD2...");
+					LOGGER.info("RELOAD1...");
 				}
 
 				now = System.currentTimeMillis();
@@ -1977,12 +1979,19 @@ public class MainFrame extends JFrame {
 			found = p != null;
 			if (found) {
 				// check is this 'logged twice' message
+				area.y -= 313;
 				Pixel pp = _scanner.scanOne("accountLoggedTwice2.bmp", area, false);
+				int which = 2;
+				if (pp == null) {
+					pp = _scanner.scanOne("accountLoggedTwice3.bmp", area, false);
+					which = 3;
+				}
 				if (pp == null) {
 					pp = _scanner.scanOne("accountLoggedTwice.bmp", area, false);
+					which = 0;
 				}
 				if (pp != null) {
-					LOGGER.info("Logged somewhere else. I'm done here!");
+					LOGGER.info("Logged somewhere else. I'm done here! " + which);
 					_stopAllThreads = true;
 					throw new RobotInterruptedException();
 				}
