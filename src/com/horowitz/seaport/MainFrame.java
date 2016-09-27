@@ -1714,6 +1714,7 @@ public class MainFrame extends JFrame {
 		}
 		if (p != null) {
 			_mouse.click(p.x, p.y);
+			_mouse.click(p.x, p.y);
 			try {
 				Robot robot = new Robot();
 				robot.keyPress(KeyEvent.VK_F5);
@@ -1727,7 +1728,7 @@ public class MainFrame extends JFrame {
 			_scanner.reset();
 
 			boolean done = false;
-			for (int i = 0; i < 25 && !done; i++) {
+			for (int i = 0; i < 14 && !done; i++) {
 				LOGGER.info("after refresh recovery try " + (i + 1));
 				// LOCATE THE GAME
 				if (_scanner.locateGameArea(false)) {
