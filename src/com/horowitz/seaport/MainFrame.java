@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.95";
+	private static String APP_TITLE = "Seaport v0.96";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -2074,7 +2074,7 @@ public class MainFrame extends JFrame {
 		else
 			_mouse.setMode(MouseRobot.NORMAL);
 
-		if (slow != _autoRefreshToggle.isSelected()) {
+		if (slow != _slowToggle.isSelected()) {
 			_slowToggle.setSelected(slow);
 		}
 
@@ -2087,7 +2087,7 @@ public class MainFrame extends JFrame {
 		if (ping != _pingToggle.isSelected()) {
 			_pingToggle.setSelected(ping);
 		}
-
+		
 		ping = "true".equalsIgnoreCase(_settings.getProperty("ping2"));
 		if (ping != _ping2Toggle.isSelected()) {
 			_ping2Toggle.setSelected(ping);

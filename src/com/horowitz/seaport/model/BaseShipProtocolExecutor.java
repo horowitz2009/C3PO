@@ -170,12 +170,17 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				if (_shipwreckAvailable) {
 					LOGGER.info("LOOKING for shipwreck...");
 					// locate the shipwreck
-					Pixel p = _scanner.scanOne("dest/shipwreck.bmp", null, false);
+					int t = 2;
+					Pixel p = _scanner.scanOne("dest/shipwreck2.bmp", null, false);
+					if (p == null) {
+						p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
+					  t = 3;
+					}
 					if (p != null) {
-						LOGGER.info("FOUND IT!");
+						LOGGER.info("FOUND IT! " + t);
 						shipwreck = true;
 						good = true;
-						x = p.x;
+						x = p.x - 30;
 						y = p.y;
 					} else {
 						LOGGER.info("CAN'T FIND IT!");
