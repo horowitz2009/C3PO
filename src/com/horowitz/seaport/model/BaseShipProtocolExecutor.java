@@ -277,6 +277,19 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							if (_mouse.getMode() == MouseRobot.SLOW)
 								_mouse.delay(700);
 
+						} else if (commodity.equalsIgnoreCase("3")) {
+							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
+							for (int i = 0; i < 13; i++) {
+								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
+								_mouse.delay(150);
+							}
+
+							_mouse.delay(33);
+							_mouse.click(marketTitle.x - 182, marketTitle.y + 266 + 78);
+							_mouse.delay(300);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(700);
+
 						}
 
 						if (prize.equalsIgnoreCase("XP") || prize.equalsIgnoreCase("1")) {
@@ -284,6 +297,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							_mouse.delay(300);
 						} else if (prize.equalsIgnoreCase("coins") || prize.equalsIgnoreCase("2")) {
 							_mouse.click(marketTitle.x + 312, marketTitle.y + 266);
+							_mouse.delay(300);
+						} else if (prize.equalsIgnoreCase("3")) {
+							_mouse.click(marketTitle.x + 312, marketTitle.y + 266 + 78);
 							_mouse.delay(300);
 						}
 						if (_mouse.getMode() == MouseRobot.SLOW)
