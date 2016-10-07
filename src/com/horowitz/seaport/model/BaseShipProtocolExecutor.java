@@ -39,7 +39,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		super();
 	}
 
-	public BaseShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings) throws IOException {
+	public BaseShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings)
+	    throws IOException {
 		_scanner = scanner;
 		_mouse = mouse;
 		_mapManager = mapManager;
@@ -53,10 +54,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		// check are there map notifications
 		boolean check = _settings.getBoolean("checkMapNotification", false);
 		if (check) {
-		  Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
-		  _shipwreckAvailable = p != null;
-	  } else
-	  	_shipwreckAvailable = true;
+			Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
+			_shipwreckAvailable = p != null;
+		} else
+			_shipwreckAvailable = true;
 		return _scanner.ensureHome();
 	}
 
@@ -130,15 +131,15 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 60,
 		    _scanner.getBottomRight().y - 240, 270, 240);
 		Pixel destButton = null;
-//		if (dest.getAbbr().equalsIgnoreCase("F")) {
-//			destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
-//		} else if (dest.isContract()) {
-			
-			destButton = _scanner.scanContractButton("dest/collect_contract_new.bmp", buttonArea);
-//			if (destButton == null) {
-//			  destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
-//			}
-//		}
+		// if (dest.getAbbr().equalsIgnoreCase("F")) {
+		// destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
+		// } else if (dest.isContract()) {
+
+		destButton = _scanner.scanContractButton("dest/collect_contract_new.bmp", buttonArea);
+		// if (destButton == null) {
+		// destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
+		// }
+		// }
 		if (destButton != null) {
 			LOGGER.info("CONTRACT COMPLETED. MOVING ON...");
 			_mouse.click(destButton);
@@ -165,28 +166,48 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 			int y = smallTownPos.y + dest.getRelativePosition().y;
 			// what if dest is shipwreck
 			boolean shipwreck = false;
+
+			// SHIPWRECK SCENARIO
 			if (dest.getAbbr().equalsIgnoreCase("SW")) {
 				good = false;
-				if (_shipwreckAvailable) {
-					LOGGER.info("LOOKING for shipwreck...");
-					// locate the shipwreck
-					int t = 2;
-					Pixel p = _scanner.scanOne("dest/shipwreck2.bmp", null, false);
-					if (p == null) {
-						p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
-					  t = 3;
-					}
-					if (p != null) {
-						LOGGER.info("FOUND IT! " + t);
-						shipwreck = true;
-						good = true;
-						x = p.x - 30;
-						y = p.y;
-					} else {
-						LOGGER.info("CAN'T FIND IT!");
-					}
+
+				if (dest.getOption() != null) {
+					// already located, ready to be sent
+					x = dest.getRelativePosition().x;
+					y = dest.getRelativePosition().y + 5;
+					shipwreck = true;
 				} else {
-					LOGGER.info("No shipwreck available right now. Moving on...");
+          
+					//locate shipwrecks. Now they can be more than one.
+					if (_shipwreckAvailable) {
+						LOGGER.info("LOOKING for shipwreck...");
+						// locate the shipwreck
+						int t = 2;
+						List<Pixel> ps = _scanner.scanMany("dest/shipwreck2.bmp", null, false);
+						if (ps.isEmpty()) {
+							ps = _scanner.scanMany("dest/shipwreck3.bmp", null, false);
+							t = 3;
+						}
+						if (!ps.isEmpty()) {
+							LOGGER.info("FOUND IT! " + t + " (" + ps.size() + " wrecks)");
+							good = true;
+							int i = 1;
+							for (Pixel p : ps) {
+								Destination d = new Destination();
+								d.setName("SW");
+								d.setAbbrs(d.getName());
+								d.setOption("" + i++);
+								d.setRelativePosition(p);
+								chain.addFirst(d);
+							}
+							return sendShip(chain);
+
+						} else {
+							LOGGER.info("CAN'T FIND WRECKS!");
+						}
+					} else {
+						LOGGER.info("No shipwreck available right now. Moving on...");
+					}
 				}
 			}
 
@@ -199,7 +220,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 				// assume the dialog is open
 				if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
-					//if friend and collected, need to click again
+					// if friend and collected, need to click again
 					_mouse.click(x, y);
 					_mouse.delay(750);
 					if (_mouse.getMode() == MouseRobot.SLOW)
@@ -210,12 +231,12 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				if (dest.getName().startsWith("Market")) {
 					Pixel marketTitle = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
 					if (marketTitle != null) {
-						//FIXME the hardcoded approach
+						// FIXME the hardcoded approach
 						String[] ss = dest.getOption().split("-");
 						String commodity = ss[0];
 						String prize = ss[1];
-						
-						if (commodity.equalsIgnoreCase("hat")||commodity.equalsIgnoreCase("1")) {
+
+						if (commodity.equalsIgnoreCase("hat") || commodity.equalsIgnoreCase("1")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
 							for (int i = 0; i < 13; i++) {
 								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
@@ -264,7 +285,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							if (_mouse.getMode() == MouseRobot.SLOW)
 								_mouse.delay(600);
 
-						} else if (commodity.equalsIgnoreCase("cannon")||commodity.equalsIgnoreCase("2")) {
+						} else if (commodity.equalsIgnoreCase("cannon") || commodity.equalsIgnoreCase("2")) {
 							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
 							for (int i = 0; i < 13; i++) {
 								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
@@ -294,19 +315,19 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				} else if (dest.getName().startsWith("Merchant")) {
 					Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
 					if (merchantTitle != null) {
-  					int option = Integer.parseInt(dest.getOption());
-  					Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
-  					
-  					//click the 'go back' button first
-  					_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
-  					_mouse.delay(250);
-  					
-  					//click the desired commodity
-  					_mouse.click(commodityP);
-  					_mouse.delay(250);
-  					
-  					//look for send button
-					}					
+						int option = Integer.parseInt(dest.getOption());
+						Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
+
+						// click the 'go back' button first
+						_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
+						_mouse.delay(250);
+
+						// click the desired commodity
+						_mouse.click(commodityP);
+						_mouse.delay(250);
+
+						// look for send button
+					}
 				}
 
 				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
