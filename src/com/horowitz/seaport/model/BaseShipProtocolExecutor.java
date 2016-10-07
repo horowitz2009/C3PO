@@ -176,6 +176,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					x = dest.getRelativePosition().x;
 					y = dest.getRelativePosition().y + 5;
 					shipwreck = true;
+					good = true;
 				} else {
           
 					//locate shipwrecks. Now they can be more than one.
