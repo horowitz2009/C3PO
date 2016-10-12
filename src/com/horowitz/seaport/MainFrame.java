@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.98";
+	private static String APP_TITLE = "Seaport v0.99";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1788,11 +1788,17 @@ public class MainFrame extends JFrame {
 	private void ping3() throws RobotInterruptedException, IOException, AWTException {
 		if (System.currentTimeMillis() - _lastPing3 > _settings.getInt("ping3.time", 300) * 1000) {
 			LOGGER.info("ping3...");
-
 			_mouse.click(_scanner.getBottomRight().x - 80, _scanner.getBottomRight().y - 53);
 			_mouse.delay(2000);
-
+			if (_mouse.getMode() == MouseRobot.SLOW)
+				_mouse.delay(2000);
+			
 			_scanner.captureScreen("ping map ", true);
+			try {
+				_mapManager.ensureMap();
+			} catch (Exception e) {
+				LOGGER.warning("ensureMap failed... Moving forward!");
+			}
 
 			// contractors
 			String contractors = _settings.getProperty("ping3.contractors", "");
