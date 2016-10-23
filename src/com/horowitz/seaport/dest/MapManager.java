@@ -292,6 +292,10 @@ public class MapManager {
 		_smallTownPos = marketPos;
 	}
 
+	public void reset() {
+		_smallTownPos = null;
+	}
+	
 	public void resetDispatchEntries() throws IOException {
 		JsonStorage jsonStorage = new JsonStorage();
 		jsonStorage.saveDispatchEntries(new ArrayList<DispatchEntry>());

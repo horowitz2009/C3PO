@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.99";
+	private static String APP_TITLE = "Seaport v0.100";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -883,6 +883,7 @@ public class MainFrame extends JFrame {
 		{
 			AbstractAction action = new AbstractAction("SRun") {
 				public void actionPerformed(ActionEvent e) {
+					_mapManager.reset();
 					_scanner.reset();
 					runMagic();
 				}
@@ -1447,6 +1448,7 @@ public class MainFrame extends JFrame {
 	private void scan() throws RobotInterruptedException {
 		try {
 			_mouse.savePosition();
+			_mapManager.reset();
 			_scanner.reset();
 			LOGGER.info("Scanning...");
 			setTitle(APP_TITLE + " ...");
