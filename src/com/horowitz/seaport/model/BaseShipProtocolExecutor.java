@@ -180,8 +180,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 						LOGGER.info("FOUND IT! " + t);
 						shipwreck = true;
 						good = true;
-						x = p.x - 30;
-						y = p.y;
+						x = p.x;
+						y = p.y + 2;
 					} else {
 						LOGGER.info("CAN'T FIND IT!");
 					}
