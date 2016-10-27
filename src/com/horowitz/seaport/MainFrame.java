@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v0.100b";
+	private static String APP_TITLE = "Seaport v101";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1732,6 +1732,14 @@ public class MainFrame extends JFrame {
 			boolean done = false;
 			for (int i = 0; i < 14 && !done; i++) {
 				LOGGER.info("after refresh recovery try " + (i + 1));
+				//check for popups first, like offers (damn it)
+				boolean f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+				if (f) _mouse.delay(500);
+				f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+				if (f) _mouse.delay(500);
+				f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+				if (f) _mouse.delay(500);
+
 				// LOCATE THE GAME
 				if (_scanner.locateGameArea(false)) {
 					_scanner.checkAndAdjustRock();
