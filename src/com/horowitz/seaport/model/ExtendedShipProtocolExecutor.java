@@ -9,6 +9,7 @@ import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
+import com.horowitz.seaport.GameErrorException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.storage.ProtocolEntryDeserializer;
@@ -21,7 +22,7 @@ public class ExtendedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		super(scanner, mouse, mapManager, settings);
 	}
 
-	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
+	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 
 		scanShipName(pin);
 

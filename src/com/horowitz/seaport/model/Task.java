@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.seaport.GameErrorException;
 
 public class Task implements Cloneable, Serializable {
 
@@ -68,7 +69,7 @@ public class Task implements Cloneable, Serializable {
 			_protocol.update();
 	}
 
-	public void execute() throws RobotInterruptedException {
+	public void execute() throws RobotInterruptedException, GameErrorException {
 		if (_protocol != null)
 			_protocol.execute();
 	}

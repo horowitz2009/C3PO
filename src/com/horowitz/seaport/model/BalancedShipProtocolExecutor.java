@@ -15,6 +15,7 @@ import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
+import com.horowitz.seaport.GameErrorException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.storage.BalancedProtocolEntryDeserializer;
@@ -58,7 +59,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		_doShipDelaySlow = _settings.getInt("shipProtocol.doShipDelaySlow", 650);
 	}
 
-	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
+	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 
 		scanShipName(pin);
 

@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v101";
+	private static String APP_TITLE = "Seaport v102";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -230,12 +230,12 @@ public class MainFrame extends JFrame {
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
 					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
-					// JLabel l = _labels.get(de.getDest());
-					// if (l != null) {
-					// //l.setText("" + de.getTimes());
-					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-					// }
-					//
+			    // JLabel l = _labels.get(de.getDest());
+			    // if (l != null) {
+			    // //l.setText("" + de.getTimes());
+			    // //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+			    // }
+			    //
 				}
 			});
 
@@ -1372,7 +1372,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-							// " (" + e.getX() + ", " + e.getY() + ")");
+			        // " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1389,7 +1389,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-						// e.getX() + ", " + e.getY() + ")");
+			      // e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -1588,7 +1588,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private void doMagic() throws IOException, AWTException {
+	private void doMagic() throws IOException, AWTException, RobotInterruptedException {
 		assert _scanner.isOptimized();
 		setTitle(APP_TITLE + " RUNNING");
 		_stopAllThreads = false;
@@ -1695,10 +1695,13 @@ public class MainFrame extends JFrame {
 
 			} while (!_stopAllThreads);
 
-		} catch (RobotInterruptedException e) {
-			LOGGER.info("interrupted");
-			setTitle(APP_TITLE);
-			// e.printStackTrace();
+		} catch (GameErrorException e) {
+			if (e.getCode() > 1) {
+				stopMagic();
+				refresh(false);
+				_scanner.reset();
+				runMagic();
+			}
 		}
 	}
 
@@ -1732,13 +1735,16 @@ public class MainFrame extends JFrame {
 			boolean done = false;
 			for (int i = 0; i < 14 && !done; i++) {
 				LOGGER.info("after refresh recovery try " + (i + 1));
-				//check for popups first, like offers (damn it)
+				// check for popups first, like offers (damn it)
 				boolean f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-				if (f) _mouse.delay(500);
+				if (f)
+					_mouse.delay(500);
 				f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-				if (f) _mouse.delay(500);
+				if (f)
+					_mouse.delay(500);
 				f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-				if (f) _mouse.delay(500);
+				if (f)
+					_mouse.delay(500);
 
 				// LOCATE THE GAME
 				if (_scanner.locateGameArea(false)) {
@@ -1795,14 +1801,14 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private void ping3() throws RobotInterruptedException, IOException, AWTException {
+	private void ping3() throws RobotInterruptedException, IOException, AWTException, GameErrorException {
 		if (System.currentTimeMillis() - _lastPing3 > _settings.getInt("ping3.time", 300) * 1000) {
 			LOGGER.info("ping3...");
 			_mouse.click(_scanner.getBottomRight().x - 80, _scanner.getBottomRight().y - 53);
 			_mouse.delay(2000);
 			if (_mouse.getMode() == MouseRobot.SLOW)
 				_mouse.delay(2000);
-			
+
 			_scanner.captureScreen("ping map ", true);
 			try {
 				_mapManager.ensureMap();
@@ -2017,15 +2023,15 @@ public class MainFrame extends JFrame {
 				_scanner.captureScreen("CRASH ", true);
 				boolean success = false;
 				do {
-				  success = refresh(false);
-				  if (!success) {
-				  	LOGGER.info("REFRESH FAILED. SLEEPING 30s...");
-				  	_scanner.captureScreen("DAMN ", true);
-				  	try {
-	            Thread.sleep(30000);
-            } catch (InterruptedException e) {
-            }
-				  }
+					success = refresh(false);
+					if (!success) {
+						LOGGER.info("REFRESH FAILED. SLEEPING 30s...");
+						_scanner.captureScreen("DAMN ", true);
+						try {
+							Thread.sleep(30000);
+						} catch (InterruptedException e) {
+						}
+					}
 				} while (!success);
 			}
 
@@ -2103,7 +2109,7 @@ public class MainFrame extends JFrame {
 		if (ping != _pingToggle.isSelected()) {
 			_pingToggle.setSelected(ping);
 		}
-		
+
 		ping = "true".equalsIgnoreCase(_settings.getProperty("ping2"));
 		if (ping != _ping2Toggle.isSelected()) {
 			_ping2Toggle.setSelected(ping);
@@ -2310,6 +2316,9 @@ public class MainFrame extends JFrame {
 					} catch (IOException | AWTException e) {
 						e.printStackTrace();
 						LOGGER.warning("Something went wrong!");
+					} catch (RobotInterruptedException e) {
+						LOGGER.info("interrupted");
+						setTitle(APP_TITLE);
 					}
 				} else {
 					LOGGER.info("I need to know where the game is!");

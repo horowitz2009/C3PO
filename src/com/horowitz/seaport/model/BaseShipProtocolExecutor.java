@@ -14,6 +14,7 @@ import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
+import com.horowitz.seaport.GameErrorException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
@@ -73,7 +74,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		_shipLocationDelaySlow = _settings.getInt("shipProtocol.shipLocationDelay.slow", 1200);
 	}
 
-	public void execute() throws RobotInterruptedException {
+	public void execute() throws RobotInterruptedException, GameErrorException {
 		if (_shipLocations != null && !_shipLocations.isEmpty()) {
 			for (Pixel pixel : _shipLocations) {
 				try {
@@ -102,7 +103,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 	}
 
-	abstract void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException;
+	abstract void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException, GameErrorException;
 
 	protected Ship scanShipName(Pixel pin) throws AWTException, RobotInterruptedException {
 		// scan the name
@@ -148,7 +149,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		return false;
 	}
 
-	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException {
+	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 		LOGGER.info("CHAIN: " + chain);
 		_mouse.checkUserMovement();
 		Destination dest = chain.poll();

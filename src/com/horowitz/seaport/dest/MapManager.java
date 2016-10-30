@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import com.horowitz.commons.ImageData;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.seaport.GameErrorException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
@@ -169,45 +170,23 @@ public class MapManager {
 		return null;
 	}
 
-	public boolean ensureMap() throws AWTException, RobotInterruptedException, IOException {
-		// MAP ZONE
-
-		// first zoom out
+	public boolean ensureMap() throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 		_scanner.zoomOut();
 
-		Destination _smallTown = getSmallTown();
-		// _marketPos = null;
 		if (_smallTownPos == null) {
-			LOGGER.info("Looking for Small Town for the first time");
-
-			int xx = _scanner.getGameWidth() / 3;
-			int yy = _scanner.getGameHeight() / 2;
-			Rectangle smallerArea = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y
-			    + yy / 2, xx, yy);
-			//Rectangle smallerArea = _mapArea;
-			_smallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), smallerArea, false);
-			if (_smallTownPos == null) {
-				_smallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), null, false);
-				LOGGER.info("DAMMMMMMMMMMMN");
-			} else {
-				LOGGER.info("BINGOOOOOOOOOO");
-			}
+			findSmallTown();
 		} else {
-			Rectangle areaSpec = new Rectangle(_smallTownPos.x - 10, _smallTownPos.y - 10, _smallTown.getImageData().getImage()
-			    .getWidth() + 20, _smallTown.getImageData().getImage().getHeight() + 20);
-
-			Pixel newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), areaSpec, false);
-			if (newSmallTownPos == null) {
-				LOGGER.info("COULDN'T FIND Small Town at once. Trying again...");
-				newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), null, false);
-			}
-
-			if (_smallTownPos.equals(newSmallTownPos)) {
-				LOGGER.info("Small Town found in the same place.");
-			}
-			_smallTownPos = newSmallTownPos;
+			findSmallTownAgain();
 		}
-
+		
+		if (_smallTownPos == null) {
+			if (_scanner.handlePopups()) {
+				findSmallTownAgain();
+				if (_smallTownPos == null)
+					throw new GameErrorException(9);
+			}
+		}
+		
 		boolean isOK = true;
 		int xx2 = 0; int yy2 = 0;
 		int xx3 = 0; int yy3 = 0;
@@ -265,23 +244,46 @@ public class MapManager {
 			  _scanner.getMouse().delay(1200);
 			  _smallTownPos.x += xxx;
 			  _smallTownPos.y += yyy;
-			  Rectangle areaSpec = new Rectangle(_smallTownPos.x - 10, _smallTownPos.y - 10, _smallTown.getImageData().getImage()
-			      .getWidth() + 20, _smallTown.getImageData().getImage().getHeight() + 20);
-
-			  Pixel newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), areaSpec, false);
-			  if (newSmallTownPos == null) {
-				  LOGGER.info("COULDN'T FIND Small Town at once. Trying again...");
-				  newSmallTownPos = _scanner.scanOneFast(_smallTown.getImageData(), null, false);
-			  }
-
-			  if (_smallTownPos.equals(newSmallTownPos)) {
-				  LOGGER.info("Small Town found in the same place.");
-			  }
-			  _smallTownPos = newSmallTownPos;
+			  findSmallTownAgain();
 			}
 		}
 		
 		return isOK;
+	}
+
+	private void findSmallTown() throws AWTException, RobotInterruptedException {
+		LOGGER.info("Looking for Small Town for the first time");
+		
+		Destination smallTownDEST = getSmallTown();
+		int xx = _scanner.getGameWidth() / 3;
+		int yy = _scanner.getGameHeight() / 2;
+		Rectangle smallerArea = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y
+		    + yy / 2, xx, yy);
+		//Rectangle smallerArea = _mapArea;
+		_smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), smallerArea, false);
+		if (_smallTownPos == null) {
+			_smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
+			LOGGER.info("DAMMMMMMMMMMMN");
+		} else {
+			LOGGER.info("BINGOOOOOOOOOO");
+		}
+	}
+
+	private void findSmallTownAgain() throws AWTException, RobotInterruptedException {
+		Destination smallTownDEST = getSmallTown();
+		Rectangle areaSpec = new Rectangle(_smallTownPos.x - 10, _smallTownPos.y - 10, smallTownDEST.getImageData().getImage()
+		    .getWidth() + 20, smallTownDEST.getImageData().getImage().getHeight() + 20);
+
+		Pixel newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), areaSpec, false);
+		if (newSmallTownPos == null) {
+			LOGGER.info("COULDN'T FIND Small Town at once. Trying again...");
+			newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
+		}
+
+		if (_smallTownPos.equals(newSmallTownPos)) {
+			LOGGER.info("Small Town found in the same place.");
+		}
+		_smallTownPos = newSmallTownPos;
 	}
 
 	public Pixel getSmallTownPos() {

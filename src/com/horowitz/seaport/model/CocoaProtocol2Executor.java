@@ -10,6 +10,7 @@ import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
+import com.horowitz.seaport.GameErrorException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
@@ -59,7 +60,7 @@ public class CocoaProtocol2Executor extends BaseShipProtocolExecutor {
 		return false;
 	}
 	
-	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException {
+	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 
 		Ship whatShip = scanShipName(pin);
 
