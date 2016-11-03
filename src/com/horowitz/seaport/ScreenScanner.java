@@ -243,6 +243,7 @@ public class ScreenScanner {
 		getImageData("buildings/produce.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/produce2.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/produceGray.bmp", _popupAreaB, 0, 0);
+		getImageData("collect.bmp", _popupAreaB, 0, 0);
 		getImageData("buildings/x.bmp", _popupAreaX, 10, 10);
 		getImageData("greenX.bmp", new Rectangle(_br.x - 28, _tl.y + 57, 22, 20), 9, 9);
 
@@ -1231,7 +1232,7 @@ public class ScreenScanner {
 	public void captureGameAreaDT() {
 		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd  HH-mm-ss-SSS");
 		String date = sdf.format(Calendar.getInstance().getTime());
-		String filename = "popup " + date + ".png";
+		String filename = "popup " + date + ".jpg";
 		captureGameArea(filename);
 	}
 
@@ -1243,6 +1244,10 @@ public class ScreenScanner {
 		MyImageIO.writeArea(rect, filename);
 	}
 
+	public void writeAreaTS(Rectangle rect, String filename) {
+		MyImageIO.writeAreaTS(rect, filename);
+	}
+	
 	public void writeImage(BufferedImage image, String filename) {
 		MyImageIO.writeImage(image, filename);
 	}

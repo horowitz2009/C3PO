@@ -84,12 +84,21 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					if (_mouse.getMode() == MouseRobot.SLOW)
 						_mouse.delay(_shipLocationDelaySlow);
 
+					//1. check for pin
 					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
 					// _scanner.writeImage(miniArea, "pin.bmp");
 					Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
 					if (pin != null) {
 						doShip(pin);
 
+					} else {
+						//2. check for shipwreck award
+						Pixel cb = _scanner.scanOneFast(_scanner.getImageData("collect.bmp"), null, false);
+						if (cb != null) {
+							_scanner.writeArea(_scanner._popupArea, "shipwreck_reward");
+							_mouse.click();
+							_mouse.delay(_shipLocationDelay);
+						}
 					}
 				} catch (AWTException e) {
 					e.printStackTrace();
