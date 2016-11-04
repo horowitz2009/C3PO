@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v103";
+	private static String APP_TITLE = "Seaport v104";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -230,12 +230,12 @@ public class MainFrame extends JFrame {
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
 					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
-			    // JLabel l = _labels.get(de.getDest());
-			    // if (l != null) {
-			    // //l.setText("" + de.getTimes());
-			    // //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-			    // }
-			    //
+					// JLabel l = _labels.get(de.getDest());
+					// if (l != null) {
+					// //l.setText("" + de.getTimes());
+					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
+					// }
+					//
 				}
 			});
 
@@ -1372,7 +1372,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-			        // " (" + e.getX() + ", " + e.getY() + ")");
+							// " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1389,7 +1389,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-			      // e.getX() + ", " + e.getY() + ")");
+						// e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -1712,13 +1712,13 @@ public class MainFrame extends JFrame {
 		Pixel p;
 		if (bookmark || !_scanner.isOptimized()) {
 			p = _scanner.scanOne("seaportBookmark.bmp", null, false);
+			if (p == null)
+				p = new Pixel(79, 76);
+			_mouse.click(p.x, p.y);
 		} else {
 			p = _scanner.getBottomRight();
 			p.x -= 10;
 			p.y += 3;
-		}
-		if (p != null) {
-			_mouse.click(p.x, p.y);
 			_mouse.click(p.x, p.y);
 			try {
 				Robot robot = new Robot();
@@ -1726,54 +1726,54 @@ public class MainFrame extends JFrame {
 				robot.keyRelease(KeyEvent.VK_F5);
 			} catch (AWTException e) {
 			}
-			try {
-				Thread.sleep(15000);
-			} catch (InterruptedException e) {
-			}
-			_scanner.reset();
+		}
+		try {
+			Thread.sleep(15000);
+		} catch (InterruptedException e) {
+		}
+		_scanner.reset();
 
-			boolean done = false;
-			for (int i = 0; i < 14 && !done; i++) {
-				LOGGER.info("after refresh recovery try " + (i + 1));
-				// check for popups first, like offers (damn it)
-				boolean f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-				if (f)
-					_mouse.delay(500);
-				f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-				if (f)
-					_mouse.delay(500);
-				f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-				if (f)
-					_mouse.delay(500);
+		boolean done = false;
+		for (int i = 0; i < 14 && !done; i++) {
+			LOGGER.info("after refresh recovery try " + (i + 1));
+			// check for popups first, like offers (damn it)
+			boolean f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+			if (f)
+				_mouse.delay(500);
+			f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+			if (f)
+				_mouse.delay(500);
+			f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+			if (f)
+				_mouse.delay(500);
 
-				// LOCATE THE GAME
-				if (_scanner.locateGameArea(false)) {
-					_scanner.checkAndAdjustRock();
-					if (_scanner.getRock() != null) {
-						_mapManager.update();
-						_buildingManager.update();
+			// LOCATE THE GAME
+			if (_scanner.locateGameArea(false)) {
+				_scanner.checkAndAdjustRock();
+				if (_scanner.getRock() != null) {
+					_mapManager.update();
+					_buildingManager.update();
 
-						LOGGER.info("Game located successfully!");
-						done = true;
-					}
-				} else {
-					processRequests();
+					LOGGER.info("Game located successfully!");
+					done = true;
 				}
-				if (i > 8) {
-					_scanner.captureScreen("refresh trouble ", true);
-				}
-			}
-			if (done) {
-				// runMagic();
-				_scanner.captureScreen("refresh done ", true);
-				// not sure why shipsTasks gets off after refresh
-				reapplySettings();
-				return true;
 			} else {
-				// try bookmark
-				if (!bookmark)
-					return refresh(true);
+				processRequests();
 			}
+			if (i > 8) {
+				_scanner.captureScreen("refresh trouble ", true);
+			}
+		}
+		if (done) {
+			// runMagic();
+			_scanner.captureScreen("refresh done ", true);
+			// not sure why shipsTasks gets off after refresh
+			reapplySettings();
+			return true;
+		} else {
+			// try bookmark
+			if (!bookmark)
+				return refresh(true);
 		}
 		return false;
 	}
