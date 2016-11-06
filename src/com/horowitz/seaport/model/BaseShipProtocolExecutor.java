@@ -93,10 +93,12 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 					} else {
 						//2. check for shipwreck award
-						Pixel cb = _scanner.scanOneFast(_scanner.getImageData("collect.bmp"), null, false);
+						//_scanner.writeArea(_scanner._popupAreaB, "shipwreck_area.jpg");
+						Pixel cb = _scanner.scanOneFast(_scanner.getImageData("collect.bmp"), _scanner._popupAreaB, false);
+						
 						if (cb != null) {
-							_scanner.writeArea(_scanner._popupArea, "shipwreck_reward");
-							_mouse.click();
+							_scanner.writeAreaTS(_scanner._popupArea, "shipwreck_reward");
+							_mouse.click(cb);
 							_mouse.delay(_shipLocationDelay);
 						}
 					}
