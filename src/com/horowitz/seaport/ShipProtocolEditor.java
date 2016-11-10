@@ -259,7 +259,7 @@ public class ShipProtocolEditor extends JPanel {
 			// ships.add(0, select);
 
 			_shipFieldCB = new JComboBox<Ship>(ships.toArray(new Ship[0]));
-			shrinkFont(_shipFieldCB, -2f);
+			shrinkFont(_shipFieldCB, -1f);
 			add(_shipFieldCB);
 			add(Box.createHorizontalStrut(3));
 

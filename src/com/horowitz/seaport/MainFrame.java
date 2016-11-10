@@ -160,7 +160,7 @@ public class MainFrame extends JFrame {
 			MainFrame frame = new MainFrame(isTestmode);
 			frame.pack();
 			frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
-			int w = 275;// frame.getSize().width;
+			int w = 293;// frame.getSize().width;
 			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			int h = (int) (screenSize.height * 0.9);
 			int x = screenSize.width - w;
