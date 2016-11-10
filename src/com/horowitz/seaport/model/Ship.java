@@ -48,7 +48,7 @@ public class Ship extends GameUnit {
 
 	@Override
 	public String toString() {
-		return getName() + (_capacity > 0 ? " " + _capacity : "");
+		return getName() + (_crew > 0 ? " " + _crew +  " " : "") + (_capacity > 0 ? " " + _capacity : "");
 	}
 
 	public void setCrew(int crew) {

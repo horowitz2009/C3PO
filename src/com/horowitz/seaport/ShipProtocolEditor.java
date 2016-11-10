@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -54,36 +55,16 @@ public class ShipProtocolEditor extends JPanel {
 
 	private void initLayout() {
 		JPanel mainRoot = new JPanel(new BorderLayout());
-		JPanel headerPanel = new JPanel(new GridBagLayout());
-		headerPanel.setBackground(Color.LIGHT_GRAY);
+		JPanel headerPanel = new JPanel(new BorderLayout());
+		//headerPanel.setBackground(Color.LIGHT_GRAY);
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		// NAME
 		_titleTF = new JTextField();
 		_titleTF.setFont(_titleTF.getFont().deriveFont(18f));
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		// gbc.gridwidth = 4;
-		gbc.insets = new Insets(3, 3, 2, 2);
+		headerPanel.add(_titleTF);
+		headerPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
-		headerPanel.add(_titleTF, gbc);
-
-		// gbc.gridx++;
-		gbc.gridy = 1;
-		// gbc.gridheight = 2;
-		// gbc.gridwidth = 1;
-		JLabel agenda = new JLabel(
-		    "<html>S - Small Town  C - Coastline   G - Gulf<br>CP - Cocoa Plant   MC - Market COINS   MX - Market COINS</html>");
-		agenda.setFont(agenda.getFont().deriveFont(9f));
-		headerPanel.add(agenda, gbc);
-
-		// // fake label
-		// gbc.gridy++;
-		// gbc.gridx++;
-		// gbc.weightx = 1.0;
-		// gbc.weighty = 1.0;
-		// headerPanel.add(new JLabel(""), gbc);
 		mainRoot.add(headerPanel, BorderLayout.NORTH);
 
 		// //////////
@@ -95,7 +76,7 @@ public class ShipProtocolEditor extends JPanel {
 		_box = Box.createVerticalBox();
 		DragMouseAdapter dmAdapter = new DragMouseAdapter(JFrame.getFrames()[0]);
 		_box.addMouseListener(dmAdapter);
-    _box.addMouseMotionListener(dmAdapter);
+		_box.addMouseMotionListener(dmAdapter);
 		root.add(_box, BorderLayout.NORTH);
 
 		// ADD BUTTON
@@ -200,7 +181,7 @@ public class ShipProtocolEditor extends JPanel {
 
 	void shrinkFont(Component comp, float size) {
 		if (size < 0)
-			size = comp.getFont().getSize() - 2;
+			size = comp.getFont().getSize() + (int) size;
 		comp.setFont(comp.getFont().deriveFont(size));
 	}
 
@@ -216,13 +197,13 @@ public class ShipProtocolEditor extends JPanel {
 			// remove
 			_removeAction = new RemoveAction(ProtocolEntryView.this);
 			JButton removeButton = new JButton(_removeAction);
-			shrinkFont(removeButton, -1);
-			removeButton.setMargin(new Insets(2, 2, 2, 2));
-			JLabel l =new JLabel("►");
-			shrinkFont(l, -1);
-      add(l);
-      add(removeButton);
-			add(Box.createHorizontalStrut(6));
+			shrinkFont(removeButton, -4f);
+			removeButton.setMargin(new Insets(1, 1, 1, 1));
+			JLabel l = new JLabel("►");
+			shrinkFont(l, -3f);
+			add(l);
+			add(removeButton);
+			add(Box.createHorizontalStrut(3));
 			// ship
 
 			// ONLY ACTIVE SHIPS
@@ -247,27 +228,27 @@ public class ShipProtocolEditor extends JPanel {
 				} else {
 					capsMap.put(ship.getCapacity(), 1);
 				}
-				
+
 				if (crewsMap.containsKey(ship.getCrew())) {
 					crewsMap.put(ship.getCrew(), crewsMap.get(ship.getCrew()) + 1);
 				} else {
 					crewsMap.put(ship.getCrew(), 1);
 				}
 			}
-			
+
 			List<Integer> capsList = new ArrayList<Integer>(capsMap.keySet());
 			Collections.sort(capsList, Collections.reverseOrder());
-			
+
 			for (Integer capN : capsList) {
 				ships.add(new Ship("[C " + capN + "] " + capsMap.get(capN)));
-      }
-			
+			}
+
 			List<Integer> crewsList = new ArrayList<Integer>(crewsMap.keySet());
 			Collections.sort(crewsList, Collections.reverseOrder());
 			for (Integer crewN : crewsList) {
 				ships.add(new Ship("[S " + crewN + "] " + crewsMap.get(crewN)));
 			}
-			
+
 			// Ship select = new Ship("-- choose ship --");
 			Ship all = new Ship("<ALL>");
 			Ship rest = new Ship("<Rest>");
@@ -278,16 +259,16 @@ public class ShipProtocolEditor extends JPanel {
 			// ships.add(0, select);
 
 			_shipFieldCB = new JComboBox<Ship>(ships.toArray(new Ship[0]));
-			shrinkFont(_shipFieldCB, -1);
+			shrinkFont(_shipFieldCB, -2f);
 			add(_shipFieldCB);
-			add(Box.createHorizontalStrut(6));
+			add(Box.createHorizontalStrut(3));
 
 			// dest
-			_destField = new JTextField(15);
+			_destField = new JTextField(18);
 			add(_destField);
-			add(Box.createHorizontalStrut(6));
+			add(Box.createHorizontalStrut(3));
 
-			setBorder(new EmptyBorder(3, 3, 3, 0));
+			setBorder(new EmptyBorder(1, 2, 1, 0));
 		}
 
 	}
