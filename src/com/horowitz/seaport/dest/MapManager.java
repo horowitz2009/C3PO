@@ -182,8 +182,11 @@ public class MapManager {
 		if (_smallTownPos == null) {
 			if (_scanner.handlePopups()) {
 				findSmallTownAgain();
-				if (_smallTownPos == null)
-					throw new GameErrorException(9);
+				if (_smallTownPos == null) {
+					LOGGER.warning("WHAT TO DO? WHAT TO DO?");
+					//throw new GameErrorException(9);
+					return false;
+				}
 			}
 		}
 		

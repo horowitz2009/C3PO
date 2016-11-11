@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v106rc";
+	private static String APP_TITLE = "Seaport v106";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1681,7 +1681,7 @@ public class MainFrame extends JFrame {
 					}
 
 					if (_ping2Toggle.isSelected()) {
-						// ping2();
+						ping2New();
 					}
 
 					if (_ping3Toggle.isSelected()) {
@@ -1784,7 +1784,7 @@ public class MainFrame extends JFrame {
 
 	private void ping() throws RobotInterruptedException {
 		if (System.currentTimeMillis() - _lastPing > _settings.getInt("ping.time", 120) * 1000) {
-			LOGGER.info("ping...");
+			LOGGER.info("ping1...");
 			if (_scanner.getScoreBoard() != null) {
 				_mouse.click(_scanner.getScoreBoard());
 				_mouse.delay(200);
@@ -1843,6 +1843,27 @@ public class MainFrame extends JFrame {
 			_lastPing3 = System.currentTimeMillis();
 		}
 
+	}
+
+	private void ping2New() throws RobotInterruptedException, IOException, AWTException {
+		if (System.currentTimeMillis() - _lastPing2 > _settings.getInt("ping2.time", 300) * 1000) {
+			LOGGER.info("ping2...");
+			BufferedImage image = _scanner.scanStorage();
+			if (image != null) {
+				try {
+				  _scanner.writeImageTS(image, "ping storage");
+				  _mouse.delay(1300);
+				  Pixel good = _scanner.scanOneFast("buildings/x.bmp", null, true);
+				  if (good == null) {
+				  	LOGGER.info("cound't find the x...");
+				  	_scanner.handlePopupsFast();
+				  }
+				} finally {
+				  _lastPing2 = System.currentTimeMillis();
+				}
+			}
+			//LOGGER.info("ping2 done");
+		}
 	}
 
 	private void ping2() throws RobotInterruptedException, IOException, AWTException {

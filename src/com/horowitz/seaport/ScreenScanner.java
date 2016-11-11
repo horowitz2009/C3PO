@@ -420,8 +420,8 @@ public class ScreenScanner {
 		return p;
 	}
 
-	public Pixel locateImageCoords(String imageName, Rectangle[] area, int xOff, int yOff)
-	    throws AWTException, IOException, RobotInterruptedException {
+	public Pixel locateImageCoords(String imageName, Rectangle[] area, int xOff, int yOff) throws AWTException,
+	    IOException, RobotInterruptedException {
 
 		final Robot robot = new Robot();
 		final BufferedImage image = ImageIO.read(ImageManager.getImageURL(imageName));
@@ -567,8 +567,8 @@ public class ScreenScanner {
 		} else {
 			yy = _br.y - (area.y + area.height);
 			if (yy < 0)
-			  // too south
-			  _mouse.drag(_tl.x + 5, y1, _tl.x + 5, y1 + yy - 20);
+				// too south
+				_mouse.drag(_tl.x + 5, y1, _tl.x + 5, y1 + yy - 20);
 		}
 
 		int xx = area.x - _tl.x;
@@ -579,8 +579,8 @@ public class ScreenScanner {
 		} else {
 			xx = _br.x - (area.x + area.width);
 			if (xx < 0)
-			  // too east
-			  _mouse.drag(x1, _br.y - 5, x1 + xx - 20, _br.y - 5);
+				// too east
+				_mouse.drag(x1, _br.y - 5, x1 + xx - 20, _br.y - 5);
 		}
 		return new Pixel(xx, yy);
 	}
@@ -633,8 +633,8 @@ public class ScreenScanner {
 		return _comparator;
 	}
 
-	public List<Pixel> scanMany(String filename, BufferedImage screen, boolean click)
-	    throws RobotInterruptedException, IOException, AWTException {
+	public List<Pixel> scanMany(String filename, BufferedImage screen, boolean click) throws RobotInterruptedException,
+	    IOException, AWTException {
 
 		ImageData imageData = getImageData(filename);
 		if (imageData == null)
@@ -739,8 +739,8 @@ public class ScreenScanner {
 		FastBitmap fbAREA = new FastBitmap(screen);
 
 		// COLOR FILTERING
-		ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255),
-		    new IntRange(255, 255));
+		ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255), new IntRange(
+		    255, 255));
 		colorFiltering.applyInPlace(fbID);
 		colorFiltering.applyInPlace(fbAREA);
 
@@ -758,8 +758,8 @@ public class ScreenScanner {
 
 	}
 
-	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click)
-	    throws AWTException, RobotInterruptedException {
+	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click) throws AWTException,
+	    RobotInterruptedException {
 		if (area == null) {
 			area = imageData.getDefaultArea();
 		}
@@ -781,8 +781,8 @@ public class ScreenScanner {
 
 	}
 
-	public Pixel scanOne(String filename, Rectangle area, boolean click)
-	    throws RobotInterruptedException, IOException, AWTException {
+	public Pixel scanOne(String filename, Rectangle area, boolean click) throws RobotInterruptedException, IOException,
+	    AWTException {
 		ImageData imageData = getImageData(filename);
 		if (imageData == null)
 			return null;
@@ -808,8 +808,8 @@ public class ScreenScanner {
 		return pixel;
 	}
 
-	public Pixel scanOneFast(ImageData imageData, Rectangle area, boolean click)
-	    throws AWTException, RobotInterruptedException {
+	public Pixel scanOneFast(ImageData imageData, Rectangle area, boolean click) throws AWTException,
+	    RobotInterruptedException {
 		if (area == null) {
 			area = imageData.getDefaultArea();
 		}
@@ -831,8 +831,8 @@ public class ScreenScanner {
 
 	}
 
-	public Pixel scanOneFast(String filename, Rectangle area, boolean click)
-	    throws RobotInterruptedException, IOException, AWTException {
+	public Pixel scanOneFast(String filename, Rectangle area, boolean click) throws RobotInterruptedException,
+	    IOException, AWTException {
 		ImageData imageData = getImageData(filename);
 		if (imageData == null)
 			return null;
@@ -856,8 +856,8 @@ public class ScreenScanner {
 		return pixel;
 	}
 
-	public Pixel scanContractButton(String filename, Rectangle area)
-	    throws RobotInterruptedException, IOException, AWTException {
+	public Pixel scanContractButton(String filename, Rectangle area) throws RobotInterruptedException, IOException,
+	    AWTException {
 		ImageData imageData = getImageData(filename);
 		assert imageData == null;
 		assert area != null;
@@ -1168,13 +1168,12 @@ public class ScreenScanner {
 		return _sailorsPos;
 	}
 
-	public Pixel scanPrecise(String filename, Rectangle area)
-	    throws AWTException, IOException, RobotInterruptedException {
+	public Pixel scanPrecise(String filename, Rectangle area) throws AWTException, IOException, RobotInterruptedException {
 		return scanPrecise(getImageData(filename), area);
 	}
 
-	/////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////
+	// ///////////////////////////////////////////////////////
+	// ///////////////////////////////////////////////////////
 
 	public void deleteOlder(String prefix, int amountFiles) {
 		File f = new File(".");
@@ -1247,9 +1246,36 @@ public class ScreenScanner {
 	public void writeAreaTS(Rectangle rect, String filename) {
 		MyImageIO.writeAreaTS(rect, filename);
 	}
+
+	public void writeImageTS(BufferedImage image, String filename) {
+		MyImageIO.writeImageTS(image, filename);
+	}
 	
 	public void writeImage(BufferedImage image, String filename) {
 		MyImageIO.writeImage(image, filename);
+	}
+
+	public BufferedImage scanStorage() throws AWTException, IOException, RobotInterruptedException {
+		if (getRock() != null) {
+			Pixel p = new Pixel(getRock());
+			p.x += 51;
+			p.y -= 145;
+			if (ensureHome()) {
+				_mouse.click(p);
+				_mouse.delay(500);
+				Rectangle area = new Rectangle(p.x - 33, p.y + 26, 140, 70);
+				// _scanner.writeArea(area, "storageArea.jpg");
+				p = scanOneFast("buildings/storage.bmp", area, false);
+				if (p != null) {
+					_mouse.click(p);
+					_mouse.delay(500);
+					Rectangle starea = generateWindowedArea(622, 485);
+					return new Robot().createScreenCapture(starea);
+				}
+			}
+		}
+
+		return null;
 	}
 
 }
