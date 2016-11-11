@@ -148,7 +148,7 @@ public class ScreenScanner {
 		_sailorsPos = scanOne("sailors.bmp", _rightNumbersArea, false);
 
 		_fishes = new Pixel[] { new Pixel(-94, 14), new Pixel(-169, -13), new Pixel(-223, -49), new Pixel(-282, -89),
-		    new Pixel(-354, -120) };
+		    new Pixel(-354, -120), new Pixel(-148, -158) };
 
 		_shipLocations = new Pixel[] { new Pixel(103, 83), new Pixel(103, 187), new Pixel(103, 278) };
 		// _buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147,
