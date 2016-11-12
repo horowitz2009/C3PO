@@ -144,6 +144,8 @@ public class MainFrame extends JFrame {
 
 	private OCRB _ocr;
 
+	private boolean _doOCR;
+
 	public static void main(String[] args) {
 
 		try {
@@ -195,6 +197,7 @@ public class MainFrame extends JFrame {
 				setDefaultSettings();
 			}
 
+			_doOCR = _settings.getBoolean("doOCR", true); 
 			_stats = new Stats();
 			_scanner = new ScreenScanner(_settings);
 			_scanner.setDebugMode(_testMode);

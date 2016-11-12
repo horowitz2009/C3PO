@@ -318,6 +318,15 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 							_mouse.delay(600);
 
 					}
+					
+					if (_settings.getBoolean("doOCR", true)) {
+						Rectangle areaSend = new Rectangle();
+						areaSend.x = marketTitle.x - 91;
+						areaSend.y = marketTitle.y + 301;
+						areaSend.width = 110;
+						areaSend.height = 64;
+						_scanner.writeAreaTS(areaSend, "ocr/areaSend.bmp");
+					}
 
 				} else if (dest.getName().startsWith("Merchant")) {
 					Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
@@ -370,6 +379,16 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				}
 				if (destButton != null) {
 					LOGGER.info("set sail " + opt);
+
+					if (_settings.getBoolean("doOCR", true)) {
+						Rectangle areaCost = new Rectangle();
+						areaCost.x = destButton.x - 161;
+						areaCost.y = destButton.y;
+						areaCost.width = 124;
+						areaCost.height = 58;
+						_scanner.writeAreaTS(areaCost, "ocr/areaCost.bmp");
+					}
+
 					// nice. we can continue
 					// if (dest.getName().startsWith("Market")) {
 					//
