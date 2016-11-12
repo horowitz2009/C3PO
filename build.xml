@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project Mickey2">
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+<project default="copy-jar" name="Create Runnable Jar for Project Mickey2">
 
-	<property name="versionNumber" value="105" />
+	<property name="versionNumber" value="106" />
 
 	<property name="jarname" value="Seaport${versionNumber}.jar" description="" />
 	<property name="dropboxjarname" value="DropboxRemote${versionNumber}.jar" description="" />
@@ -18,16 +17,17 @@
 			</manifest>
 			<fileset dir="bin" />
 		</jar>
+	</target>
 
+	<target name="copy-jar" depends="create_run_jar">
 
-		<property name="subfolder" value="office" />
-	  
-		<property name="office_subfolder" value="office" />
-		<property name="spZhivko_subfolder" value="SeaportROSKO" />
-		<property name="spZhivko_subfolder2" value="SeaportZHIVKO2" />
+		<property name="dir1" value="SeaportZHIVKO2" />
+		<mkdir dir="${dropbox}/${dir1}" />
+		<copy todir="${dropbox}/${dir1}" file="${jarname}" />
 
-		<foreach list="${spZhivko_subfolder2},${spZhivko_subfolder}" param="subfolder" target="copy" /> <!-- OFF ${office_subfolder},${spZhivko_subfolder}, -->
-	  
+		<property name="dir2" value="SeaportROSKO" />
+		<mkdir dir="${dropbox}/${dir2}" />
+		<copy todir="${dropbox}/${dir2}" file="${jarname}" />
 	</target>
 
 	<target name="create_dropbox_remote_jar">
@@ -36,12 +36,12 @@
 				<attribute name="Main-Class" value="com.horowitz.mickey.DropboxRemote" />
 			</manifest>
 			<fileset dir="bin">
-			  <include name="**/DropboxRemote*.class"/>
-			  <include name="**/Service*.class"/>
-			  <include name="**/DateUtils*.class"/>
-			  <include name="**/MyImageIO.class"/>
-			  <include name="**/MouseRobot.class"/>
-			  <include name="**/RobotInter*.class"/>
+				<include name="**/DropboxRemote*.class" />
+				<include name="**/Service*.class" />
+				<include name="**/DateUtils*.class" />
+				<include name="**/MyImageIO.class" />
+				<include name="**/MouseRobot.class" />
+				<include name="**/RobotInter*.class" />
 			</fileset>
 		</jar>
 
@@ -55,9 +55,9 @@
 
 		<!--<foreach list="${office_subfolder},${office2_subfolder}" param="subfolder" target="copyDropboxRemote" />-->
 		<!-- from list => ,${office_subfolder},${programs_subfolder} -->
-	  
-	  
-	  
+
+
+
 		<mkdir dir="${dropbox}/${subfolder}" />
 		<copy todir="${dropbox}/${subfolder}" file="${jarname}" />
 		<mkdir dir="${dropbox}/${subfolder}/lib" />
@@ -66,27 +66,27 @@
 		<copy file="lib/gson-2.3.jar" todir="${dropbox}/${subfolder}/lib" />
 		<copy file="lib/commons-io-2.4.jar" todir="${dropbox}/${subfolder}/lib" />
 
-		
+
 		<copy todir="${dropbox}/${subfolder}/lib">
 			<fileset dir="lib" includes="**" />
-			
+
 		</copy>
 
-	  
-	  
-	  
 
-    <mkdir dir="${dropbox}/${subfolder}" />
-    <copy todir="${dropbox}/${subfolder}" file="${jarname}" />
-    <mkdir dir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/commons-lang-2.1.jar" todir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/json-simple-1.1.1.jar" todir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/gson-2.3.jar" todir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/commons-io-2.4.jar" todir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/Catalano.Core.jar" todir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/Catalano.Image.jar" todir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/Catalano.Math.jar" todir="${dropbox}/${subfolder}/lib" />
-    <copy file="lib/Catalano.Statistics.jar" todir="${dropbox}/${subfolder}/lib" />
+
+
+
+		<mkdir dir="${dropbox}/${subfolder}" />
+		<copy todir="${dropbox}/${subfolder}" file="${jarname}" />
+		<mkdir dir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/commons-lang-2.1.jar" todir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/json-simple-1.1.1.jar" todir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/gson-2.3.jar" todir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/commons-io-2.4.jar" todir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/Catalano.Core.jar" todir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/Catalano.Image.jar" todir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/Catalano.Math.jar" todir="${dropbox}/${subfolder}/lib" />
+		<copy file="lib/Catalano.Statistics.jar" todir="${dropbox}/${subfolder}/lib" />
 
 	</target>
 
@@ -99,12 +99,12 @@
 		<copy file="lib/gson-2.3.jar" todir="${dropbox}/${subfolder}/lib" />
 		<copy file="lib/commons-io-2.4.jar" todir="${dropbox}/${subfolder}/lib" />
 
-		
+
 		<copy todir="${dropbox}/${subfolder}/lib">
 			<fileset dir="lib" includes="**" />
-			
+
 		</copy>
-		
+
 		<!--
     <copy file="data/destinations.json" todir="${dropbox}/${subfolder}/data" />
     <copy file="data/destinationsNEW.json" todir="${dropbox}/${subfolder}/data" />
@@ -114,10 +114,10 @@
     -->
 
 	</target>
-	
+
 	<target name="copyDropboxRemote">
 		<mkdir dir="${dropbox}/${subfolder}" />
 		<copy todir="${dropbox}/${subfolder}" file="${dropboxjarname}" />
 	</target>
-	
+
 </project>

@@ -80,9 +80,8 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
 		}
 
-		if (anchor != null) {
+		if (anchor != null && _mapManager.ensureMap()) {
 			// MAP IS OPEN
-			boolean isOK = _mapManager.ensureMap();
 
 			if (_lastShip == null) {
 				_lastShip = new Ship("<Unknown>");

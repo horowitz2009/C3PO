@@ -19,6 +19,7 @@ public class FishingProtocol implements GameProtocol {
 
 	private ScreenScanner _scanner;
 	private MouseRobot _mouse;
+	private Long _lastTimeExecuted = null;
 
 	public FishingProtocol(ScreenScanner scanner, MouseRobot mouse) {
 		_scanner = scanner;
@@ -44,14 +45,19 @@ public class FishingProtocol implements GameProtocol {
 
 	@Override
 	public void execute() throws RobotInterruptedException {
-		if (_fishes != null && !_fishes.isEmpty()) {
-			for (Pixel pixel : _fishes) {
-				_mouse.checkUserMovement();
-				_mouse.click(pixel);
-				//_mouse.delay(200);
+		long now = System.currentTimeMillis();
+		if (_lastTimeExecuted == null || ((now - _lastTimeExecuted) > 2 * 60000)) {
+			_lastTimeExecuted = now;
+
+			if (_fishes != null && !_fishes.isEmpty()) {
+				for (Pixel pixel : _fishes) {
+					_mouse.checkUserMovement();
+					_mouse.click(pixel);
+					// _mouse.delay(200);
+				}
+			} else {
+				LOGGER.info("Fishes empty! Why?");
 			}
-		} else {
-			LOGGER.info("Fishes empty! Why?");
 		}
 	}
 }
