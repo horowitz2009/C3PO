@@ -42,6 +42,8 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.SimilarityImageComparator;
 import com.horowitz.commons.TemplateMatcher;
+import com.horowitz.seaport.ocr.OCRMarket;
+import com.horowitz.seaport.ocr.OCRMarketBonus;
 
 public class ScreenScanner {
 
@@ -53,7 +55,8 @@ public class ScreenScanner {
 	private ImageComparator _comparator;
 	private TemplateMatcher _matcher;
 	private MouseRobot _mouse;
-
+  private OCRMarket _ocrMarket;
+  private OCRMarketBonus _ocrMarketBonus;
 	private Pixel _br = null;
 	private Pixel _tl = null;
 	private boolean _optimized = false;
@@ -102,6 +105,13 @@ public class ScreenScanner {
 		_settings = settings;
 		_comparator = new SimilarityImageComparator(0.04, 2000);
 		_matcher = new TemplateMatcher();
+		try {
+			_ocrMarket = new OCRMarket(new SimilarityImageComparator(0.04, 2000));
+			_ocrMarketBonus = new OCRMarketBonus(new SimilarityImageComparator(0.04, 2000));
+		} catch (IOException e2) {
+			System.err.println("FAILED TO INIT OCRs!!!");
+			e2.printStackTrace();
+		}
 		// _matcher.setSimilarityThreshold(.91d);
 
 		try {
@@ -1255,6 +1265,22 @@ public class ScreenScanner {
 		MyImageIO.writeImage(image, filename);
 	}
 
+	public String ocrScanMarket(Rectangle area) throws AWTException {
+		if (_ocrMarket != null) {
+			BufferedImage image = new Robot().createScreenCapture(area);
+			return _ocrMarket.scanImage(image);
+		}
+		return null;
+	}
+	
+	public String ocrScanMarketBonus(Rectangle area) throws AWTException {
+		if (_ocrMarketBonus != null) {
+			BufferedImage image = new Robot().createScreenCapture(area);
+			return _ocrMarketBonus.scanImage(image);
+		}
+		return null;
+	}
+	
 	public BufferedImage scanStorage() throws AWTException, IOException, RobotInterruptedException {
 		if (getRock() != null) {
 			Pixel p = new Pixel(getRock());

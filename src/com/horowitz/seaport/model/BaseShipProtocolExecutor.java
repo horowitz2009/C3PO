@@ -319,13 +319,37 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 					}
 					
-					if (_settings.getBoolean("doOCR", true)) {
+					if (_lastShip != null ) {//&& _settings.getBoolean("doOCR", true)
 						Rectangle areaSend = new Rectangle();
 						areaSend.x = marketTitle.x - 91;
 						areaSend.y = marketTitle.y + 301;
 						areaSend.width = 110;
 						areaSend.height = 64;
-						_scanner.writeAreaTS(areaSend, "ocr/areaSend.bmp");
+						Rectangle areaBonus = new Rectangle();
+						areaBonus.x = marketTitle.x - 216;
+						areaBonus.y = marketTitle.y + 423;
+						areaBonus.width = 68;
+						areaBonus.height = 30;
+						
+						String sc = _scanner.ocrScanMarket(areaSend);
+						String bonus = _scanner.ocrScanMarketBonus(areaBonus);
+						if (sc!= null && !sc.isEmpty() && bonus!= null && !bonus.isEmpty()) {
+							try {
+								int n = Integer.parseInt(sc);
+								int b = Integer.parseInt(bonus);
+								int fullLoad = _lastShip.getCapacity() * b;
+								LOGGER.info("n = " + n + ", b = " + b);
+								if (fullLoad != n) {
+									LOGGER.info("SHIP NOT FULLY LOADED. SKIPPING!");
+									return doNext(chain, dest);
+								}
+							} catch (NumberFormatException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+						
+						//_scanner.writeAreaTS(areaBonus, "ocr/areaBonus.bmp");
 					}
 
 				} else if (dest.getName().startsWith("Merchant")) {
@@ -434,23 +458,28 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 					return true;
 				} else {
-					LOGGER.info(dest.getName() + " can't be done!");
-					boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-					// if (found)
-					_mouse.checkUserMovement();
-					_mouse.delay(1500);
-					// chain.poll();
-					if (chain.isEmpty()) {
-						LOGGER.info("reached the end of chain");
-						// TODO close the map and move on
-						return false;
-					} else
-						return sendShip(chain);
+					return doNext(chain, dest);
 				}
 			} else
 				return sendShip(chain);
 		}
 		return false;
+	}
+
+	private boolean doNext(LinkedList<Destination> chain, Destination dest)
+	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
+		LOGGER.info(dest.getName() + " can't be done!");
+		boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
+		// if (found)
+		_mouse.checkUserMovement();
+		_mouse.delay(1500);
+		// chain.poll();
+		if (chain.isEmpty()) {
+			LOGGER.info("reached the end of chain");
+			// TODO close the map and move on
+			return false;
+		} else
+			return sendShip(chain);
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
