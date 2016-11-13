@@ -22,6 +22,7 @@ public class OCRMarket {
   public OCRMarket(ImageComparator comparator) throws IOException {
     super();
     ocrb = new OCRB(OUTPUT_PATH + "/" + OCR_PREFIX, comparator);
+    ocrb.setErrors(2);
   }
 
   public String scanImage(BufferedImage image) {
