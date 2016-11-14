@@ -40,7 +40,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		super();
 	}
 
-	public BaseShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings) throws IOException {
+	public BaseShipProtocolExecutor(ScreenScanner scanner, MouseRobot mouse, MapManager mapManager, Settings settings)
+	    throws IOException {
 		_scanner = scanner;
 		_mouse = mouse;
 		_mapManager = mapManager;
@@ -54,10 +55,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		// check are there map notifications
 		boolean check = _settings.getBoolean("checkMapNotification", false);
 		if (check) {
-		  Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
-		  _shipwreckAvailable = p != null;
-	  } else
-	  	_shipwreckAvailable = true;
+			Pixel p = _scanner.scanOne("dest/mapNotification.bmp", null, false);
+			_shipwreckAvailable = p != null;
+		} else
+			_shipwreckAvailable = true;
 		return _scanner.ensureHome();
 	}
 
@@ -84,7 +85,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					if (_mouse.getMode() == MouseRobot.SLOW)
 						_mouse.delay(_shipLocationDelaySlow);
 
-					//1. check for pin
+					// 1. check for pin
 					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
 					// _scanner.writeImage(miniArea, "pin.bmp");
 					Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
@@ -92,10 +93,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 						doShip(pin);
 
 					} else {
-						//2. check for shipwreck award
-						//_scanner.writeArea(_scanner._popupAreaB, "shipwreck_area.jpg");
+						// 2. check for shipwreck award
+						// _scanner.writeArea(_scanner._popupAreaB, "shipwreck_area.jpg");
 						Pixel cb = _scanner.scanOneFast(_scanner.getImageData("collect.bmp"), _scanner._popupAreaB, false);
-						
+
 						if (cb != null) {
 							_scanner.writeAreaTS(_scanner._popupArea, "shipwreck_reward");
 							_mouse.click(cb);
@@ -142,15 +143,15 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 60,
 		    _scanner.getBottomRight().y - 240, 270, 240);
 		Pixel destButton = null;
-//		if (dest.getAbbr().equalsIgnoreCase("F")) {
-//			destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
-//		} else if (dest.isContract()) {
-			
-			destButton = _scanner.scanContractButton("dest/collect_contract_new.bmp", buttonArea);
-//			if (destButton == null) {
-//			  destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
-//			}
-//		}
+		// if (dest.getAbbr().equalsIgnoreCase("F")) {
+		// destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
+		// } else if (dest.isContract()) {
+
+		destButton = _scanner.scanContractButton("dest/collect_contract_new.bmp", buttonArea);
+		// if (destButton == null) {
+		// destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
+		// }
+		// }
 		if (destButton != null) {
 			LOGGER.info("CONTRACT COMPLETED. MOVING ON...");
 			_mouse.click(destButton);
@@ -160,7 +161,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		return false;
 	}
 
-	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException, IOException, GameErrorException {
+	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException,
+	    IOException, GameErrorException {
 		LOGGER.info("CHAIN: " + chain);
 		_mouse.checkUserMovement();
 		Destination dest = chain.poll();
@@ -175,8 +177,8 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 			int x = smallTownPos.x + dest.getRelativePosition().x;
 			int y = smallTownPos.y + dest.getRelativePosition().y;
+			
 			// what if dest is shipwreck
-			boolean shipwreck = false;
 			if (dest.getAbbr().equalsIgnoreCase("SW")) {
 				good = false;
 				if (_shipwreckAvailable) {
@@ -186,11 +188,10 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 					Pixel p = _scanner.scanOne("dest/shipwreck2.bmp", null, false);
 					if (p == null) {
 						p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
-					  t = 3;
+						t = 3;
 					}
 					if (p != null) {
 						LOGGER.info("FOUND IT! " + t);
-						shipwreck = true;
 						good = true;
 						x = p.x;
 						y = p.y + 2;
@@ -211,7 +212,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 				// assume the dialog is open
 				if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
-					//if friend and collected, need to click again
+					// if friend and collected, need to click again
 					_mouse.click(x, y);
 					_mouse.delay(750);
 					if (_mouse.getMode() == MouseRobot.SLOW)
@@ -219,264 +220,230 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				}
 
 				// manage market
-				if (dest.getName().startsWith("Market")) {
-					Pixel marketTitle = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
-					if (marketTitle != null) {
-						//FIXME the hardcoded approach
-						String[] ss = dest.getOption().split("-");
-						String commodity = ss[0];
-						String prize = ss[1];
-						
-						if (commodity.equalsIgnoreCase("hat")||commodity.equalsIgnoreCase("1")) {
-							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
-							for (int i = 0; i < 13; i++) {
-								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
-								_mouse.delay(150);
-							}
-
-							_mouse.delay(33);
-							_mouse.click();
-							_mouse.delay(300);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(600);
-
-						} else if (commodity.equalsIgnoreCase("cocoa") || commodity.equalsIgnoreCase("7")) {
-							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
-							for (int i = 0; i < 13; i++) {
-								_mouse.wheelDown(2);// scroll down to the last commodity, then click second last, which is cocoa
-								_mouse.delay(150);
-							}
-							_mouse.delay(33);
-							_mouse.click(marketTitle.x - 182, marketTitle.y + 171);
-							_mouse.delay(300);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(600);
-
-						} else if (commodity.equalsIgnoreCase("8")) {
-							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
-							for (int i = 0; i < 13; i++) {
-								_mouse.wheelDown(2);// scroll down to the last commodity, then click second last
-								_mouse.delay(150);
-							}
-							_mouse.delay(33);
-							_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
-							_mouse.delay(300);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(600);
-
-						} else if (commodity.equalsIgnoreCase("9")) {
-							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
-							for (int i = 0; i < 13; i++) {
-								_mouse.wheelDown(2);// scroll down to the last commodity, then click the LAST
-								_mouse.delay(150);
-							}
-							_mouse.delay(33);
-							_mouse.click(marketTitle.x - 182, marketTitle.y + 349);
-							_mouse.delay(300);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(600);
-
-						} else if (commodity.equalsIgnoreCase("cannon")||commodity.equalsIgnoreCase("2")) {
-							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
-							for (int i = 0; i < 13; i++) {
-								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
-								_mouse.delay(150);
-							}
-
-							_mouse.delay(33);
-							_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
-							_mouse.delay(300);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(700);
-
-						} else if (commodity.equalsIgnoreCase("3")) {
-							_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
-							for (int i = 0; i < 13; i++) {
-								_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
-								_mouse.delay(150);
-							}
-
-							_mouse.delay(33);
-							_mouse.click(marketTitle.x - 182, marketTitle.y + 266 + 78);
-							_mouse.delay(300);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(700);
-
-						}
-
-						if (prize.equalsIgnoreCase("XP") || prize.equalsIgnoreCase("1")) {
-							_mouse.click(marketTitle.x + 312, marketTitle.y + 188);
-							_mouse.delay(300);
-						} else if (prize.equalsIgnoreCase("coins") || prize.equalsIgnoreCase("2")) {
-							_mouse.click(marketTitle.x + 312, marketTitle.y + 266);
-							_mouse.delay(300);
-						} else if (prize.equalsIgnoreCase("3")) {
-							_mouse.click(marketTitle.x + 312, marketTitle.y + 266 + 78);
-							_mouse.delay(300);
-						}
-						if (_mouse.getMode() == MouseRobot.SLOW)
-							_mouse.delay(600);
-
-					}
-					
-					if (_lastShip != null ) {//&& _settings.getBoolean("doOCR", true)
-						Rectangle areaSend = new Rectangle();
-						areaSend.x = marketTitle.x - 91;
-						areaSend.y = marketTitle.y + 301;
-						areaSend.width = 110;
-						areaSend.height = 64;
-						Rectangle areaBonus = new Rectangle();
-						areaBonus.x = marketTitle.x - 216;
-						areaBonus.y = marketTitle.y + 423;
-						areaBonus.width = 68;
-						areaBonus.height = 30;
-						
-						String sc = _scanner.ocrScanMarket(areaSend);
-						String bonus = _scanner.ocrScanMarketBonus(areaBonus);
-						if (sc!= null && !sc.isEmpty() && bonus!= null && !bonus.isEmpty()) {
-							try {
-								int n = Integer.parseInt(sc);
-								int b = Integer.parseInt(bonus);
-								int fullLoad = _lastShip.getCapacity() * b;
-								LOGGER.info("n = " + n + ", b = " + b);
-								if (fullLoad != n) {
-									LOGGER.info("SHIP NOT FULLY LOADED. SKIPPING!");
-									return doNext(chain, dest);
-								}
-							} catch (NumberFormatException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						
-						//_scanner.writeAreaTS(areaBonus, "ocr/areaBonus.bmp");
-					}
-
-				} else if (dest.getName().startsWith("Merchant")) {
+				if (dest.getName().startsWith("Market"))
+					good = doMarket(chain, dest);
+				else if (dest.getName().startsWith("Merchant")) {
 					Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
 					if (merchantTitle != null) {
-  					int option = Integer.parseInt(dest.getOption());
-  					Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
-  					
-  					//click the 'go back' button first
-  					_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
-  					_mouse.delay(250);
-  					
-  					//click the desired commodity
-  					_mouse.click(commodityP);
-  					_mouse.delay(250);
-  					
-  					//look for send button
-					}					
+						int option = Integer.parseInt(dest.getOption());
+						Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
+
+						// click the 'go back' button first
+						_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
+						_mouse.delay(250);
+
+						// click the desired commodity
+						_mouse.click(commodityP);
+						_mouse.delay(250);
+
+						// look for send button
+					}
 				}
 
-				Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
-				    _scanner.getBottomRight().y - 175, 255, 90);
-				int opt = 4;
-				Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-				if (destButton == null) {
-					opt = 0;
-					destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
-				}
-				if (destButton == null) {
-					opt = 2;
-					destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
-				}
-				if (destButton == null) {
-					// check for got it button
-					LOGGER.info("CHECK FOR BLUE GOT IT...");
-					buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
-					    _scanner.getBottomRight().y - 240, 205, 240);
-					Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
-					if (gotitButtonBlue == null) {
-						gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+				if (good) {
+					Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
+					    _scanner.getBottomRight().y - 175, 255, 90);
+					int opt = 4;
+					Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
+					if (destButton == null) {
+						opt = 0;
+						destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
 					}
-					if (gotitButtonBlue != null) {
-						_mouse.click(gotitButtonBlue);
-						LOGGER.info("DESTINATION COMPLETED!");
-						_mouse.delay(800);
+					if (destButton == null) {
+						opt = 2;
+						destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+					}
+					if (destButton == null) {
+						// check for got it button
+						LOGGER.info("CHECK FOR BLUE GOT IT...");
+						buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
+						    _scanner.getBottomRight().y - 240, 205, 240);
+						Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
+						if (gotitButtonBlue == null) {
+							gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+						}
+						if (gotitButtonBlue != null) {
+							_mouse.click(gotitButtonBlue);
+							LOGGER.info("DESTINATION COMPLETED!");
+							_mouse.delay(800);
+							if (_mouse.getMode() == MouseRobot.SLOW)
+								_mouse.delay(1000);
+
+							return false;
+						}
+					}
+					if (destButton != null) {
+						LOGGER.info("set sail " + opt);
+
+						_mouse.checkUserMovement();
+						_mouse.click(destButton);
+
+						_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+						_mouse.checkUserMovement();
+						_mouse.delay(1300);
 						if (_mouse.getMode() == MouseRobot.SLOW)
 							_mouse.delay(1000);
 
-						return false;
-					}
-				}
-				if (destButton != null) {
-					LOGGER.info("set sail " + opt);
-
-					if (_settings.getBoolean("doOCR", true)) {
-						Rectangle areaCost = new Rectangle();
-						areaCost.x = destButton.x - 161;
-						areaCost.y = destButton.y;
-						areaCost.width = 124;
-						areaCost.height = 58;
-						_scanner.writeAreaTS(areaCost, "ocr/areaCost.bmp");
-					}
-
-					// nice. we can continue
-					// if (dest.getName().startsWith("Market")) {
-					//
-					// // FIXME
-					// if ("Hat-XP".equalsIgnoreCase(dest.getOption())) {
-					// // XP
-					// Pixel phat = new Pixel(destButton.x - 222 - 27, destButton.y - 247 - 5);// xOff: 27, yOff: 5
-					// _mouse.checkUserMovement();
-					// _mouse.click(phat);
-					// _mouse.delay(650);
-					//
-					// Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
-					// _mouse.checkUserMovement();
-					// _mouse.click(pxp);
-					// _mouse.delay(650);
-					// } else if ("Cocoa-XP".equalsIgnoreCase(dest.getOption())) {
-					// // XP
-					// Pixel pxp = new Pixel(destButton.x + 282 - 27, destButton.y - 227 - 5);// xOff: 27, yOff: 5
-					// _mouse.checkUserMovement();
-					// _mouse.click(pxp);
-					// _mouse.delay(650);
-					// } else if ("Cocoa-Coins".equalsIgnoreCase(dest.getOption())) {
-					// // coins
-					// Pixel coins = new Pixel(destButton.x + 282 - 27, destButton.y - 150 - 5);// xOff: 27, yOff: 5
-					// _mouse.checkUserMovement();
-					// _mouse.click(coins);
-					// _mouse.delay(650);
-					// }
-					// }
-					_mouse.checkUserMovement();
-					_mouse.click(destButton);
-
-					if (shipwreck) {
-						// do screenshot
-						_scanner.captureScreen("shipwreck ", true);
-					}
-
-					_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
-					_mouse.checkUserMovement();
-					_mouse.delay(1300);
-					if (_mouse.getMode() == MouseRobot.SLOW)
-						_mouse.delay(1000);
-
-					return true;
-				} else {
+						return true;
+					} else {
+						good = false;
+					}//no Set sail button
+				}//probably market not good
+				
+				if (!good) {
 					return doNext(chain, dest);
 				}
-			} else
+			} else {
 				return sendShip(chain);
+			}
 		}
 		return false;
 	}
 
-	private boolean doNext(LinkedList<Destination> chain, Destination dest)
-	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
+	private boolean doMarket(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
+	    IOException, AWTException, GameErrorException {
+		Pixel marketTitle = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
+		if (marketTitle != null) {
+			// FIXME the hardcoded approach
+			String[] ss = dest.getOption().split("-");
+			String commodity = ss[0];
+			String prize = ss[1];
+
+			if (commodity.equalsIgnoreCase("1")) {
+				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
+				for (int i = 0; i < 13; i++) {
+					_mouse.wheelDown(-2);// scroll up to the first commodity
+					_mouse.delay(150);
+				}
+
+				_mouse.delay(33);
+				_mouse.click();
+				_mouse.delay(300);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(600);
+
+			} else if (commodity.equalsIgnoreCase("7")) {
+				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
+				for (int i = 0; i < 13; i++) {
+					_mouse.wheelDown(2);// scroll down to the last commodity, then click third last
+					_mouse.delay(150);
+				}
+				_mouse.delay(33);
+				_mouse.click(marketTitle.x - 182, marketTitle.y + 171);
+				_mouse.delay(300);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(600);
+
+			} else if (commodity.equalsIgnoreCase("8")) {
+				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
+				for (int i = 0; i < 13; i++) {
+					_mouse.wheelDown(2);// scroll down to the last commodity, then click second last
+					_mouse.delay(150);
+				}
+				_mouse.delay(33);
+				_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
+				_mouse.delay(300);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(600);
+
+			} else if (commodity.equalsIgnoreCase("9")) {
+				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
+				for (int i = 0; i < 13; i++) {
+					_mouse.wheelDown(2);// scroll down to the last commodity, then click the LAST
+					_mouse.delay(150);
+				}
+				_mouse.delay(33);
+				_mouse.click(marketTitle.x - 182, marketTitle.y + 349);
+				_mouse.delay(300);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(600);
+
+			} else if (commodity.equalsIgnoreCase("2")) {
+				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
+				for (int i = 0; i < 13; i++) {
+					_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
+					_mouse.delay(150);
+				}
+
+				_mouse.delay(33);
+				_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
+				_mouse.delay(300);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(700);
+
+			} else if (commodity.equalsIgnoreCase("3")) {
+				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
+				for (int i = 0; i < 13; i++) {
+					_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
+					_mouse.delay(150);
+				}
+
+				_mouse.delay(33);
+				_mouse.click(marketTitle.x - 182, marketTitle.y + 266 + 78);
+				_mouse.delay(300);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(700);
+
+			}
+
+			if (prize.equalsIgnoreCase("XP") || prize.equalsIgnoreCase("1")) {
+				_mouse.click(marketTitle.x + 312, marketTitle.y + 188);
+				_mouse.delay(300);
+			} else if (prize.equalsIgnoreCase("coins") || prize.equalsIgnoreCase("2")) {
+				_mouse.click(marketTitle.x + 312, marketTitle.y + 266);
+				_mouse.delay(300);
+			} else if (prize.equalsIgnoreCase("3")) {
+				_mouse.click(marketTitle.x + 312, marketTitle.y + 266 + 78);
+				_mouse.delay(300);
+			}
+			if (_mouse.getMode() == MouseRobot.SLOW)
+				_mouse.delay(600);
+
+		}
+
+		if (_lastShip != null) {// && _settings.getBoolean("doOCR", true)
+			Rectangle areaSend = new Rectangle();
+			areaSend.x = marketTitle.x - 91;
+			areaSend.y = marketTitle.y + 301;
+			areaSend.width = 110;
+			areaSend.height = 64;
+			Rectangle areaBonus = new Rectangle();
+			areaBonus.x = marketTitle.x - 216;
+			areaBonus.y = marketTitle.y + 423;
+			areaBonus.width = 68;
+			areaBonus.height = 30;
+
+			String sc = _scanner.ocrScanMarket(areaSend);
+			String bonus = _scanner.ocrScanMarketBonus(areaBonus);
+			if (sc != null && !sc.isEmpty() && bonus != null && !bonus.isEmpty()) {
+				try {
+					int n = Integer.parseInt(sc);
+					int b = Integer.parseInt(bonus);
+					int fullLoad = _lastShip.getCapacity() * b;
+					LOGGER.info("n = " + n + ", b = " + b);
+					if (fullLoad != n) {
+						LOGGER.info("SHIP NOT FULLY LOADED. SKIPPING!");
+						return false;
+					}
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+
+			// _scanner.writeAreaTS(areaBonus, "ocr/areaBonus.bmp");
+		}
+		return true;
+	}
+
+	private boolean doNext(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
+	    IOException, AWTException, GameErrorException {
 		LOGGER.info(dest.getName() + " can't be done!");
-		boolean found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-		// if (found)
+		_scanner.scanOneFast("buildings/x.bmp", null, true);
 		_mouse.checkUserMovement();
 		_mouse.delay(1500);
-		// chain.poll();
 		if (chain.isEmpty()) {
 			LOGGER.info("reached the end of chain");
-			// TODO close the map and move on
 			return false;
 		} else
 			return sendShip(chain);
