@@ -770,11 +770,15 @@ public class ScreenScanner {
 
 	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click) throws AWTException,
 	    RobotInterruptedException {
+		return scanOne(imageData, area, click, null);
+	}
+	
+	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click, Color colorToBypass) throws AWTException {
 		if (area == null) {
 			area = imageData.getDefaultArea();
 		}
 		BufferedImage screen = new Robot().createScreenCapture(area);
-		Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, imageData.getColorToBypass());
+		Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, colorToBypass != null ? colorToBypass : imageData.getColorToBypass());
 		LOGGER
 		    .fine("LOOKING FOR " + imageData.getName() + "  screen: " + area + " BYPASS: " + imageData.getColorToBypass());
 
@@ -790,6 +794,7 @@ public class ScreenScanner {
 		return pixel;
 
 	}
+	
 
 	public Pixel scanOne(String filename, Rectangle area, boolean click) throws RobotInterruptedException, IOException,
 	    AWTException {
@@ -1303,5 +1308,7 @@ public class ScreenScanner {
 
 		return null;
 	}
+
+
 
 }

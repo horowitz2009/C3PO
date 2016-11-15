@@ -1,6 +1,7 @@
 package com.horowitz.seaport.model;
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -125,7 +126,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		for (Ship ship : ships) {
 			if (ship.isActive()) {
 				_mouse.checkUserMovement();
-				if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false) != null) {
+				if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false, Color.RED) != null) {
 					LOGGER.info("SHIP: " + ship.getName());
 					_lastShip = ship;
 					break;
