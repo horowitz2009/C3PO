@@ -177,7 +177,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 			int x = smallTownPos.x + dest.getRelativePosition().x;
 			int y = smallTownPos.y + dest.getRelativePosition().y;
-			
+
 			// what if dest is shipwreck
 			if (dest.getAbbr().equalsIgnoreCase("SW")) {
 				good = false;
@@ -287,9 +287,9 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 						return true;
 					} else {
 						good = false;
-					}//no Set sail button
-				}//probably market not good
-				
+					}// no Set sail button
+				}// probably market not good
+
 				if (!good) {
 					return doNext(chain, dest);
 				}
@@ -302,114 +302,126 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 	private boolean doMarket(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
 	    IOException, AWTException, GameErrorException {
-		Pixel marketTitle = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
-		if (marketTitle != null) {
+		Pixel mt = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
+		boolean good = false;
+		if (mt != null) {
 			// FIXME the hardcoded approach
+			// Rectangle sendIconArea = new Rectangle(mt.x - 75, mt.y+238, 90, 70);
+			//
+			// Rectangle getIconArea = new Rectangle(mt.x + 118, mt.y+238, 90, 70);
+			// _scanner.writeArea(sendIconArea, "sendIconArea.jpg");
+			// _scanner.writeArea(getIconArea, "getIconArea.jpg");
+			//
+			//
 			String[] ss = dest.getOption().split("-");
 			String commodity = ss[0];
 			String prize = ss[1];
+			int c = -1;
+			try {
+				c = Integer.parseInt(commodity);
+			} catch (NumberFormatException e) {
+				// not a number, then we do new approach
+			}
 
-			if (commodity.equalsIgnoreCase("1")) {
-				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
-				for (int i = 0; i < 13; i++) {
-					_mouse.wheelDown(-2);// scroll up to the first commodity
-					_mouse.delay(150);
+			if (c >= 0) {
+				// old approach
+				good = true;
+				int x = mt.x - 182;
+				int y = mt.y + 171;
+				switch (c) {
+				case 1:
+					scrollUp(mt);
+					y = mt.y + 171;
+					break;
+				case 2:
+					scrollUp(mt);
+					y = mt.y + 266;
+					break;
+				case 3:
+					scrollUp(mt);
+					y = mt.y + 344;
+					break;
+
+				case 7:
+					scrollDown(mt, 13);
+					y = mt.y + 171;
+					break;
+				case 8:
+					scrollDown(mt, 13);
+					y = mt.y + 266;
+					break;
+				case 9:
+					scrollDown(mt, 13);
+					y = mt.y + 344;
+					break;
 				}
 
-				_mouse.delay(33);
-				_mouse.click();
-				_mouse.delay(300);
-				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(600);
-
-			} else if (commodity.equalsIgnoreCase("7")) {
-				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
-				for (int i = 0; i < 13; i++) {
-					_mouse.wheelDown(2);// scroll down to the last commodity, then click third last
-					_mouse.delay(150);
-				}
-				_mouse.delay(33);
-				_mouse.click(marketTitle.x - 182, marketTitle.y + 171);
-				_mouse.delay(300);
-				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(600);
-
-			} else if (commodity.equalsIgnoreCase("8")) {
-				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
-				for (int i = 0; i < 13; i++) {
-					_mouse.wheelDown(2);// scroll down to the last commodity, then click second last
-					_mouse.delay(150);
-				}
-				_mouse.delay(33);
-				_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
-				_mouse.delay(300);
-				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(600);
-
-			} else if (commodity.equalsIgnoreCase("9")) {
-				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 349);
-				for (int i = 0; i < 13; i++) {
-					_mouse.wheelDown(2);// scroll down to the last commodity, then click the LAST
-					_mouse.delay(150);
-				}
-				_mouse.delay(33);
-				_mouse.click(marketTitle.x - 182, marketTitle.y + 349);
-				_mouse.delay(300);
-				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(600);
-
-			} else if (commodity.equalsIgnoreCase("2")) {
-				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
-				for (int i = 0; i < 13; i++) {
-					_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
-					_mouse.delay(150);
-				}
-
-				_mouse.delay(33);
-				_mouse.click(marketTitle.x - 182, marketTitle.y + 266);
+				_mouse.click(x, y);
 				_mouse.delay(300);
 				if (_mouse.getMode() == MouseRobot.SLOW)
 					_mouse.delay(700);
 
-			} else if (commodity.equalsIgnoreCase("3")) {
-				_mouse.mouseMove(marketTitle.x - 182, marketTitle.y + 171);
-				for (int i = 0; i < 13; i++) {
-					_mouse.wheelDown(-2);// scroll up to the first commodity which is hat
-					_mouse.delay(150);
+				// now prize options
+				int pr = 2;// default to 2, as most probably gem is there
+				try {
+					pr = Integer.parseInt(prize);
+				} catch (NumberFormatException e) {
+					pr = 2;// stick to default
 				}
 
-				_mouse.delay(33);
-				_mouse.click(marketTitle.x - 182, marketTitle.y + 266 + 78);
+				x = mt.x + 312;
+				y = mt.y + 188;
+				switch (pr) {
+				case 1:
+					y = mt.y + 188;
+					break;
+				case 2:
+					y = mt.y + 266;
+					break;
+				case 3:
+					y = mt.y + 344;
+					break;
+				}
+				_mouse.click(x, y);
 				_mouse.delay(300);
 				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(700);
+					_mouse.delay(600);
 
-			}
+				// end of old approach
+			} else {
+				// new approach
+				good = true;
+				Rectangle sendIconArea = new Rectangle(mt.x - 75, mt.y + 238, 90, 70);
 
-			if (prize.equalsIgnoreCase("XP") || prize.equalsIgnoreCase("1")) {
-				_mouse.click(marketTitle.x + 312, marketTitle.y + 188);
-				_mouse.delay(300);
-			} else if (prize.equalsIgnoreCase("coins") || prize.equalsIgnoreCase("2")) {
-				_mouse.click(marketTitle.x + 312, marketTitle.y + 266);
-				_mouse.delay(300);
-			} else if (prize.equalsIgnoreCase("3")) {
-				_mouse.click(marketTitle.x + 312, marketTitle.y + 266 + 78);
-				_mouse.delay(300);
+				Rectangle getIconArea = new Rectangle(mt.x + 118, mt.y + 238, 90, 70);
+				// check commodity
+				Pixel pc = _scanner.scanOneFast("market/" + commodity + "M2.bmp", sendIconArea, false);
+				if (pc == null) {
+					// need to find it in scrollmenu and click it
+					good = locateCommodity(mt, commodity);
+				}
+				if (good) {
+					// check prize
+					Pixel pp = _scanner.scanOneFast("market/" + prize + "M2.bmp", getIconArea, false);
+					if (pp == null) {
+						// need to find it in scrollmenu and click it
+						good = locatePrize(mt, prize);
+					}
+				}
+				// else we're fine.
 			}
-			if (_mouse.getMode() == MouseRobot.SLOW)
-				_mouse.delay(600);
 
 		}
 
-		if (_lastShip != null) {// && _settings.getBoolean("doOCR", true)
+		if (good && _lastShip != null) {// && _settings.getBoolean("doOCR", true)
 			Rectangle areaSend = new Rectangle();
-			areaSend.x = marketTitle.x - 91;
-			areaSend.y = marketTitle.y + 301;
+			areaSend.x = mt.x - 91;
+			areaSend.y = mt.y + 301;
 			areaSend.width = 110;
 			areaSend.height = 64;
 			Rectangle areaBonus = new Rectangle();
-			areaBonus.x = marketTitle.x - 216;
-			areaBonus.y = marketTitle.y + 423;
+			areaBonus.x = mt.x - 216;
+			areaBonus.y = mt.y + 423;
 			areaBonus.width = 68;
 			areaBonus.height = 30;
 
@@ -433,7 +445,60 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 
 			// _scanner.writeAreaTS(areaBonus, "ocr/areaBonus.bmp");
 		}
-		return true;
+		return good;
+	}
+
+	private boolean locatePrize(Pixel mt, String prize) throws RobotInterruptedException, IOException, AWTException {
+		int x = mt.x + 274;
+		int y = mt.y + 144;
+		Rectangle menuArea = new Rectangle(x, y, 80, 234);
+		Pixel pp = _scanner.scanOneFast("market/" + prize + "M1.bmp", menuArea, false);
+		if (pp != null) {
+			_mouse.click(pp.x + 5, pp.y + 5);
+			_mouse.delay(100);
+		}
+		return pp != null;
+	}
+
+	private boolean locateCommodity(Pixel mt, String commodity) throws RobotInterruptedException, IOException,
+	    AWTException {
+		int x = mt.x - 220;
+		int y = mt.y + 144;
+		Rectangle menuArea = new Rectangle(x, y, 80, 234);
+		scrollUp(mt);
+		boolean found = false;
+		int turns = 0;
+		do {
+			Pixel pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
+			if (pc != null) {
+				_mouse.click(pc.x + 13, pc.y + 9);
+				_mouse.delay(100);
+				found = true;
+			} else {
+				turns++;
+				scrollDown(mt, 2);
+				_mouse.delay(200);
+			}
+		} while (!found && turns > 22);
+		return found;
+	}
+
+	private void scrollDown(Pixel mt, int times) throws RobotInterruptedException {
+		_mouse.mouseMove(mt.x - 182, mt.y + 349);
+		for (int i = 0; i < times; i++) {
+			_mouse.wheelDown(2);// scroll down to the last commodity, then click the LAST
+			_mouse.delay(150);
+		}
+		_mouse.delay(33);
+	}
+
+	private void scrollUp(Pixel mt) throws RobotInterruptedException {
+		_mouse.mouseMove(mt.x - 182, mt.y + 171);
+		for (int i = 0; i < 13; i++) {
+			_mouse.wheelDown(-2);// scroll up to the first commodity
+			_mouse.delay(150);
+		}
+		_mouse.delay(33);
 	}
 
 	private boolean doNext(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
