@@ -773,11 +773,20 @@ public class ScreenScanner {
 		return scanOne(imageData, area, click, null);
 	}
 	
+	
 	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click, Color colorToBypass) throws AWTException {
 		if (area == null) {
 			area = imageData.getDefaultArea();
 		}
 		BufferedImage screen = new Robot().createScreenCapture(area);
+		
+		if (imageData.getFilename().endsWith("F.bmp")) {
+	    FastBitmap fb = new FastBitmap(screen);
+      fb.toGrayscale();
+	    new Threshold(200).applyInPlace(fb);
+	    fb.toRGB();
+	    fb.saveAsBMP("ship_area.bmp");
+		}
 		Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, colorToBypass != null ? colorToBypass : imageData.getColorToBypass());
 		LOGGER
 		    .fine("LOOKING FOR " + imageData.getName() + "  screen: " + area + " BYPASS: " + imageData.getColorToBypass());
@@ -1289,8 +1298,8 @@ public class ScreenScanner {
 	public BufferedImage scanStorage() throws AWTException, IOException, RobotInterruptedException {
 		if (getRock() != null) {
 			Pixel p = new Pixel(getRock());
-			p.x += 51;
-			p.y -= 145;
+			p.x += 53;
+			p.y -= 127;
 			if (ensureHome()) {
 				_mouse.click(p);
 				_mouse.delay(500);

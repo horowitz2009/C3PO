@@ -126,12 +126,16 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		for (Ship ship : ships) {
 			if (ship.isActive()) {
 				_mouse.checkUserMovement();
-				if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false, Color.RED) != null) {
-					LOGGER.info("SHIP: " + ship.getName());
-					_lastShip = ship;
-					break;
-				}
-				;
+				try {
+	        if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false, Color.RED) != null) {
+	        	LOGGER.info("SHIP: " + ship.getName());
+	        	_lastShip = ship;
+	        	break;
+	        }
+        } catch (Exception e) {
+        	LOGGER.info("fail: " + ship.getImageDataTitle().getFilename());
+	        e.printStackTrace();
+        }
 			}
 		}
 		if (_lastShip == null) {
