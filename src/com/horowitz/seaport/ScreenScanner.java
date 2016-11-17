@@ -785,7 +785,7 @@ public class ScreenScanner {
       fb.toGrayscale();
 	    new Threshold(200).applyInPlace(fb);
 	    fb.toRGB();
-	    fb.saveAsBMP("ship_area.bmp");
+	    //fb.saveAsBMP("ship_area.bmp");
 		}
 		Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, colorToBypass != null ? colorToBypass : imageData.getColorToBypass());
 		LOGGER

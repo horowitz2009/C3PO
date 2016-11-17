@@ -133,7 +133,7 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	        	break;
 	        }
         } catch (Exception e) {
-        	LOGGER.info("fail: " + ship.getImageDataTitle().getFilename());
+        	LOGGER.info("fail: " + ship.getImageTitle());
 	        e.printStackTrace();
         }
 			}
