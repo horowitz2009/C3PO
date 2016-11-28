@@ -11,7 +11,7 @@ import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 
-public class FishingProtocol implements GameProtocol {
+public class FishingProtocol extends AbstractGameProtocol {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 

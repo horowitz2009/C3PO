@@ -14,6 +14,8 @@ public interface GameProtocol {
 
 	public boolean preExecute() throws AWTException, IOException, RobotInterruptedException;
   
+  public void interrupt();
   
+  public void reset();
   
 }

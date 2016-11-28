@@ -24,7 +24,7 @@ import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 
-public class BarrelsProtocol implements GameProtocol {
+public class BarrelsProtocol extends AbstractGameProtocol {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
@@ -134,27 +134,38 @@ public class BarrelsProtocol implements GameProtocol {
 
 			List<Blob> blobs = bd.ProcessImage(fb);
 			for (Blob blob : blobs) {
-				cnt++;
-				IntPoint c = blob.getCenter();
-				System.out.println(c);
-				Pixel p = new Pixel(c.y + area.x + 0, c.x + area.y + 0);
-				LOGGER.info("BARREL: " + p);
-				_mouse.click(p);
-				_mouse.delay(50);
+				if (isNotInterrupted()) {
+					cnt++;
+					IntPoint c = blob.getCenter();
+					System.out.println(c);
+					Pixel p = new Pixel(c.y + area.x + 0, c.x + area.y + 0);
+					LOGGER.fine("BARREL: " + p);
+					_mouse.click(p);
+					_mouse.delay(50);
 
-				p.x += 6;
-				p.y += 6;
-				_mouse.click(p);
-				_mouse.delay(50);
+					p.x += 6;
+					p.y += 6;
+					_mouse.click(p);
+					_mouse.delay(50);
 
-				p.x -= 12;
-				p.y -= 6;
-				_mouse.click(p);
-				_mouse.delay(150);
-				if (_capture) {
-				  _scanner.captureArea(new Rectangle(p.x - 21, p.y - 120, 51, 120), "barrels/barrels", true);
+					p.x -= 12;
+					p.y -= 6;
+					_mouse.click(p);
+					_mouse.delay(100);
+					if (_capture) {
+						_scanner.captureArea(new Rectangle(p.x - 21, p.y - 120, 51, 120), "barrels/barrels", true);
+					}
 				}
 
+			}
+			if (isNotInterrupted()) {
+				// additional clicks to gem area
+				int x = _scanner.getBottomRight().x - 170;
+				int y = _scanner.getTopLeft().y + 42;
+				for (int i = 0; i < 16 && isNotInterrupted(); i++) {
+					_mouse.click(x + i * 10, y);
+				}
+				_mouse.delay(100);
 			}
 			LOGGER.info("BARRELS CNT: " + cnt);
 

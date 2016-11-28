@@ -76,6 +76,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Service;
 import com.horowitz.commons.Settings;
 import com.horowitz.commons.TemplateMatcher;
+import com.horowitz.monitor.GameHealthMonitor;
 import com.horowitz.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
@@ -98,7 +99,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v109";
+	private static String APP_TITLE = "Seaport v111";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -162,7 +163,7 @@ public class MainFrame extends JFrame {
 			MainFrame frame = new MainFrame(isTestmode);
 			frame.pack();
 			frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
-			int w = 293;// frame.getSize().width;
+			int w = 290;// frame.getSize().width;
 			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			int h = (int) (screenSize.height * 0.9);
 			int x = screenSize.width - w;
@@ -197,7 +198,7 @@ public class MainFrame extends JFrame {
 				setDefaultSettings();
 			}
 
-			_doOCR = _settings.getBoolean("doOCR", true); 
+			_doOCR = _settings.getBoolean("doOCR", true);
 			_stats = new Stats();
 			_scanner = new ScreenScanner(_settings);
 			_scanner.setDebugMode(_testMode);
@@ -232,13 +233,6 @@ public class MainFrame extends JFrame {
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
 					loadStats();
-					// DispatchEntry de = (DispatchEntry) evt.getNewValue();
-					// JLabel l = _labels.get(de.getDest());
-					// if (l != null) {
-					// //l.setText("" + de.getTimes());
-					// //l.setText("" + (Integer.parseInt(l.getText())+ de.getTimes()));
-					// }
-					//
 				}
 			});
 
@@ -273,6 +267,23 @@ public class MainFrame extends JFrame {
 		reapplySettings();
 
 		runSettingsListener();
+		_monitor = new GameHealthMonitor(_settings);
+		_monitor.addPropertyChangeListener("NO_ACTIVITY", new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent e) {
+				bounce();
+			}
+		});
+		_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				_monitor.pingActivity();
+			}
+		});
+
+		_monitor.startMonitoring();
 
 	}
 
@@ -1112,7 +1123,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					_barrelsProtocol.setCapture(false);//TODO OFF FOR GOOD!!!! move it to settings, motherfucker!
+					_barrelsProtocol.setCapture(false);// TODO OFF FOR GOOD!!!! move it to settings, motherfucker!
 					LOGGER.info("Ping2: " + (b ? "on" : "off"));
 					_settings.setProperty("ping2", "" + b);
 					_settings.saveSettingsSorted();
@@ -1595,12 +1606,13 @@ public class MainFrame extends JFrame {
 		assert _scanner.isOptimized();
 		setTitle(APP_TITLE + " RUNNING");
 		_stopAllThreads = false;
-
+		_monitor.pingActivity();
 		try {
 			long start = System.currentTimeMillis();
 			// initial recalc
 			// recalcPositions(false, 2);
 			for (Task task : _tasks) {
+				task.getProtocol().reset();
 				if (task.isEnabled())
 					task.update();
 			}
@@ -1628,7 +1640,7 @@ public class MainFrame extends JFrame {
 				LOGGER.fine("refresh ? " + _settings.getBoolean("autoRefresh", false) + " - " + mandatoryRefresh + " < "
 				    + (now - fstart));
 				long minTime = getInactivityTimeAllowed();
-				LOGGER.info("time since no ship sent: " + ((now - _lastTime) / 60000) + " < " + minTime / 60000);
+				LOGGER.fine("time since no ship sent: " + ((now - _lastTime) / 60000) + " < " + minTime / 60000);
 
 				if (_settings.getBoolean("autoRefresh", false)) {
 
@@ -1636,10 +1648,10 @@ public class MainFrame extends JFrame {
 					if (mandatoryRefresh > 0 && now - fstart >= mandatoryRefresh) {
 						LOGGER.info("mandatory refresh time...");
 						r = true;
-					} else if (now - _lastTime >= minTime) {
-						LOGGER.info("INACTIVITY REFRESH...");
-						_scanner.captureScreen("INACTIVITY ", true);
-						r = true;
+						// } else if (now - _lastTime >= minTime) {
+						// LOGGER.info("INACTIVITY REFRESH...");
+						// _scanner.captureScreen("INACTIVITY ", true);
+						// r = true;
 					}
 					if (r) {
 						try {
@@ -1662,12 +1674,13 @@ public class MainFrame extends JFrame {
 				// long now = System.currentTimeMillis();
 				// if (now - start > 11*60000) {
 				for (Task task : _tasks) {
-					if (task.isEnabled()) {
+					if (task.isEnabled() && !_stopAllThreads) {
 						try {
 							_mouse.checkUserMovement();
 							task.preExecute();
 							_mouse.checkUserMovement();
-							task.execute();
+							if (!_stopAllThreads)
+								task.execute();
 						} catch (AWTException e) {
 							LOGGER.info("FAILED TO execute task: " + task.getName());
 						} catch (IOException e) {
@@ -1677,7 +1690,7 @@ public class MainFrame extends JFrame {
 				}
 
 				// 4. PING
-				if (turn % 3 == 0) {
+				if (turn % 3 == 0 && !_stopAllThreads) {
 					_mouse.checkUserMovement();
 					if (_pingToggle.isSelected()) {
 						ping();
@@ -1700,10 +1713,7 @@ public class MainFrame extends JFrame {
 
 		} catch (GameErrorException e) {
 			if (e.getCode() > 1) {
-				stopMagic();
-				refresh(false);
-				_scanner.reset();
-				runMagic();
+				bounce();
 			}
 		}
 	}
@@ -1823,22 +1833,25 @@ public class MainFrame extends JFrame {
 			String contractors = _settings.getProperty("ping3.contractors", "");
 			String[] s = contractors.split(",");
 			for (String abbr : s) {
-				Destination dest = _mapManager.getDestinationByAbbr(abbr);
-				if (dest != null) {
-					Pixel smallTownPos = _mapManager.getSmallTownPos();
-					if (smallTownPos == null) {
-						_mapManager.ensureMap();
-						smallTownPos = _mapManager.getSmallTownPos();
+				if (!_stopAllThreads) {
+					Destination dest = _mapManager.getDestinationByAbbr(abbr);
+					if (dest != null) {
+						Pixel smallTownPos = _mapManager.getSmallTownPos();
+						if (smallTownPos == null) {
+							_mapManager.ensureMap();
+							smallTownPos = _mapManager.getSmallTownPos();
+						}
+						if (smallTownPos != null) {
+							int x = smallTownPos.x + dest.getRelativePosition().x;
+							int y = smallTownPos.y + dest.getRelativePosition().y;
+							_mouse.click(x, y);
+							_mouse.delay(750);
+							_scanner.captureScreen("ping " + dest.getAbbr() + " ", true);
+
+							if (_scanner.scanOneFast("buildings/x.bmp", null, true) != null)
+								_mouse.delay(200);
+						}
 					}
-
-					int x = smallTownPos.x + dest.getRelativePosition().x;
-					int y = smallTownPos.y + dest.getRelativePosition().y;
-					_mouse.click(x, y);
-					_mouse.delay(750);
-					_scanner.captureScreen("ping " + dest.getAbbr() + " ", true);
-
-					if (_scanner.scanOneFast("buildings/x.bmp", null, true) != null)
-						_mouse.delay(200);
 				}
 			}
 
@@ -1854,18 +1867,18 @@ public class MainFrame extends JFrame {
 			BufferedImage image = _scanner.scanStorage();
 			if (image != null) {
 				try {
-				  _scanner.writeImageTS(image, "ping storage");
-				  _mouse.delay(1300);
-				  Pixel good = _scanner.scanOneFast("buildings/x.bmp", null, true);
-				  if (good == null) {
-				  	LOGGER.info("cound't find the x...");
-				  	_scanner.handlePopupsFast();
-				  }
+					_scanner.writeImageTS(image, "ping storage");
+					_mouse.delay(1300);
+					Pixel good = _scanner.scanOneFast("buildings/x.bmp", null, true);
+					if (good == null) {
+						LOGGER.info("cound't find the x...");
+						_scanner.handlePopupsFast();
+					}
 				} finally {
-				  _lastPing2 = System.currentTimeMillis();
+					_lastPing2 = System.currentTimeMillis();
 				}
 			}
-			//LOGGER.info("ping2 done");
+			// LOGGER.info("ping2 done");
 		}
 	}
 
@@ -2174,6 +2187,9 @@ public class MainFrame extends JFrame {
 	private void stopMagic() {
 		_stopAllThreads = true;
 		LOGGER.info("Stopping...");
+		for (Task task : _tasks) {
+			task.getProtocol().interrupt();
+		}
 		int tries = 10;
 		boolean stillRunning = true;
 		for (int i = 0; i < tries && stillRunning; ++i) {
@@ -2215,18 +2231,7 @@ public class MainFrame extends JFrame {
 				processClick(r);
 			} else if (r.startsWith("refresh")) {
 				service.inProgress(r);
-				try {
-					stopMagic();
-					refresh(false);
-					_scanner.reset();
-					runMagic();
-				} catch (AWTException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (RobotInterruptedException e) {
-					e.printStackTrace();
-				}
+				bounce();
 
 			} else if (r.startsWith("ping") || r.startsWith("p")) {
 				service.inProgress(r);
@@ -2245,6 +2250,21 @@ public class MainFrame extends JFrame {
 		}
 
 		// service.purgeOld(1000 * 60 * 60);// 1 hour old
+	}
+
+	private void bounce() {
+		try {
+			stopMagic();
+			refresh(false);
+			_scanner.reset();
+			runMagic();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (RobotInterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void processClick(String r) {
@@ -2303,6 +2323,8 @@ public class MainFrame extends JFrame {
 	}
 
 	private Map<String, Long> _filesTracked;
+
+	private GameHealthMonitor _monitor;
 
 	protected boolean filesChanged() {
 		boolean changed = false;

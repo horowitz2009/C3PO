@@ -62,7 +62,8 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 
 		scanShipName(pin);
-
+    if (isInterrupted())
+    	return;
 		_mouse.click(pin);
 		_mouse.delay(_doShipDelay);
 		if (_mouse.getMode() == MouseRobot.SLOW)
@@ -80,7 +81,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
 		}
 
-		if (anchor != null && _mapManager.ensureMap()) {
+		if (anchor != null && isNotInterrupted() && _mapManager.ensureMap()) {
 			// MAP IS OPEN
 
 			if (_lastShip == null) {
@@ -89,6 +90,9 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			Ship ship = _lastShip;
 			List<ProtocolEntry> entries = _shipProtocol.getEntries();
 
+	    if (isInterrupted())
+	    	return;
+			
 			ProtocolEntry pe = findSuitableProtocolEntry(ship, entries);
 
 			if (pe != null) {
@@ -135,7 +139,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 				// use this chain
 				boolean sent = sendShip(new LinkedList<Destination>(chainList));
-				if (!sent) {
+				if (!sent && isNotInterrupted()) {
 					_scanner.scanOne(_scanner.getAnchorButton(), null, true);
 				}
 

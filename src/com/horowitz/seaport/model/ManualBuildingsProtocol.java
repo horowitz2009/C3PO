@@ -12,7 +12,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.BuildingManager;
 
-public class ManualBuildingsProtocol implements GameProtocol {
+public class ManualBuildingsProtocol extends AbstractGameProtocol {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
@@ -55,7 +55,7 @@ public class ManualBuildingsProtocol implements GameProtocol {
 		try {
 	    List<Building> buildings = _buildingManager.getBuildings();
 	    for (Building b : buildings) {
-	    	if (b.isEnabled()) {
+	    	if (b.isEnabled() && isNotInterrupted()) {
 	    		try {
 	    			_mouse.checkUserMovement();
 	    			doBuilding(b);

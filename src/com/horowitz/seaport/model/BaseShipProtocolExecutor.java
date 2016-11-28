@@ -19,7 +19,7 @@ import com.horowitz.seaport.GameErrorException;
 import com.horowitz.seaport.ScreenScanner;
 import com.horowitz.seaport.dest.MapManager;
 
-public abstract class BaseShipProtocolExecutor implements GameProtocol {
+public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 	protected final static Logger LOGGER = Logger.getLogger("MAIN");
 
@@ -52,7 +52,6 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	}
 
 	public boolean preExecute() throws AWTException, IOException, RobotInterruptedException {
-
 		// check are there map notifications
 		boolean check = _settings.getBoolean("checkMapNotification", false);
 		if (check) {
@@ -79,36 +78,37 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	public void execute() throws RobotInterruptedException, GameErrorException {
 		if (_shipLocations != null && !_shipLocations.isEmpty()) {
 			for (Pixel pixel : _shipLocations) {
-				try {
-					_mouse.checkUserMovement();
-					_mouse.click(pixel);
-					_mouse.delay(_shipLocationDelay);
-					if (_mouse.getMode() == MouseRobot.SLOW)
-						_mouse.delay(_shipLocationDelaySlow);
+				if (isNotInterrupted())
+					try {
+						_mouse.checkUserMovement();
+						_mouse.click(pixel);
+						_mouse.delay(_shipLocationDelay);
+						if (_mouse.getMode() == MouseRobot.SLOW)
+							_mouse.delay(_shipLocationDelaySlow);
 
-					// 1. check for pin
-					Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
-					// _scanner.writeImage(miniArea, "pin.bmp");
-					Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
-					if (pin != null) {
-						doShip(pin);
+						// 1. check for pin
+						Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
+						// _scanner.writeImage(miniArea, "pin.bmp");
+						Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
+						if (pin != null) {
+							doShip(pin);
 
-					} else {
-						// 2. check for shipwreck award
-						// _scanner.writeArea(_scanner._popupAreaB, "shipwreck_area.jpg");
-						Pixel cb = _scanner.scanOneFast(_scanner.getImageData("collect.bmp"), _scanner._popupAreaB, false);
+						} else {
+							// 2. check for shipwreck award
+							// _scanner.writeArea(_scanner._popupAreaB, "shipwreck_area.jpg");
+							Pixel cb = _scanner.scanOneFast(_scanner.getImageData("collect.bmp"), _scanner._popupAreaB, false);
 
-						if (cb != null) {
-							_scanner.writeAreaTS(_scanner._popupArea, "shipwreck_reward");
-							_mouse.click(cb);
-							_mouse.delay(_shipLocationDelay);
+							if (cb != null) {
+								_scanner.writeAreaTS(_scanner._popupArea, "shipwreck_reward");
+								_mouse.click(cb);
+								_mouse.delay(_shipLocationDelay);
+							}
 						}
+					} catch (AWTException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
-				} catch (AWTException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 
 			}
 
@@ -124,18 +124,18 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 		List<Ship> ships = _mapManager.getShips();
 		_lastShip = null;
 		for (Ship ship : ships) {
-			if (ship.isActive()) {
+			if (ship.isActive() && isNotInterrupted()) {
 				_mouse.checkUserMovement();
 				try {
-	        if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false, Color.RED) != null) {
-	        	LOGGER.info("SHIP: " + ship.getName());
-	        	_lastShip = ship;
-	        	break;
-	        }
-        } catch (Exception e) {
-        	LOGGER.info("fail: " + ship.getImageTitle());
-	        e.printStackTrace();
-        }
+					if (_scanner.scanOne(ship.getImageDataTitle(), nameArea, false, Color.RED) != null) {
+						LOGGER.info("SHIP: " + ship.getName());
+						_lastShip = ship;
+						break;
+					}
+				} catch (Exception e) {
+					LOGGER.info("fail: " + ship.getImageTitle());
+					e.printStackTrace();
+				}
 			}
 		}
 		if (_lastShip == null) {
@@ -179,127 +179,131 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 				_mapManager.ensureMap();
 				smallTownPos = _mapManager.getSmallTownPos();
 			}
+			if (smallTownPos != null) {
+				int x = smallTownPos.x + dest.getRelativePosition().x;
+				int y = smallTownPos.y + dest.getRelativePosition().y;
 
-			int x = smallTownPos.x + dest.getRelativePosition().x;
-			int y = smallTownPos.y + dest.getRelativePosition().y;
-
-			// what if dest is shipwreck
-			if (dest.getAbbr().equalsIgnoreCase("SW")) {
-				good = false;
-				if (_shipwreckAvailable) {
-					LOGGER.info("LOOKING for shipwreck...");
-					// locate the shipwreck
-					int t = 2;
-					Pixel p = _scanner.scanOne("dest/shipwreck2.bmp", null, false);
-					if (p == null) {
-						p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
-						t = 3;
-					}
-					if (p != null) {
-						LOGGER.info("FOUND IT! " + t);
-						good = true;
-						x = p.x;
-						y = p.y + 2;
+				// what if dest is shipwreck
+				if (dest.getAbbr().equalsIgnoreCase("SW")) {
+					good = false;
+					if (_shipwreckAvailable) {
+						LOGGER.info("LOOKING for shipwreck...");
+						// locate the shipwreck
+						int t = 2;
+						Pixel p = _scanner.scanOne("dest/shipwreck2.bmp", null, false);
+						if (p == null) {
+							p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
+							t = 3;
+						}
+						if (p != null) {
+							LOGGER.info("FOUND IT! " + t);
+							good = true;
+							x = p.x;
+							y = p.y + 2;
+						} else {
+							LOGGER.info("CAN'T FIND IT!");
+						}
 					} else {
-						LOGGER.info("CAN'T FIND IT!");
-					}
-				} else {
-					LOGGER.info("No shipwreck available right now. Moving on...");
-				}
-			}
-
-			if (good) {
-
-				_mouse.click(x, y);
-				_mouse.delay(750);
-				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(500);
-
-				// assume the dialog is open
-				if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
-					// if friend and collected, need to click again
-					_mouse.click(x, y);
-					_mouse.delay(750);
-					if (_mouse.getMode() == MouseRobot.SLOW)
-						_mouse.delay(500);
-				}
-
-				// manage market
-				if (dest.getName().startsWith("Market"))
-					good = doMarket(chain, dest);
-				else if (dest.getName().startsWith("Merchant")) {
-					Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
-					if (merchantTitle != null) {
-						int option = Integer.parseInt(dest.getOption());
-						Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
-
-						// click the 'go back' button first
-						_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
-						_mouse.delay(250);
-
-						// click the desired commodity
-						_mouse.click(commodityP);
-						_mouse.delay(250);
-
-						// look for send button
+						LOGGER.info("No shipwreck available right now. Moving on...");
 					}
 				}
 
 				if (good) {
-					Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
-					    _scanner.getBottomRight().y - 175, 255, 90);
-					int opt = 4;
-					Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-					if (destButton == null) {
-						opt = 0;
-						destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
+
+					_mouse.click(x, y);
+					_mouse.delay(750);
+					if (_mouse.getMode() == MouseRobot.SLOW)
+						_mouse.delay(500);
+
+					// assume the dialog is open
+					if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
+						// if friend and collected, need to click again
+						_mouse.click(x, y);
+						_mouse.delay(750);
+						if (_mouse.getMode() == MouseRobot.SLOW)
+							_mouse.delay(500);
 					}
-					if (destButton == null) {
-						opt = 2;
-						destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
-					}
-					if (destButton == null) {
-						// check for got it button
-						LOGGER.info("CHECK FOR BLUE GOT IT...");
-						buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
-						    _scanner.getBottomRight().y - 240, 205, 240);
-						Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
-						if (gotitButtonBlue == null) {
-							gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+
+					// manage market
+					if (dest.getName().startsWith("Market"))
+						good = doMarket(chain, dest);
+					else if (dest.getName().startsWith("Merchant")) {
+						Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
+						if (merchantTitle != null) {
+							int option = Integer.parseInt(dest.getOption());
+							Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
+
+							// click the 'go back' button first
+							_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
+							_mouse.delay(250);
+
+							// click the desired commodity
+							_mouse.click(commodityP);
+							_mouse.delay(250);
+
+							// look for send button
 						}
-						if (gotitButtonBlue != null) {
-							_mouse.click(gotitButtonBlue);
-							LOGGER.info("DESTINATION COMPLETED!");
-							_mouse.delay(800);
+					}
+
+					if (good) {
+						Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
+						    _scanner.getBottomRight().y - 175, 255, 90);
+						int opt = 4;
+						Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
+						if (destButton == null) {
+							opt = 0;
+							destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
+						}
+						if (destButton == null) {
+							opt = 2;
+							destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+						}
+						if (destButton == null) {
+							// check for got it button
+							LOGGER.info("CHECK FOR BLUE GOT IT...");
+							buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
+							    _scanner.getBottomRight().y - 240, 205, 240);
+							Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
+							if (gotitButtonBlue == null) {
+								gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+							}
+							if (gotitButtonBlue != null) {
+								_mouse.click(gotitButtonBlue);
+								LOGGER.info("DESTINATION COMPLETED!");
+								_mouse.delay(800);
+								if (_mouse.getMode() == MouseRobot.SLOW)
+									_mouse.delay(1000);
+
+								return false;
+							}
+						}
+						if (destButton != null) {
+							LOGGER.info("set sail " + opt);
+
+							_mouse.checkUserMovement();
+							_mouse.click(destButton);
+
+							_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+							_mouse.checkUserMovement();
+							_mouse.delay(1300);
 							if (_mouse.getMode() == MouseRobot.SLOW)
 								_mouse.delay(1000);
 
-							return false;
-						}
+							return true;
+						} else {
+							good = false;
+						}// no Set sail button
+					}// probably market not good
+
+					if (!good && isNotInterrupted()) {
+						return doNext(chain, dest);
 					}
-					if (destButton != null) {
-						LOGGER.info("set sail " + opt);
-
-						_mouse.checkUserMovement();
-						_mouse.click(destButton);
-
-						_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
-						_mouse.checkUserMovement();
-						_mouse.delay(1300);
-						if (_mouse.getMode() == MouseRobot.SLOW)
-							_mouse.delay(1000);
-
-						return true;
-					} else {
-						good = false;
-					}// no Set sail button
-				}// probably market not good
-
-				if (!good) {
-					return doNext(chain, dest);
+				} else {
+					return sendShip(chain);
 				}
 			} else {
-				return sendShip(chain);
+				LOGGER.warning("SmallTown can't be found!");
+				throw new GameErrorException(3, "SmallTown can't be found!", null);
 			}
 		}
 		return false;
@@ -526,5 +530,5 @@ public abstract class BaseShipProtocolExecutor implements GameProtocol {
 	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		_support.addPropertyChangeListener(propertyName, listener);
 	}
-
+	
 }
