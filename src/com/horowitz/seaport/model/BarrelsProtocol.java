@@ -85,7 +85,7 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 				fb.saveAsPNG("IMAGE.PNG");
 
 			// FILTER BROWN
-			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 250), new IntRange(65, 175), new IntRange(0,
+			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 255), new IntRange(30, 255), new IntRange(0,
 			    110));
 			colorFiltering.applyInPlace(fb);
 
