@@ -436,6 +436,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 			String sc = _scanner.ocrScanMarket(areaSend);
 			String bonus = _scanner.ocrScanMarketBonus(areaBonus);
+			LOGGER.info("MARKET: [" + sc + "][" + bonus + "]");
 			if (sc != null && !sc.isEmpty() && bonus != null && !bonus.isEmpty()) {
 				try {
 					int n = Integer.parseInt(sc);
