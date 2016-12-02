@@ -339,15 +339,15 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				int y = mt.y + 171;
 				switch (c) {
 				case 1:
-					scrollUp(mt);
+					scrollUp(mt, 13);
 					y = mt.y + 171;
 					break;
 				case 2:
-					scrollUp(mt);
+					scrollUp(mt, 13);
 					y = mt.y + 266;
 					break;
 				case 3:
-					scrollUp(mt);
+					scrollUp(mt, 13);
 					y = mt.y + 344;
 					break;
 
@@ -436,6 +436,10 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 			String sc = _scanner.ocrScanMarket(areaSend);
 			String bonus = _scanner.ocrScanMarketBonus(areaBonus);
+			if (bonus == null || bonus.isEmpty()) {
+				bonus = dest.getBonus();
+			}
+				
 			LOGGER.info("MARKET: [" + sc + "][" + bonus + "]");
 			if (sc != null && !sc.isEmpty() && bonus != null && !bonus.isEmpty()) {
 				try {
@@ -448,9 +452,12 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						return false;
 					}
 				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.info("ERROR SCANNING NUMBERS. SKIPPING!");
+					return false;
 				}
+			} else {
+				LOGGER.info("CAN'T SCAN NUMBERS. SKIPPING!");
+				return false;
 			}
 
 			// _scanner.writeAreaTS(areaBonus, "ocr/areaBonus.bmp");
@@ -475,7 +482,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		int x = mt.x - 220;
 		int y = mt.y + 144;
 		Rectangle menuArea = new Rectangle(x, y, 80, 234);
-		scrollUp(mt);
+		scrollUp(mt, 15);
 		boolean found = false;
 		int turns = 0;
 		do {
@@ -489,7 +496,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				scrollDown(mt, 2);
 				_mouse.delay(200);
 			}
-		} while (!found && turns > 22);
+		} while (!found && turns < 47);
 		return found;
 	}
 
@@ -498,17 +505,25 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		for (int i = 0; i < times; i++) {
 			_mouse.wheelDown(2);// scroll down to the last commodity, then click the LAST
 			_mouse.delay(150);
+			if (_mouse.getMode() == MouseRobot.SLOW)
+				_mouse.delay(250);
 		}
 		_mouse.delay(33);
+		if (_mouse.getMode() == MouseRobot.SLOW)
+			_mouse.delay(66);
 	}
 
-	private void scrollUp(Pixel mt) throws RobotInterruptedException {
+	private void scrollUp(Pixel mt, int times) throws RobotInterruptedException {
 		_mouse.mouseMove(mt.x - 182, mt.y + 171);
-		for (int i = 0; i < 13; i++) {
+		for (int i = 0; i < times; i++) {
 			_mouse.wheelDown(-2);// scroll up to the first commodity
 			_mouse.delay(150);
+			if (_mouse.getMode() == MouseRobot.SLOW)
+				_mouse.delay(250);
 		}
 		_mouse.delay(33);
+		if (_mouse.getMode() == MouseRobot.SLOW)
+			_mouse.delay(66);
 	}
 
 	private boolean doNext(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,

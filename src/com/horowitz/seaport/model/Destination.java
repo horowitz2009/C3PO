@@ -7,6 +7,7 @@ public class Destination extends GameUnit {
 	private String _abbrs;
 	private int _time;
 	private String _option;
+	private String _bonus;
 	private boolean _favorite;
 	private boolean _contract;
 	private Pixel _relativePosition;
@@ -99,5 +100,15 @@ public class Destination extends GameUnit {
 	public void setY(int y) {
 		this.y = y;
 	}
+	
+	public String getBonus() {
+		return _bonus;
+	}
+
+	public void setBonus(String bonus) {
+		_bonus = bonus;
+	}
+
+
 
 }
