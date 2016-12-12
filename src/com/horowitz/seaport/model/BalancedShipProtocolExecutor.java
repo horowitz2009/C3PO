@@ -62,8 +62,8 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 	void doShip(Pixel pin) throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 
 		scanShipName(pin);
-    if (isInterrupted())
-    	return;
+		if (isInterrupted())
+			return;
 		_mouse.click(pin);
 		_mouse.delay(_doShipDelay);
 		if (_mouse.getMode() == MouseRobot.SLOW)
@@ -90,9 +90,9 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			Ship ship = _lastShip;
 			List<ProtocolEntry> entries = _shipProtocol.getEntries();
 
-	    if (isInterrupted())
-	    	return;
-			
+			if (isInterrupted())
+				return;
+
 			ProtocolEntry pe = findSuitableProtocolEntry(ship, entries);
 
 			if (pe != null) {
@@ -251,6 +251,5 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 	public void setShipProtocol(ShipProtocol shipProtocol) {
 		_shipProtocol = shipProtocol;
 	}
-
 
 }

@@ -166,8 +166,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return false;
 	}
 
-	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException,
-	    IOException, GameErrorException {
+	protected boolean sendShip(LinkedList<Destination> chain)
+	    throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 		LOGGER.info("CHAIN: " + chain);
 		_mouse.checkUserMovement();
 		Destination dest = chain.poll();
@@ -292,8 +292,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 							return true;
 						} else {
 							good = false;
-						}// no Set sail button
-					}// probably market not good
+						} // no Set sail button
+					} // probably market not good
 
 					if (!good && isNotInterrupted()) {
 						return doNext(chain, dest);
@@ -309,8 +309,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return false;
 	}
 
-	private boolean doMarket(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
-	    IOException, AWTException, GameErrorException {
+	private boolean doMarket(LinkedList<Destination> chain, Destination dest)
+	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
 		Pixel mt = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
 		boolean good = false;
 		if (mt != null) {
@@ -439,7 +439,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			if (bonus == null || bonus.isEmpty()) {
 				bonus = dest.getBonus();
 			}
-				
+
 			LOGGER.info("MARKET: [" + sc + "][" + bonus + "]");
 			if (sc != null && !sc.isEmpty() && bonus != null && !bonus.isEmpty()) {
 				try {
@@ -477,27 +477,35 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return pp != null;
 	}
 
-	private boolean locateCommodity(Pixel mt, String commodity) throws RobotInterruptedException, IOException,
-	    AWTException {
+	private boolean locateCommodity(Pixel mt, String commodity)
+	    throws RobotInterruptedException, IOException, AWTException {
 		int x = mt.x - 220;
 		int y = mt.y + 144;
 		Rectangle menuArea = new Rectangle(x, y, 80, 234);
-		scrollUp(mt, 15);
-		boolean found = false;
-		int turns = 0;
-		do {
-			Pixel pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
-			if (pc != null) {
-				_mouse.click(pc.x + 13, pc.y + 9);
-				_mouse.delay(100);
-				found = true;
-			} else {
-				turns++;
-				scrollDown(mt, 2);
-				_mouse.delay(200);
-			}
-		} while (!found && turns < 47);
-		return found;
+		Pixel pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
+		if (pc != null) {
+			_mouse.click(pc.x + 13, pc.y + 9);
+			_mouse.delay(200);
+			return true;
+		} else {
+			boolean found = false;
+			scrollUp(mt, 15);
+			_mouse.delay(450);
+			int turns = 0;
+			do {
+				pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
+				if (pc != null) {
+					_mouse.click(pc.x + 13, pc.y + 9);
+					_mouse.delay(200);
+					found = true;
+				} else {
+					turns++;
+					scrollDown(mt, 2);
+					_mouse.delay(333);
+				}
+			} while (!found && turns < 37);
+			return found;
+		}
 	}
 
 	private void scrollDown(Pixel mt, int times) throws RobotInterruptedException {
@@ -526,8 +534,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			_mouse.delay(66);
 	}
 
-	private boolean doNext(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
-	    IOException, AWTException, GameErrorException {
+	private boolean doNext(LinkedList<Destination> chain, Destination dest)
+	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
 		LOGGER.info(dest.getName() + " can't be done!");
 		_scanner.scanOneFast("buildings/x.bmp", null, true);
 		_mouse.checkUserMovement();
@@ -546,5 +554,5 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		_support.addPropertyChangeListener(propertyName, listener);
 	}
-	
+
 }
