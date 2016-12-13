@@ -30,14 +30,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,10 +62,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import Catalano.Core.IntRange;
-import Catalano.Imaging.FastBitmap;
-import Catalano.Imaging.Filters.ColorFiltering;
-
 import com.horowitz.commons.ImageData;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.MyLogger;
@@ -91,7 +85,12 @@ import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
+import com.horowitz.seaport.model.VintageBarrelsProtocol;
 import com.horowitz.seaport.model.storage.JsonStorage;
+
+import Catalano.Core.IntRange;
+import Catalano.Imaging.FastBitmap;
+import Catalano.Imaging.Filters.ColorFiltering;
 
 public class MainFrame extends JFrame {
 
@@ -99,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v112";
+	private static String APP_TITLE = "Seaport v113";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -247,7 +246,7 @@ public class MainFrame extends JFrame {
 			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
-			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse);
+			_barrelsProtocol = new VintageBarrelsProtocol(_scanner, _mouse);
 			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
 			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
 			_barrelsTask.setProtocol(_barrelsProtocol);
@@ -1926,7 +1925,7 @@ public class MainFrame extends JFrame {
 
 	private Long _speedTime = null;
 
-	private BarrelsProtocol _barrelsProtocol;
+	private VintageBarrelsProtocol _barrelsProtocol;
 
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
