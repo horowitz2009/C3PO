@@ -2,6 +2,8 @@ package com.horowitz.monitor;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.horowitz.commons.DateUtils;
@@ -24,7 +26,6 @@ public class GameHealthMonitor {
 	public GameHealthMonitor(Settings settings) {
 		super();
 		_settings = settings;
-		_lastTime = System.currentTimeMillis();
 		_stopIt = false;
 		_support = new PropertyChangeSupport(this);
 	}
@@ -33,8 +34,30 @@ public class GameHealthMonitor {
 		_stopIt = true;
 	}
 
+	private boolean isRunning(String threadName) {
+		boolean isRunning = false;
+		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+		for (Iterator<Thread> it = threadSet.iterator(); it.hasNext();) {
+			Thread thread = it.next();
+			if (thread.getName().equals(threadName)) {
+				isRunning = true;
+				break;
+			}
+		}
+		return isRunning;
+	}
+
 	public void startMonitoring() {
+		stopMonitoring();
+		while (isRunning("MONITOR")) {
+			try {
+	      Thread.sleep(2000);
+      } catch (InterruptedException e) {
+      }
+		}
 		_stopIt = false;
+		_lastTime = System.currentTimeMillis();
+		
 		Thread t = new Thread(new Runnable() {
 			public void run() {
 				monitor();
@@ -47,7 +70,9 @@ public class GameHealthMonitor {
 	protected void monitor() {
 		while (!_stopIt) {
 			try {
-				Thread.sleep(_settings.getInt("monitor.sleepTime", 15) * 1000);
+				int secs = _settings.getInt("monitor.sleepTime", 15);
+				for(int i = 0; i < secs && !_stopIt; i++)
+				  Thread.sleep(1000);
 			} catch (InterruptedException e) {
 			}
 
@@ -62,6 +87,7 @@ public class GameHealthMonitor {
 				_lastTime = System.currentTimeMillis();
 			}
 		}
+		LOGGER.info("Monitor stopped!");
 	}
 
 	public void pingActivity() {
@@ -83,5 +109,9 @@ public class GameHealthMonitor {
 	public void removePropertyChangeListener(String arg0, PropertyChangeListener arg1) {
 		_support.removePropertyChangeListener(arg0, arg1);
 	}
+
+	public boolean isRunning() {
+	  return !_stopIt && isRunning("MONITOR");
+  }
 
 }

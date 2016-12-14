@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v113";
+	private static String APP_TITLE = "Seaport v114";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -912,15 +912,16 @@ public class MainFrame extends JFrame {
 
 						@Override
 						public void run() {
-							LOGGER.info("Stopping BB Gun");
+							LOGGER.info("Stopping all processes...");
 							_stopAllThreads = true;
+							_monitor.stopMonitoring();
 						}
 					});
 
 					myThread.start();
 				}
 			};
-			// mainToolbar1.add(action);
+			mainToolbar1.add(action);
 		}
 
 		// RECORD
@@ -1744,10 +1745,10 @@ public class MainFrame extends JFrame {
 		} catch (InterruptedException e) {
 		}
 		_scanner.reset();
-
+		
 		boolean done = false;
-		for (int i = 0; i < 14 && !done; i++) {
-			LOGGER.info("after refresh recovery try " + (i + 1));
+		for (int i = 0; i < 14 && !done && !_stopAllThreads; i++) {
+			LOGGER.info("after refresh recovery try " + (i + 1) + " " + _stopAllThreads);
 			// check for popups first, like offers (damn it)
 			boolean f = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
 			if (f)
@@ -1776,16 +1777,21 @@ public class MainFrame extends JFrame {
 				_scanner.captureScreen("refresh trouble ", true);
 			}
 		}
-		if (done) {
-			// runMagic();
-			_scanner.captureScreen("refresh done ", true);
-			// not sure why shipsTasks gets off after refresh
-			reapplySettings();
-			return true;
+		if (_stopAllThreads) { 
+			LOGGER.info("Refresh stopped...");
+		  _scanner.captureScreen("refresh stopped ", true);
 		} else {
-			// try bookmark
-			if (!bookmark)
-				return refresh(true);
+  		if (done) {
+  			// runMagic();
+  			_scanner.captureScreen("refresh done ", true);
+  			// not sure why shipsTasks gets off after refresh
+  			reapplySettings();
+  			return true;
+  		} else {
+  			// try bookmark
+  			if (!bookmark)
+  				return refresh(true);
+  		}
 		}
 		return false;
 	}
@@ -2204,7 +2210,7 @@ public class MainFrame extends JFrame {
 				setTitle(APP_TITLE);
 			}
 		}
-		_stopAllThreads = false;
+		//_stopAllThreads = false;
 	}
 
 	private void processRequests() {
@@ -2215,6 +2221,7 @@ public class MainFrame extends JFrame {
 
 			if (r.startsWith("stop")) {
 				service.inProgress(r);
+				_monitor.stopMonitoring();
 				stopMagic();
 				_scanner.captureScreen(null, true);
 
@@ -2230,6 +2237,7 @@ public class MainFrame extends JFrame {
 				processClick(r);
 			} else if (r.startsWith("refresh")) {
 				service.inProgress(r);
+				
 				bounce();
 
 			} else if (r.startsWith("ping") || r.startsWith("p")) {
@@ -2254,9 +2262,15 @@ public class MainFrame extends JFrame {
 	private void bounce() {
 		try {
 			stopMagic();
+			if (!_monitor.isRunning()) {
+				_monitor.startMonitoring();
+			}
+			_stopAllThreads = false;
 			refresh(false);
-			_scanner.reset();
-			runMagic();
+			if (!_stopAllThreads) {
+			  _scanner.reset();
+			  runMagic();
+			}
 		} catch (AWTException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -2341,6 +2355,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void runMagic() {
+		_monitor.startMonitoring();
 		Thread myThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
