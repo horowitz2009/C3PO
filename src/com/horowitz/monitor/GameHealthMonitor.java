@@ -48,38 +48,33 @@ public class GameHealthMonitor {
 	}
 
 	public void startMonitoring() {
-		stopMonitoring();
-		while (isRunning("MONITOR")) {
-			try {
-	      Thread.sleep(2000);
-      } catch (InterruptedException e) {
-      }
-		}
-		_stopIt = false;
-		_lastTime = System.currentTimeMillis();
-		
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				monitor();
-			}
-		}, "MONITOR");
+		if (!isRunning()) {
+			_stopIt = false;
+			_lastTime = System.currentTimeMillis();
 
-		t.start();
+			Thread t = new Thread(new Runnable() {
+				public void run() {
+					monitor();
+				}
+			}, "MONITOR");
+
+			t.start();
+		}
 	}
 
 	protected void monitor() {
 		while (!_stopIt) {
 			try {
 				int secs = _settings.getInt("monitor.sleepTime", 15);
-				for(int i = 0; i < secs && !_stopIt; i++)
-				  Thread.sleep(1000);
+				for (int i = 0; i < secs && !_stopIt; i++)
+					Thread.sleep(1000);
 			} catch (InterruptedException e) {
 			}
 
 			long time = (System.currentTimeMillis() - _lastTime);
 			long threshold = _settings.getInt("monitor.inactivityThreshold", 12) * 60000;
-			LOGGER.info("Time since last activity: " + DateUtils.fancyTime2(time) + "  <  "
-			    + DateUtils.fancyTime2(threshold));
+			LOGGER
+			    .info("Time since last activity: " + DateUtils.fancyTime2(time) + "  <  " + DateUtils.fancyTime2(threshold));
 			// LOGGER.info("time since no ship sent: " + ((now - _lastTime) / 60000) + " < " + minTime / 60000);
 			if (time >= threshold) {
 				// ALERT!!!!!
@@ -111,7 +106,7 @@ public class GameHealthMonitor {
 	}
 
 	public boolean isRunning() {
-	  return !_stopIt && isRunning("MONITOR");
-  }
+		return !_stopIt && isRunning("MONITOR");
+	}
 
 }

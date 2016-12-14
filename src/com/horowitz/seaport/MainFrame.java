@@ -1745,7 +1745,7 @@ public class MainFrame extends JFrame {
 		} catch (InterruptedException e) {
 		}
 		_scanner.reset();
-		
+
 		boolean done = false;
 		for (int i = 0; i < 14 && !done && !_stopAllThreads; i++) {
 			LOGGER.info("after refresh recovery try " + (i + 1) + " " + _stopAllThreads);
@@ -1777,21 +1777,21 @@ public class MainFrame extends JFrame {
 				_scanner.captureScreen("refresh trouble ", true);
 			}
 		}
-		if (_stopAllThreads) { 
+		if (_stopAllThreads) {
 			LOGGER.info("Refresh stopped...");
-		  _scanner.captureScreen("refresh stopped ", true);
+			_scanner.captureScreen("refresh stopped ", true);
 		} else {
-  		if (done) {
-  			// runMagic();
-  			_scanner.captureScreen("refresh done ", true);
-  			// not sure why shipsTasks gets off after refresh
-  			reapplySettings();
-  			return true;
-  		} else {
-  			// try bookmark
-  			if (!bookmark)
-  				return refresh(true);
-  		}
+			if (done) {
+				// runMagic();
+				_scanner.captureScreen("refresh done ", true);
+				// not sure why shipsTasks gets off after refresh
+				reapplySettings();
+				return true;
+			} else {
+				// try bookmark
+				if (!bookmark)
+					return refresh(true);
+			}
 		}
 		return false;
 	}
@@ -2010,7 +2010,7 @@ public class MainFrame extends JFrame {
 			// reload
 			long start = System.currentTimeMillis();
 			long now, t1 = 0, t2 = 0, t3, t4;
-			Rectangle area = _scanner.generateWindowedArea(402, 550);
+			Rectangle area = _scanner.generateWindowedArea(400, 400);
 			area.y = _scanner.getBottomRight().y - 175;
 			area.height = 50;
 			p = _scanner.scanOneFast("reload2.bmp", area, false);
@@ -2022,6 +2022,7 @@ public class MainFrame extends JFrame {
 			t1 = now - start;
 			t2 = now;
 			if (p == null) {
+				area.y -= 72;
 				p = _scanner.scanOneFast("reload.bmp", area, false);
 				if (p != null) {
 					LOGGER.info("RELOAD1...");
@@ -2031,33 +2032,27 @@ public class MainFrame extends JFrame {
 				t2 = now - t2;
 			}
 
-			if (p == null) {
-				p = _scanner.scanOneFast("connect.bmp", area, false);
-				if (p != null) {
-					LOGGER.info("CONNECT...");
-				}
-
-				now = System.currentTimeMillis();
-				t2 = now - t2;
-			}
-
 			found = p != null;
 			if (found) {
 				// check is this 'logged twice' message
-				area.y -= 313;
+				area.y = _scanner.getTopLeft().y + 168;
+				area.x += 118;
+				area.width = 69;
+				area.height = 33;
 				Pixel pp = _scanner.scanOne("accountLoggedTwice2.bmp", area, false);
 				int which = 2;
-				if (pp == null) {
-					pp = _scanner.scanOne("accountLoggedTwice3.bmp", area, false);
-					which = 3;
-				}
 				if (pp == null) {
 					pp = _scanner.scanOne("accountLoggedTwice.bmp", area, false);
 					which = 0;
 				}
+				if (pp == null) {
+					pp = _scanner.scanOne("accountLoggedTwice3.bmp", area, false);
+					which = 3;
+				}
 				if (pp != null) {
 					LOGGER.info("Logged somewhere else. I'm done here! " + which);
 					_stopAllThreads = true;
+					_monitor.stopMonitoring();
 					throw new RobotInterruptedException();
 				}
 
@@ -2210,7 +2205,7 @@ public class MainFrame extends JFrame {
 				setTitle(APP_TITLE);
 			}
 		}
-		//_stopAllThreads = false;
+		// _stopAllThreads = false;
 	}
 
 	private void processRequests() {
@@ -2237,7 +2232,7 @@ public class MainFrame extends JFrame {
 				processClick(r);
 			} else if (r.startsWith("refresh")) {
 				service.inProgress(r);
-				
+
 				bounce();
 
 			} else if (r.startsWith("ping") || r.startsWith("p")) {
@@ -2262,14 +2257,12 @@ public class MainFrame extends JFrame {
 	private void bounce() {
 		try {
 			stopMagic();
-			if (!_monitor.isRunning()) {
-				_monitor.startMonitoring();
-			}
+			_monitor.startMonitoring();//need to be run before refresh in order to monitor refresh as well
 			_stopAllThreads = false;
 			refresh(false);
 			if (!_stopAllThreads) {
-			  _scanner.reset();
-			  runMagic();
+				_scanner.reset();
+				runMagic();
 			}
 		} catch (AWTException e) {
 			e.printStackTrace();
