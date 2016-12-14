@@ -65,10 +65,10 @@ public class VintageBarrelsProtocol extends AbstractGameProtocol {
 			int x1 = rock.x - 114;
 			int x2 = _scanner.getBottomRight().x - 28;
 			int y1 = rock.y - 225 + 32;
-			int y1a = _scanner.getTopLeft().y + 150;
+			int y1a = _scanner.getTopLeft().y + 140;
 			y1 = Math.max(y1, y1a);
 
-			Rectangle area = new Rectangle(x1, y1, Math.min(764, x2 - x1), 318 - 150);
+			Rectangle area = new Rectangle(x1, y1, Math.min(764, x2 - x1), 318 - 140);
 
 			FastBitmap landFB = new FastBitmap(image.getSubimage(0, 263 - rock.y + y1, area.width, area.height));
 			if (landFB.isRGB())
