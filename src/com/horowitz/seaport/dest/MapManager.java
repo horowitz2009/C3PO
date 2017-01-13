@@ -235,15 +235,17 @@ public class MapManager {
 			int yyy = (yy2 != 0) ? yy2 : yy3;
 			if (xxx != 0 || yyy != 0) {
 				if (xxx > 0)
-					xxx += 15;
+					xxx += 35;
 				else
-					xxx -= 15;
+					xxx -= 35;
 				if (yyy > 0)
-					yyy += 15;
+					yyy += 35;
 				else
-					yyy -= 15;
+					yyy -= 35;
 				
-			  _scanner.getMouse().drag4(_smallTownPos.x + 40, _smallTownPos.y - 36, _smallTownPos.x + xxx, _smallTownPos.y + yyy - 36, true, true);
+			  _scanner.getMouse().drag4(_smallTownPos.x + 40, _smallTownPos.y - 70, _smallTownPos.x + xxx, _smallTownPos.y + yyy - 70, true, true);
+			  _scanner.getMouse().click();
+			  _scanner.getMouse().click();
 			  _scanner.getMouse().delay(1200);
 			  _smallTownPos.x += xxx;
 			  _smallTownPos.y += yyy;
@@ -274,8 +276,8 @@ public class MapManager {
 
 	private void findSmallTownAgain() throws AWTException, RobotInterruptedException {
 		Destination smallTownDEST = getSmallTown();
-		Rectangle areaSpec = new Rectangle(_smallTownPos.x - 10, _smallTownPos.y - 10, smallTownDEST.getImageData().getImage()
-		    .getWidth() + 20, smallTownDEST.getImageData().getImage().getHeight() + 20);
+		Rectangle areaSpec = new Rectangle(_smallTownPos.x - 20, _smallTownPos.y - 20, smallTownDEST.getImageData().getImage()
+		    .getWidth() + 40, smallTownDEST.getImageData().getImage().getHeight() + 40);
 
 		Pixel newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), areaSpec, false);
 		if (newSmallTownPos == null) {
@@ -283,7 +285,7 @@ public class MapManager {
 			newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
 		}
 
-		if (_smallTownPos.equals(newSmallTownPos)) {
+		if (Math.abs(_smallTownPos.x - newSmallTownPos.x) < 7 && Math.abs(_smallTownPos.y - newSmallTownPos.y) < 7) {
 			LOGGER.info("Small Town found in the same place.");
 		}
 		_smallTownPos = newSmallTownPos;
