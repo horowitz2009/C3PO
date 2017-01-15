@@ -56,7 +56,7 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 	@Override
 	public void execute() throws RobotInterruptedException {
 		// TODO HUNT BARRELS
-		boolean debug = true;
+		boolean debug = false;
 		try {
 
 			BufferedImage image = _scanner.getImageData("LAND5.bmp").getImage();
@@ -69,10 +69,10 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 			int x1 = rock.x - 114;
 			int x2 = _scanner.getBottomRight().x - 28;
 			
-			if (yy < 263) {//outside the game area => need to cut off the land5
-				int toCut = 263 - yy;
-				image = image.getSubimage(0, toCut, image.getWidth(), image.getHeight() - toCut);
-			}
+//			if (yy < 263) {//outside the game area => need to cut off the land5
+//				int toCut = 263 - yy;
+//				image = image.getSubimage(0, toCut, image.getWidth(), image.getHeight() - toCut);
+//			}
 			
 			image = image.getSubimage(0, 0, Math.min(image.getWidth(), x2 - x1), image.getHeight());
 			
@@ -166,15 +166,15 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 				}
 
 			}
-			if (isNotInterrupted()) {
-				// additional clicks to gem area
-				int x = _scanner.getBottomRight().x - 170;
-				int y = _scanner.getTopLeft().y + 42;
-				for (int i = 0; i < 16 && isNotInterrupted(); i++) {
-					_mouse.click(x + i * 10, y);
-				}
-				_mouse.delay(100);
-			}
+//			if (isNotInterrupted()) {
+//				// additional clicks to gem area
+//				int x = _scanner.getBottomRight().x - 170;
+//				int y = _scanner.getTopLeft().y + 42;
+//				for (int i = 0; i < 16 && isNotInterrupted(); i++) {
+//					_mouse.click(x + i * 10, y);
+//				}
+//				_mouse.delay(100);
+//			}
 			LOGGER.info("BARRELS CNT: " + cnt);
 
 		} catch (RobotInterruptedException e) {

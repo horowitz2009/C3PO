@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -86,7 +85,6 @@ import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
-import com.horowitz.seaport.model.VintageBarrelsProtocol;
 import com.horowitz.seaport.model.storage.JsonStorage;
 
 import Catalano.Core.IntRange;
@@ -239,7 +237,7 @@ public class MainFrame extends JFrame {
 			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
-			_barrelsProtocol = new VintageBarrelsProtocol(_scanner, _mouse);
+			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse);
 			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
 			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
 			_barrelsTask.setProtocol(_barrelsProtocol);
@@ -1018,7 +1016,7 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					// if (b && _barrelsAToggle.isSelected())
-					// _barrelsAToggle.setSelected(false);
+			    // _barrelsAToggle.setSelected(false);
 
 					_barrelsTask.setEnabled(b);
 					_settings.setProperty("barrelsS", "" + b);
@@ -1437,7 +1435,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-							// " (" + e.getX() + ", " + e.getY() + ")");
+			        // " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1454,7 +1452,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-						// e.getX() + ", " + e.getY() + ")");
+			      // e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -2013,7 +2011,7 @@ public class MainFrame extends JFrame {
 
 	private Long _speedTime = null;
 
-	private VintageBarrelsProtocol _barrelsProtocol;
+	private BarrelsProtocol _barrelsProtocol;
 
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
