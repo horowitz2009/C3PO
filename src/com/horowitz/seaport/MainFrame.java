@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -122,7 +123,7 @@ public class MainFrame extends JFrame {
 	private JToggleButton _shipsToggle;
 
 	private JToggleButton _industriesToggle;
-	private JToggleButton _barrelsAToggle;
+	// private JToggleButton _barrelsAToggle;
 	private JToggleButton _barrelsSToggle;
 	// private JToggleButton _xpToggle;
 
@@ -160,14 +161,6 @@ public class MainFrame extends JFrame {
 				}
 			}
 			MainFrame frame = new MainFrame(isTestmode);
-			frame.pack();
-			frame.setSize(new Dimension(frame.getSize().width + 8, frame.getSize().height + 8));
-			int w = 290;// frame.getSize().width;
-			final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			int h = (int) (screenSize.height * 0.9);
-			int x = screenSize.width - w;
-			int y = (screenSize.height - h) / 2;
-			frame.setBounds(x, y, w, h);
 
 			frame.setVisible(true);
 		} catch (Throwable e) {
@@ -282,7 +275,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-		_monitor.startMonitoring();
+		// _monitor.startMonitoring();
 
 	}
 
@@ -306,6 +299,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void initLayout() {
+
 		if (_testMode)
 			APP_TITLE += " TEST";
 		setTitle(APP_TITLE);
@@ -316,29 +310,30 @@ public class MainFrame extends JFrame {
 		JPanel rootPanel = new JPanel(new BorderLayout());
 		getContentPane().add(rootPanel, BorderLayout.CENTER);
 
-		// CONSOLE
-		rootPanel.add(buildConsole(), BorderLayout.CENTER);
+		_console = buildConsole();
+		rootPanel.add(_console, BorderLayout.CENTER);
 
-		// TOOLBARS
-		JToolBar mainToolbar1 = createToolbar1();
-		JToolBar mainToolbar2 = createToolbar2();
-		// List<JToolBar> mainToolbars3 = createToolbars3();
-		JToolBar mainToolbar4 = createToolbar4();
+		_mainToolbar1 = createToolbar1();
+		_mainToolbar2 = createToolbar2();
+		_mainToolbar4 = createToolbar4();
 
 		JPanel toolbars = new JPanel(new GridLayout(0, 1));
-		toolbars.add(mainToolbar1);
-		toolbars.add(mainToolbar2);
+		// JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		toolbars.add(_mainToolbar1);
+		toolbars.add(_mainToolbar2);
 		// for (JToolBar jToolBar : mainToolbars3) {
 		// toolbars.add(jToolBar);
 		// }
-		toolbars.add(mainToolbar4);
+		toolbars.add(_mainToolbar4);
 
 		// toolbars.add(createToolbar5());
 
 		Box north = Box.createVerticalBox();
 		north.add(toolbars);
-		north.add(createStatsPanel());
-		north.add(createShipProtocolManagerPanel());
+		_statsPanel = createStatsPanel();
+		_shipProtocolManagerPanel = createShipProtocolManagerPanel();
+		north.add(_statsPanel);
+		north.add(_shipProtocolManagerPanel);
 
 		if (_testMode) {
 
@@ -399,27 +394,27 @@ public class MainFrame extends JFrame {
 		north.add(_mouseInfoLabel);
 		rootPanel.add(north, BorderLayout.NORTH);
 
-		final JTextArea shipLog = new JTextArea(5, 10);
-		rootPanel.add(new JScrollPane(shipLog), BorderLayout.SOUTH);
+		_shipLog = new JTextArea(5, 10);
+		rootPanel.add(new JScrollPane(_shipLog), BorderLayout.SOUTH);
 
 		_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
 
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				String text = shipLog.getText();
+				String text = _shipLog.getText();
 				if (text.length() > 3000) {
 					int ind = text.indexOf("\n", 2000);
 					if (ind <= 0)
 						ind = 2000;
 					text = text.substring(ind);
-					shipLog.setText(text);
+					_shipLog.setText(text);
 				}
 
 				DispatchEntry de = (DispatchEntry) evt.getNewValue();
 				Calendar now = Calendar.getInstance();
 				SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-				shipLog.append(sdf.format(now.getTime()) + "  " + de.getDest() + "  " + de.getShip() + "\n");
-				shipLog.setCaretPosition(shipLog.getDocument().getLength());
+				_shipLog.append(sdf.format(now.getTime()) + "  " + de.getDest() + "  " + de.getShip() + "\n");
+				_shipLog.setCaretPosition(_shipLog.getDocument().getLength());
 
 			}
 		});
@@ -599,6 +594,9 @@ public class MainFrame extends JFrame {
 	private JToggleButton _ping3Toggle;
 
 	public long _lastTime;
+
+	private JToggleButton _fullScreenToggle;
+	private JToggleButton _miniLayoutToggle;
 
 	private JPanel createShipProtocolManagerPanel() {
 		_shipProtocolManagerUI = new ShipProtocolManagerUI(_mapManager);
@@ -1019,8 +1017,8 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					if (b && _barrelsAToggle.isSelected())
-						_barrelsAToggle.setSelected(false);
+					// if (b && _barrelsAToggle.isSelected())
+					// _barrelsAToggle.setSelected(false);
 
 					_barrelsTask.setEnabled(b);
 					_settings.setProperty("barrelsS", "" + b);
@@ -1029,20 +1027,50 @@ public class MainFrame extends JFrame {
 				}
 			});
 			toolbar.add(_barrelsSToggle);
-			_barrelsAToggle = new JToggleButton("BA");
-			// _industriesToggle.setSelected(true);
-			_barrelsAToggle.addItemListener(new ItemListener() {
+
+			// _barrelsAToggle = new JToggleButton("BA");
+			// // _industriesToggle.setSelected(true);
+			// _barrelsAToggle.addItemListener(new ItemListener() {
+			// @Override
+			// public void itemStateChanged(ItemEvent e) {
+			// boolean b = e.getStateChange() == ItemEvent.SELECTED;
+			// if (b && _barrelsSToggle.isSelected())
+			// _barrelsSToggle.setSelected(false);
+			// _settings.setProperty("barrelsA", "" + b);
+			// _settings.saveSettingsSorted();
+			//
+			// }
+			// });
+			// toolbar.add(_barrelsAToggle);
+
+			_fullScreenToggle = new JToggleButton("FS");
+			_fullScreenToggle.addItemListener(new ItemListener() {
+
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					if (b && _barrelsSToggle.isSelected())
-						_barrelsSToggle.setSelected(false);
-					_settings.setProperty("barrelsA", "" + b);
+					LOGGER.info("Full Screen mode: " + (b ? "on" : "off"));
+					_settings.setProperty("fullScreen", "" + b);
 					_settings.saveSettingsSorted();
-
 				}
 			});
-			toolbar.add(_barrelsAToggle);
+			// _slowToggle.setSelected(false);
+			toolbar.add(_fullScreenToggle);
+
+			_miniLayoutToggle = new JToggleButton("ML");
+			_miniLayoutToggle.addItemListener(new ItemListener() {
+
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					boolean b = e.getStateChange() == ItemEvent.SELECTED;
+					LOGGER.info("Mini Layout mode: " + (b ? "on" : "off"));
+					_settings.setProperty("miniLayout", "" + b);
+					_settings.saveSettingsSorted();
+					transformLayout();
+				}
+			});
+			// _slowToggle.setSelected(false);
+			toolbar.add(_miniLayoutToggle);
 
 			_autoRefreshToggle = new JToggleButton("AR");
 			_autoRefreshToggle.addItemListener(new ItemListener() {
@@ -1165,6 +1193,29 @@ public class MainFrame extends JFrame {
 
 		}
 		return toolbar;
+	}
+
+	protected void transformLayout() {
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+				}
+				boolean vis = !_settings.getBoolean("miniLayout", false);
+
+				_mainToolbar4.setVisible(vis);
+				_shipLog.setVisible(vis);
+				_statsPanel.setVisible(vis);
+				_shipProtocolManagerPanel.setVisible(vis);
+				_console.setVisible(vis);
+				resizeFrame(vis);
+				if (_settings.getBoolean("miniLayout", false)) {
+				} else {
+				}
+			}
+		});
+		t.start();
 	}
 
 	@SuppressWarnings("serial")
@@ -1466,8 +1517,11 @@ public class MainFrame extends JFrame {
 			_scanner.reset();
 			LOGGER.info("Scanning...");
 			setTitle(APP_TITLE + " ...");
+			boolean fullScreen = _settings.getBoolean("fullScreen", false);
 			boolean found = _scanner.locateGameArea(false);
 			if (found) {
+				_scanner.zoomOut();
+
 				_scanner.checkAndAdjustRock();
 				_mapManager.update();
 				_buildingManager.update();
@@ -1528,6 +1582,26 @@ public class MainFrame extends JFrame {
 		_testMode = isTestmode;
 		setupLogger();
 		init();
+		resizeFrame(true);
+	}
+
+	private void resizeFrame(boolean big) {
+		int w = 290;// frame.getSize().width;
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		int x, y, h;
+		if (big) {
+			pack();
+			// setSize(new Dimension(getSize().width + 8, getSize().height + 8));
+			h = (int) (screenSize.height * 0.9);
+			x = screenSize.width - w;
+			y = (screenSize.height - h) / 2;
+		} else {
+			h = 99;
+			x = 150;
+			y = screenSize.height - h - 1;
+		}
+		setBounds(x, y, w, h);
+
 	}
 
 	private void test() {
@@ -1729,6 +1803,13 @@ public class MainFrame extends JFrame {
 				p = new Pixel(79, 76);
 			_mouse.click(p.x, p.y);
 		} else {
+			if (_scanner.isFullScreen()) {
+				Robot robot = new Robot();
+				robot.keyPress(KeyEvent.VK_ESCAPE);
+				robot.keyRelease(KeyEvent.VK_ESCAPE);
+				_mouse.delay(2000);
+				_scanner.locateGameArea(false);
+			}
 			p = _scanner.getBottomRight();
 			p.x -= 10;
 			p.y += 3;
@@ -1739,6 +1820,7 @@ public class MainFrame extends JFrame {
 				robot.keyRelease(KeyEvent.VK_F5);
 			} catch (AWTException e) {
 			}
+
 		}
 		try {
 			Thread.sleep(15000);
@@ -2117,14 +2199,24 @@ public class MainFrame extends JFrame {
 			_barrelsSToggle.setSelected(barrels);
 		}
 
-		barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsA"));
-		if (barrels != _barrelsAToggle.isSelected()) {
-			_barrelsAToggle.setSelected(barrels);
-		}
+		// barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsA"));
+		// if (barrels != _barrelsAToggle.isSelected()) {
+		// _barrelsAToggle.setSelected(barrels);
+		// }
 
 		boolean ar = "true".equalsIgnoreCase(_settings.getProperty("autoRefresh"));
 		if (ar != _autoRefreshToggle.isSelected()) {
 			_autoRefreshToggle.setSelected(ar);
+		}
+
+		boolean fs = "true".equalsIgnoreCase(_settings.getProperty("fullScreen"));
+		if (fs != _fullScreenToggle.isSelected()) {
+			_fullScreenToggle.setSelected(ar);
+		}
+
+		boolean ml = "true".equalsIgnoreCase(_settings.getProperty("miniLayout"));
+		if (ml != _miniLayoutToggle.isSelected()) {
+			_miniLayoutToggle.setSelected(ar);
 		}
 
 		boolean slow = "true".equalsIgnoreCase(_settings.getProperty("slow"));
@@ -2257,7 +2349,7 @@ public class MainFrame extends JFrame {
 	private void bounce() {
 		try {
 			stopMagic();
-			_monitor.startMonitoring();//need to be run before refresh in order to monitor refresh as well
+			_monitor.startMonitoring();// need to be run before refresh in order to monitor refresh as well
 			_stopAllThreads = false;
 			refresh(false);
 			if (!_stopAllThreads) {
@@ -2331,6 +2423,20 @@ public class MainFrame extends JFrame {
 	private Map<String, Long> _filesTracked;
 
 	private GameHealthMonitor _monitor;
+
+	private JToolBar _mainToolbar1;
+
+	private JToolBar _mainToolbar2;
+
+	private JToolBar _mainToolbar4;
+
+	private JTextArea _shipLog;
+
+	private Component _statsPanel;
+
+	private JPanel _shipProtocolManagerPanel;
+
+	private Container _console;
 
 	protected boolean filesChanged() {
 		boolean changed = false;

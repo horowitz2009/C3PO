@@ -56,21 +56,29 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 	@Override
 	public void execute() throws RobotInterruptedException {
 		// TODO HUNT BARRELS
-		boolean debug = false;
+		boolean debug = true;
 		try {
 
 			BufferedImage image = _scanner.getImageData("LAND5.bmp").getImage();
 
 			Pixel rock = _scanner.getRock();
+			int topY = _scanner.getTopLeft().y;
+			int yy = rock.y - topY;
+			int y1 = rock.y - 263;
+			
 			int x1 = rock.x - 114;
 			int x2 = _scanner.getBottomRight().x - 28;
-			int y1 = rock.y - 225 + 32;
-			int y1a = _scanner.getTopLeft().y + 32;
-			y1 = Math.max(y1, y1a);
+			
+			if (yy < 263) {//outside the game area => need to cut off the land5
+				int toCut = 263 - yy;
+				image = image.getSubimage(0, toCut, image.getWidth(), image.getHeight() - toCut);
+			}
+			
+			image = image.getSubimage(0, 0, Math.min(image.getWidth(), x2 - x1), image.getHeight());
+			
+			Rectangle area = new Rectangle(x1, y1, image.getWidth(), image.getHeight());
 
-			Rectangle area = new Rectangle(x1, y1, Math.min(764, x2 - x1), 318);
-
-			FastBitmap landFB = new FastBitmap(image.getSubimage(0, 263 - rock.y + y1, area.width, area.height));
+			FastBitmap landFB = new FastBitmap(image);
 			if (landFB.isRGB())
 				landFB.toGrayscale();
 			if (debug)

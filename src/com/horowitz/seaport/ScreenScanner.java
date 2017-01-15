@@ -55,8 +55,8 @@ public class ScreenScanner {
 	private ImageComparator _comparator;
 	private TemplateMatcher _matcher;
 	private MouseRobot _mouse;
-  private OCRMarket _ocrMarket;
-  private OCRMarketBonus _ocrMarketBonus;
+	private OCRMarket _ocrMarket;
+	private OCRMarketBonus _ocrMarketBonus;
 	private Pixel _br = null;
 	private Pixel _tl = null;
 	private boolean _optimized = false;
@@ -85,7 +85,7 @@ public class ScreenScanner {
 	private Pixel _scoreBoard;
 	private Pixel _zoomIn;
 	private Pixel _zoomOut;
-	private Pixel _fullScreen;
+	private Pixel _fullScreenButton;
 	private ImageData _mapButton;
 	private ImageData _anchorButton;
 
@@ -96,6 +96,8 @@ public class ScreenScanner {
 	private Pixel _sailorsPos;
 
 	private Rectangle _barrelsArea;
+
+	private boolean _fsMode = false;
 
 	public Pixel[] getShipLocations() {
 		return _shipLocations;
@@ -190,8 +192,8 @@ public class ScreenScanner {
 		_popupAreaB.y = _popupAreaB.y + _popupAreaB.height - 125;
 		_popupAreaB.height = 125;
 
-		_safePoint = new Pixel(_br.x - 15, _br.y - 15);
-		_parkingPoint = new Pixel(_br);
+		_safePoint = new Pixel(_br.x - 15, _br.y - 115);
+		_parkingPoint = new Pixel(_br.x, _br.y - 100);
 
 		getImageData("ROCK.bmp", _scanArea, 10, 44);
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
@@ -220,12 +222,12 @@ public class ScreenScanner {
 				_scoreBoard = new Pixel(sbp.x + 8, sbp.y - 8);
 				_zoomIn = new Pixel(sbp.x + 8, sbp.y + 108);
 				_zoomOut = new Pixel(sbp.x + 8, sbp.y + 141);
-				_fullScreen = new Pixel(sbp.x + 8, sbp.y + 179);
+				_fullScreenButton = new Pixel(sbp.x + 8, sbp.y + 179);
 				LOGGER.info("left toolbar ok!");
 			} else {
 				_zoomIn = null;
 				_zoomOut = null;
-				_fullScreen = null;
+				_fullScreenButton = null;
 				LOGGER.info("left toolbar NOT FOUND!");
 			}
 		} catch (AWTException e) {
@@ -287,6 +289,10 @@ public class ScreenScanner {
 	public Pixel getParkingPoint() {
 		return _parkingPoint;
 	}
+	
+	public boolean isFullScreen() {
+		return _fsMode;
+	}
 
 	public Rectangle getProductionArea3() {
 		return _productionArea3;
@@ -331,21 +337,31 @@ public class ScreenScanner {
 	public boolean locateGameArea(boolean fullScreen) throws AWTException, IOException, RobotInterruptedException {
 		LOGGER.fine("Locating game area ... ");
 
-		_tl = new Pixel(0, 0);
+		_tl = new Pixel(0, 1);
 
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		_br = new Pixel(screenSize.width - 3, screenSize.height - 130);
+		_br = new Pixel(screenSize.width - 0, screenSize.height - 1);
 
 		if (fullScreen) {
 			// use default
 			setKeyAreas();
 			return true;
 		} else {
-			boolean found = _gameLocator.locateGameArea(new ImageData("topLeft.bmp", null, _comparator, -22, -13),
+			boolean found = _gameLocator.locateGameArea(new ImageData("topLeft.bmp", null, _comparator, -22, -12),
 			    new ImageData("bottomRight.bmp", null, _comparator, 45 + 53, 64), false);
 			if (found) {
 				_tl = _gameLocator.getTopLeft();
 				_br = _gameLocator.getBottomRight();
+				if (_tl.y < 5 && screenSize.height - getGameHeight() < 5) {
+					_fsMode = true;
+					LOGGER.info("FULL SCREEN DETECTED!!!");
+				} else {
+					_fsMode = false;
+				}
+				boolean fsb = _settings.getBoolean("fullScreen", false);
+				if (fsb != _fsMode) {
+					_settings.setProperty("fullScreen", "" + _fsMode);
+				}
 				setKeyAreas();
 				return true;
 			}
@@ -378,16 +394,26 @@ public class ScreenScanner {
 			}
 		}
 
-		Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 0, _tl.y + 209 + 3);// was 219
+		if (_fsMode) {
+			// TODO
+			int diff = (_br.y - _rock.y);
+			if (diff < 440) {
+				diff = 440 - diff;
+				_mouse.drag4(_rock.x, _rock.y, _rock.x, _rock.y - diff, true, true);
+			} else
+				LOGGER.info("NO NEED TO MOVE ROCK");
+		} else {
+			Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 + 0, _tl.y + 209 + 3);// was 219
 
-		if (Math.abs(_rock.x - goodRock.x) > 52 || Math.abs(_rock.y - goodRock.y) > 8) {
-			// need adjusting
-			_mouse.drag4(_rock.x, _rock.y, goodRock.x, goodRock.y, true, true);
-			_mouse.click();
-			LOGGER.info("waiting 1s...");
-			_mouse.delay(1000);
-			_rock = findRockAgain(goodRock);
-			needRecalc = true;
+			if (Math.abs(_rock.x - goodRock.x) > 52 || Math.abs(_rock.y - goodRock.y) > 8) {
+				// need adjusting
+				_mouse.drag4(_rock.x, _rock.y, goodRock.x, goodRock.y, true, true);
+				_mouse.click();
+				LOGGER.info("waiting 1s...");
+				_mouse.delay(1000);
+				_rock = findRockAgain(goodRock);
+				needRecalc = true;
+			}
 		}
 
 		return needRecalc;
@@ -430,8 +456,8 @@ public class ScreenScanner {
 		return p;
 	}
 
-	public Pixel locateImageCoords(String imageName, Rectangle[] area, int xOff, int yOff) throws AWTException,
-	    IOException, RobotInterruptedException {
+	public Pixel locateImageCoords(String imageName, Rectangle[] area, int xOff, int yOff)
+	    throws AWTException, IOException, RobotInterruptedException {
 
 		final Robot robot = new Robot();
 		final BufferedImage image = ImageIO.read(ImageManager.getImageURL(imageName));
@@ -643,8 +669,8 @@ public class ScreenScanner {
 		return _comparator;
 	}
 
-	public List<Pixel> scanMany(String filename, BufferedImage screen, boolean click) throws RobotInterruptedException,
-	    IOException, AWTException {
+	public List<Pixel> scanMany(String filename, BufferedImage screen, boolean click)
+	    throws RobotInterruptedException, IOException, AWTException {
 
 		ImageData imageData = getImageData(filename);
 		if (imageData == null)
@@ -749,8 +775,8 @@ public class ScreenScanner {
 		FastBitmap fbAREA = new FastBitmap(screen);
 
 		// COLOR FILTERING
-		ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255), new IntRange(
-		    255, 255));
+		ColorFiltering colorFiltering = new ColorFiltering(new IntRange(255, 255), new IntRange(255, 255),
+		    new IntRange(255, 255));
 		colorFiltering.applyInPlace(fbID);
 		colorFiltering.applyInPlace(fbAREA);
 
@@ -768,26 +794,26 @@ public class ScreenScanner {
 
 	}
 
-	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click) throws AWTException,
-	    RobotInterruptedException {
+	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click)
+	    throws AWTException, RobotInterruptedException {
 		return scanOne(imageData, area, click, null);
 	}
-	
-	
+
 	public Pixel scanOne(ImageData imageData, Rectangle area, boolean click, Color colorToBypass) throws AWTException {
 		if (area == null) {
 			area = imageData.getDefaultArea();
 		}
 		BufferedImage screen = new Robot().createScreenCapture(area);
-		
+
 		if (imageData.getFilename().endsWith("F.bmp")) {
-	    FastBitmap fb = new FastBitmap(screen);
-      fb.toGrayscale();
-	    new Threshold(200).applyInPlace(fb);
-	    fb.toRGB();
-	    //fb.saveAsBMP("ship_area.bmp");
+			FastBitmap fb = new FastBitmap(screen);
+			fb.toGrayscale();
+			new Threshold(200).applyInPlace(fb);
+			fb.toRGB();
+			// fb.saveAsBMP("ship_area.bmp");
 		}
-		Pixel pixel = _matcher.findMatch(imageData.getImage(), screen, colorToBypass != null ? colorToBypass : imageData.getColorToBypass());
+		Pixel pixel = _matcher.findMatch(imageData.getImage(), screen,
+		    colorToBypass != null ? colorToBypass : imageData.getColorToBypass());
 		LOGGER
 		    .fine("LOOKING FOR " + imageData.getName() + "  screen: " + area + " BYPASS: " + imageData.getColorToBypass());
 
@@ -803,10 +829,9 @@ public class ScreenScanner {
 		return pixel;
 
 	}
-	
 
-	public Pixel scanOne(String filename, Rectangle area, boolean click) throws RobotInterruptedException, IOException,
-	    AWTException {
+	public Pixel scanOne(String filename, Rectangle area, boolean click)
+	    throws RobotInterruptedException, IOException, AWTException {
 		ImageData imageData = getImageData(filename);
 		if (imageData == null)
 			return null;
@@ -832,8 +857,8 @@ public class ScreenScanner {
 		return pixel;
 	}
 
-	public Pixel scanOneFast(ImageData imageData, Rectangle area, boolean click) throws AWTException,
-	    RobotInterruptedException {
+	public Pixel scanOneFast(ImageData imageData, Rectangle area, boolean click)
+	    throws AWTException, RobotInterruptedException {
 		if (area == null) {
 			area = imageData.getDefaultArea();
 		}
@@ -855,8 +880,8 @@ public class ScreenScanner {
 
 	}
 
-	public Pixel scanOneFast(String filename, Rectangle area, boolean click) throws RobotInterruptedException,
-	    IOException, AWTException {
+	public Pixel scanOneFast(String filename, Rectangle area, boolean click)
+	    throws RobotInterruptedException, IOException, AWTException {
 		ImageData imageData = getImageData(filename);
 		if (imageData == null)
 			return null;
@@ -880,8 +905,8 @@ public class ScreenScanner {
 		return pixel;
 	}
 
-	public Pixel scanContractButton(String filename, Rectangle area) throws RobotInterruptedException, IOException,
-	    AWTException {
+	public Pixel scanContractButton(String filename, Rectangle area)
+	    throws RobotInterruptedException, IOException, AWTException {
 		ImageData imageData = getImageData(filename);
 		assert imageData == null;
 		assert area != null;
@@ -958,11 +983,11 @@ public class ScreenScanner {
 	}
 
 	public Pixel getFullScreen() {
-		return _fullScreen;
+		return _fullScreenButton;
 	}
 
 	public void setFullScreen(Pixel fullScreen) {
-		_fullScreen = fullScreen;
+		_fullScreenButton = fullScreen;
 	}
 
 	public void zoomOut() throws RobotInterruptedException, IOException {
@@ -983,7 +1008,7 @@ public class ScreenScanner {
 				e.printStackTrace();
 			}
 		}
-
+		_mouse.delay(500);
 		LOGGER.info("Zooming done!");
 	}
 
@@ -1192,7 +1217,8 @@ public class ScreenScanner {
 		return _sailorsPos;
 	}
 
-	public Pixel scanPrecise(String filename, Rectangle area) throws AWTException, IOException, RobotInterruptedException {
+	public Pixel scanPrecise(String filename, Rectangle area)
+	    throws AWTException, IOException, RobotInterruptedException {
 		return scanPrecise(getImageData(filename), area);
 	}
 
@@ -1274,7 +1300,7 @@ public class ScreenScanner {
 	public void writeImageTS(BufferedImage image, String filename) {
 		MyImageIO.writeImageTS(image, filename);
 	}
-	
+
 	public void writeImage(BufferedImage image, String filename) {
 		MyImageIO.writeImage(image, filename);
 	}
@@ -1286,7 +1312,7 @@ public class ScreenScanner {
 		}
 		return null;
 	}
-	
+
 	public String ocrScanMarketBonus(Rectangle area) throws AWTException {
 		if (_ocrMarketBonus != null) {
 			BufferedImage image = new Robot().createScreenCapture(area);
@@ -1294,7 +1320,7 @@ public class ScreenScanner {
 		}
 		return null;
 	}
-	
+
 	public BufferedImage scanStorage() throws AWTException, IOException, RobotInterruptedException {
 		if (getRock() != null) {
 			Pixel p = new Pixel(getRock());
@@ -1317,7 +1343,5 @@ public class ScreenScanner {
 
 		return null;
 	}
-
-
 
 }
