@@ -204,12 +204,10 @@ public class ScreenScanner {
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
 		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
 
-		area = new Rectangle(_br.x - 110, _br.y - 75, 60, 40);
-		getImageData("anchor.bmp", area, 22, 12);
-		getImageData("anchor2.bmp", area, 22, 12);
-		getImageData("anchor3.bmp", area, 22, 12);
+		area = new Rectangle(_br.x - 110, _br.y - 110, 70, 75);
+		getImageData("anchor.bmp", area, 11, 46);
 
-		_anchorButton = getImageData("anchor3.bmp", area, 22, 12);
+		_anchorButton = getImageData("anchor.bmp", area, 11, 46);
 		_mapButton = getImageData("mapButton.bmp", area, 20, 7);
 
 		area = new Rectangle(_br.x - 30, _tl.y + 100, 30, getGameHeight() / 2 - 100);

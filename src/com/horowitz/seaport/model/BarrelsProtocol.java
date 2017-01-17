@@ -65,17 +65,17 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 			int topY = _scanner.getTopLeft().y;
 			int yy = rock.y - topY;
 			int y1 = rock.y - 263;
-			
+
 			int x1 = rock.x - 114;
 			int x2 = _scanner.getBottomRight().x - 28;
-			
-//			if (yy < 263) {//outside the game area => need to cut off the land5
-//				int toCut = 263 - yy;
-//				image = image.getSubimage(0, toCut, image.getWidth(), image.getHeight() - toCut);
-//			}
-			
+
+			// if (yy < 263) {//outside the game area => need to cut off the land5
+			// int toCut = 263 - yy;
+			// image = image.getSubimage(0, toCut, image.getWidth(), image.getHeight() - toCut);
+			// }
+
 			image = image.getSubimage(0, 0, Math.min(image.getWidth(), x2 - x1), image.getHeight());
-			
+
 			Rectangle area = new Rectangle(x1, y1, image.getWidth(), image.getHeight());
 
 			FastBitmap landFB = new FastBitmap(image);
@@ -145,36 +145,37 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 				if (isNotInterrupted()) {
 					cnt++;
 					IntPoint c = blob.getCenter();
-					System.out.println(c);
 					Pixel p = new Pixel(c.y + area.x + 0, c.x + area.y + 0);
 					LOGGER.fine("BARREL: " + p);
-					_mouse.click(p);
-					_mouse.delay(50);
+					if (p.y > _scanner.getTopLeft().y + 72) {
+						_mouse.click(p);
+						_mouse.delay(50);
 
-					p.x += 6;
-					p.y += 6;
-					_mouse.click(p);
-					_mouse.delay(50);
+						p.x += 6;
+						p.y += 6;
+						_mouse.click(p);
+						_mouse.delay(50);
 
-					p.x -= 12;
-					p.y -= 6;
-					_mouse.click(p);
-					_mouse.delay(100);
-					if (_capture) {
-						_scanner.captureArea(new Rectangle(p.x - 21, p.y - 120, 51, 120), "barrels/barrels", true);
+						p.x -= 12;
+						p.y -= 6;
+						_mouse.click(p);
+						_mouse.delay(100);
+						if (_capture) {
+							_scanner.captureArea(new Rectangle(p.x - 21, p.y - 120, 51, 120), "barrels/barrels", true);
+						}
 					}
 				}
 
 			}
-//			if (isNotInterrupted()) {
-//				// additional clicks to gem area
-//				int x = _scanner.getBottomRight().x - 170;
-//				int y = _scanner.getTopLeft().y + 42;
-//				for (int i = 0; i < 16 && isNotInterrupted(); i++) {
-//					_mouse.click(x + i * 10, y);
-//				}
-//				_mouse.delay(100);
-//			}
+			// if (isNotInterrupted()) {
+			// // additional clicks to gem area
+			// int x = _scanner.getBottomRight().x - 170;
+			// int y = _scanner.getTopLeft().y + 42;
+			// for (int i = 0; i < 16 && isNotInterrupted(); i++) {
+			// _mouse.click(x + i * 10, y);
+			// }
+			// _mouse.delay(100);
+			// }
 			LOGGER.info("BARRELS CNT: " + cnt);
 
 		} catch (RobotInterruptedException e) {
