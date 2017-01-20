@@ -166,8 +166,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return false;
 	}
 
-	protected boolean sendShip(LinkedList<Destination> chain)
-	    throws AWTException, RobotInterruptedException, IOException, GameErrorException {
+	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException,
+	    IOException, GameErrorException {
 		LOGGER.info("CHAIN: " + chain);
 		_mouse.checkUserMovement();
 		Destination dest = chain.poll();
@@ -180,9 +180,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				smallTownPos = _mapManager.getSmallTownPos();
 			}
 			if (smallTownPos != null) {
-				int x = smallTownPos.x + dest.getRelativePosition().x;
-				int y = smallTownPos.y + dest.getRelativePosition().y;
-
+				int x = -1;
+				int y = -1;
 				// what if dest is shipwreck
 				if (dest.getAbbr().equalsIgnoreCase("SW")) {
 					good = false;
@@ -206,6 +205,14 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					} else {
 						LOGGER.info("No shipwreck available right now. Moving on...");
 					}
+				} 
+				if (x < 0) {
+					Pixel pos = _mapManager.ensureDestination(dest);
+					// int x = smallTownPos.x + dest.getRelativePosition().x;
+					// int y = smallTownPos.y + dest.getRelativePosition().y;
+					x = pos.x;
+					y = pos.y;
+					good = true;
 				}
 
 				if (good) {
@@ -309,8 +316,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return false;
 	}
 
-	private boolean doMarket(LinkedList<Destination> chain, Destination dest)
-	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
+	private boolean doMarket(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
+	    IOException, AWTException, GameErrorException {
 		Pixel mt = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
 		boolean good = false;
 		if (mt != null) {
@@ -477,8 +484,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return pp != null;
 	}
 
-	private boolean locateCommodity(Pixel mt, String commodity)
-	    throws RobotInterruptedException, IOException, AWTException {
+	private boolean locateCommodity(Pixel mt, String commodity) throws RobotInterruptedException, IOException,
+	    AWTException {
 		int x = mt.x - 220;
 		int y = mt.y + 144;
 		Rectangle menuArea = new Rectangle(x, y, 80, 234);
@@ -534,8 +541,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			_mouse.delay(66);
 	}
 
-	private boolean doNext(LinkedList<Destination> chain, Destination dest)
-	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
+	private boolean doNext(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
+	    IOException, AWTException, GameErrorException {
 		LOGGER.info(dest.getName() + " can't be done!");
 		_scanner.scanOneFast("buildings/x.bmp", null, true);
 		_mouse.checkUserMovement();

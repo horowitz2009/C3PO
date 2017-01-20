@@ -418,7 +418,17 @@ public class ScreenScanner {
 	}
 
 	public Pixel findRock() throws IOException, AWTException, RobotInterruptedException {
-		Rectangle area = new Rectangle(_tl.x + 350, _tl.y + 43, 860, getGameHeight() - 43);
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		Rectangle area = new Rectangle(_tl.x + 350, _tl.y + 70, getGameWidth() - 700, getGameHeight() - 70);
+		
+		if (screenSize.width > 1900) {
+			//HD mode
+			area =  new Rectangle(_tl.x + 760, _tl.y + 318, 107, 173);
+		} else if (screenSize.width > 1590) {
+			//1600x1200
+			area =  new Rectangle(_tl.x + 622, _tl.y + 148, 75, 134);
+		}
+		
 		int tries = 0;
 		Pixel p = null;
 		do {
@@ -428,7 +438,28 @@ public class ScreenScanner {
 			// writeImage(area, "admArea1.png");
 			if (p == null) {
 				LOGGER.info("Rock try 2 ...");
-				p = scanOne("ROCK.bmp", getScanArea(), false);
+				if (screenSize.width > 1900) {
+					//HD mode
+					area =  new Rectangle(_tl.x + 768, _tl.y + 155, 75, 153);
+				} else if (screenSize.width > 1590) {
+					//1600x1200
+					area =  new Rectangle(_tl.x + 570, _tl.y + 133, 75, 111);
+				}
+
+				p = scanOne("ROCK.bmp", area, false);
+				if (p == null) {
+					LOGGER.info("Rock try 3 ...");
+					if (screenSize.width > 1900) {
+						//HD mode
+						area =  new Rectangle(_tl.x + 700, _tl.y + 70, 230, getGameHeight() - 70);
+					} else if (screenSize.width > 1590) {
+						//1600x1200
+						area =  new Rectangle(_tl.x + 567, _tl.y + 70, 244, getGameHeight() - 70);
+					}
+					p = scanOne("ROCK.bmp", area, false);
+					if (p == null)
+					  p = scanOne("ROCK.bmp", getScanArea(), false);
+				}
 			}
 			// _rock = p;
 		} while (p == null && tries < 17);

@@ -81,73 +81,77 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
 		}
 
-		if (anchor != null && isNotInterrupted() && _mapManager.ensureMap()) {
-			// MAP IS OPEN
+		if (anchor != null && isNotInterrupted()) {
+			if (_mapManager.ensureMap()) {
+				// MAP IS OPEN and SmallTown visible
 
-			if (_lastShip == null) {
-				_lastShip = new Ship("<Unknown>");
-			}
-			Ship ship = _lastShip;
-			List<ProtocolEntry> entries = _shipProtocol.getEntries();
-
-			if (isInterrupted())
-				return;
-
-			ProtocolEntry pe = findSuitableProtocolEntry(ship, entries);
-
-			if (pe != null) {
-
-				// do what you gotta do with pe
-				// end product: _destChain
-
-				pe.deserialize(new BalancedProtocolEntryDeserializer(_mapManager, ship));
-
-				// TODO NOT GOOD _destChain = pe.getChain();
-				List<DispatchEntry> des = pe.getDispatchEntries();
-				float z = 1;
-				List<DispatchEntry> allDEs = new JsonStorage().loadDispatchEntries();
-				for (DispatchEntry de : des) {
-					z *= de.getGoal();
-					for (DispatchEntry dep : allDEs) {
-						if (dep.getShip().equals(ship.getName()) && dep.getDest().equals(de.getDest())) {
-							de.setTimes(dep.getTimes());
-							break;
-						}
-					}
+				if (_lastShip == null) {
+					_lastShip = new Ship("<Unknown>");
 				}
+				Ship ship = _lastShip;
+				List<ProtocolEntry> entries = _shipProtocol.getEntries();
 
-				if (Math.abs(1 - z) > 0.0000001) {// z > 1
+				if (isInterrupted())
+					return;
 
-					// now that we have Z and times/ let's calculate the coef
+				ProtocolEntry pe = findSuitableProtocolEntry(ship, entries);
+
+				if (pe != null) {
+
+					// do what you gotta do with pe
+					// end product: _destChain
+
+					pe.deserialize(new BalancedProtocolEntryDeserializer(_mapManager, ship));
+
+					// TODO NOT GOOD _destChain = pe.getChain();
+					List<DispatchEntry> des = pe.getDispatchEntries();
+					float z = 1;
+					List<DispatchEntry> allDEs = new JsonStorage().loadDispatchEntries();
 					for (DispatchEntry de : des) {
-						de.setCoef(de.getTimes() * z / de.getGoal());
+						z *= de.getGoal();
+						for (DispatchEntry dep : allDEs) {
+							if (dep.getShip().equals(ship.getName()) && dep.getDest().equals(de.getDest())) {
+								de.setTimes(dep.getTimes());
+								break;
+							}
+						}
 					}
 
-					// next sort by this coef
-					Collections.sort(des, new Comparator<DispatchEntry>() {
-						@Override
-						public int compare(DispatchEntry o1, DispatchEntry o2) {
-							return new CompareToBuilder().append(o1.getCoef(), o2.getCoef()).toComparison();
+					if (Math.abs(1 - z) > 0.0000001) {// z > 1
+
+						// now that we have Z and times/ let's calculate the coef
+						for (DispatchEntry de : des) {
+							de.setCoef(de.getTimes() * z / de.getGoal());
 						}
-					});
-				}
-				// finally extract the result in form of dest chain
-				LinkedList<Destination> chainList = new LinkedList<Destination>();
-				for (DispatchEntry de : des) {
-					chainList.add(_mapManager.getDestinationByAbbr(de.getDest()));
-				}
 
-				// use this chain
-				boolean sent = sendShip(new LinkedList<Destination>(chainList));
-				if (!sent && isNotInterrupted()) {
-					_scanner.scanOne(_scanner.getAnchorButton(), null, true);
-				}
+						// next sort by this coef
+						Collections.sort(des, new Comparator<DispatchEntry>() {
+							@Override
+							public int compare(DispatchEntry o1, DispatchEntry o2) {
+								return new CompareToBuilder().append(o1.getCoef(), o2.getCoef()).toComparison();
+							}
+						});
+					}
+					// finally extract the result in form of dest chain
+					LinkedList<Destination> chainList = new LinkedList<Destination>();
+					for (DispatchEntry de : des) {
+						chainList.add(_mapManager.getDestinationByAbbr(de.getDest()));
+					}
 
+					// use this chain
+					boolean sent = sendShip(new LinkedList<Destination>(chainList));
+					if (!sent && isNotInterrupted()) {
+						_scanner.scanOne(_scanner.getAnchorButton(), null, true);
+					}
+
+				} else {
+					LOGGER.info("ERROR: BADLY DEFINED PROTOCOL!");
+					LOGGER.info("COUNDN'T FIND WHERE TO SEND THE SHIP!");
+					_mouse.click(anchor);
+					_mouse.delay(1000);
+				}
 			} else {
-				LOGGER.info("ERROR: BADLY DEFINED PROTOCOL!");
-				LOGGER.info("COUNDN'T FIND WHERE TO SEND THE SHIP!");
-				_mouse.click(anchor);
-				_mouse.delay(1000);
+				LOGGER.info("Can't find Small Town...");
 			}
 		} else {
 			LOGGER.info("anchor not found...");

@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v115cc";
+	private static String APP_TITLE = "Seaport v116";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1927,6 +1927,7 @@ public class MainFrame extends JFrame {
 							smallTownPos = _mapManager.getSmallTownPos();
 						}
 						if (smallTownPos != null) {
+							//TODO ensure dest
 							int x = smallTownPos.x + dest.getRelativePosition().x;
 							int y = smallTownPos.y + dest.getRelativePosition().y;
 							_mouse.click(x, y);

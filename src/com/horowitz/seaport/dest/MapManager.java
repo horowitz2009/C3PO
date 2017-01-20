@@ -77,13 +77,13 @@ public class MapManager {
 		deserializeShips();
 
 		_forbiddenAreas.clear();
+		Pixel tl = _scanner.getTopLeft();
 		Pixel br = _scanner.getBottomRight();
 		Rectangle anchorZone = new Rectangle(br.x - 127, br.y - 100, 127, 100);
+		Rectangle shipZone = new Rectangle(tl.x + 23, tl.y + 62, 261, 374);
 		_forbiddenAreas.add(anchorZone);
-		Pixel tl = _scanner.getTopLeft();
-		int w = _scanner.getGameWidth() - 268 - 29;
-		_mapArea = new Rectangle(tl.x + 278, tl.y + 69, w, _scanner.getGameHeight() - 69);
-
+		_forbiddenAreas.add(shipZone);
+		_mapArea = new Rectangle(tl.x, tl.y + 69, _scanner.getGameWidth() - 29, _scanner.getGameHeight() - 69);
 	}
 
 	public Destination getSmallTown() {
@@ -97,11 +97,11 @@ public class MapManager {
 			destination.setImageDataTitle(_scanner.getImageData(destination.getImageTitle()));
 
 			ImageData id = destination.getImageData();
-			//id.set_xOff(id.getImage().getWidth() / 2);
-			//id.set_yOff(43);
+			// id.set_xOff(id.getImage().getWidth() / 2);
+			// id.set_yOff(43);
 			id.set_xOff(0);
 			id.set_yOff(0);
-			
+
 			id.setDefaultArea(_scanner.getScanArea());
 			id = destination.getImageDataTitle();
 			id.setDefaultArea(_scanner.getPopupArea());
@@ -120,8 +120,8 @@ public class MapManager {
 			// destination.setImageDataTitle(_scanner.getImageData(destination.getImageTitle()));
 
 			ImageData id = destination.getImageData();
-//			id.set_xOff(id.getImage().getWidth() / 2);
-//			id.set_yOff(43);
+			// id.set_xOff(id.getImage().getWidth() / 2);
+			// id.set_yOff(43);
 			id.set_xOff(0);
 			id.set_yOff(0);
 			id.setDefaultArea(_scanner.getScanArea());
@@ -173,122 +173,136 @@ public class MapManager {
 	public boolean ensureMap() throws AWTException, RobotInterruptedException, IOException, GameErrorException {
 		_scanner.zoomOut();
 
-		if (_smallTownPos == null) {
-			findSmallTown();
-		} else {
-			findSmallTownAgain();
-		}
-		
+		findSmallTownAgain();
+
 		if (_smallTownPos == null) {
 			if (_scanner.handlePopups()) {
 				findSmallTownAgain();
 				if (_smallTownPos == null) {
 					LOGGER.warning("WHAT TO DO? WHAT TO DO?");
-					//throw new GameErrorException(9);
+					// throw new GameErrorException(9);
 					return false;
 				}
 			}
 		}
-		
-		boolean isOK = true;
-		int xx2 = 0; int yy2 = 0;
-		int xx3 = 0; int yy3 = 0;
-		for (Destination dest : _destinations) {
-	    if (dest.isFavorite()) {
-	    	dest.getRelativePosition();
-				int x = _smallTownPos.x + dest.getRelativePosition().x;
-				int y = _smallTownPos.y + dest.getRelativePosition().y;
-				if (x < _mapArea.x) {
-					//2
-					dest.x = _mapArea.x - x;
-					if (dest.x > xx2)
-						xx2 = dest.x;
-				} else if (x > _mapArea.x + _mapArea.getWidth()) {
-					//3
-					dest.x = (int)(_mapArea.x + _mapArea.getWidth() - x);
-					if (dest.x < xx3)
-						xx3 = dest.x;
-				}
-
-				if (y < _mapArea.y) {
-					//2
-					dest.y = _mapArea.y - y;
-					if (dest.y > yy2)
-						yy2 = dest.y;
-				} else if (y > _mapArea.y + _mapArea.getHeight()) {
-					//3
-					dest.y = (int)(_mapArea.y + _mapArea.getHeight() - y);
-					if (dest.y < yy3)
-						yy3 = dest.y;
-				}
-				
-	    	
-	    }
-    }
-		
-		if ((xx2 != 0 && xx3 != 0) || (yy2 != 0 && yy3 != 0)) {
-			isOK = false;
-			LOGGER.info("ALL DESTINATIONS CAN'T BE IN THE ZONE!!!");
-		} else {
-			//can be fixed by dragging
-			int xxx = (xx2 != 0) ? xx2 : xx3;
-			int yyy = (yy2 != 0) ? yy2 : yy3;
-			if (xxx != 0 || yyy != 0) {
-				if (xxx > 0)
-					xxx += 35;
-				else
-					xxx -= 35;
-				if (yyy > 0)
-					yyy += 35;
-				else
-					yyy -= 35;
-				
-			  _scanner.getMouse().drag4(_smallTownPos.x + 40, _smallTownPos.y - 70, _smallTownPos.x + xxx, _smallTownPos.y + yyy - 70, true, true);
-			  _scanner.getMouse().click();
-			  _scanner.getMouse().click();
-			  _scanner.getMouse().delay(1200);
-			  _smallTownPos.x += xxx;
-			  _smallTownPos.y += yyy;
-			  findSmallTownAgain();
-			}
-		}
-		
-		return isOK;
+		return true;
+		//
+		// boolean isOK = true;
+		// int xx2 = 0;
+		// int yy2 = 0;
+		// int xx3 = 0;
+		// int yy3 = 0;
+		// for (Destination dest : _destinations) {
+		// if (dest.isFavorite()) {
+		// dest.getRelativePosition();
+		// int x = _smallTownPos.x + dest.getRelativePosition().x;
+		// int y = _smallTownPos.y + dest.getRelativePosition().y;
+		// if (x < _mapArea.x) {
+		// // 2
+		// dest.x = _mapArea.x - x;
+		// if (dest.x > xx2)
+		// xx2 = dest.x;
+		// } else if (x > _mapArea.x + _mapArea.getWidth()) {
+		// // 3
+		// dest.x = (int) (_mapArea.x + _mapArea.getWidth() - x);
+		// if (dest.x < xx3)
+		// xx3 = dest.x;
+		// }
+		//
+		// if (y < _mapArea.y) {
+		// // 2
+		// dest.y = _mapArea.y - y;
+		// if (dest.y > yy2)
+		// yy2 = dest.y;
+		// } else if (y > _mapArea.y + _mapArea.getHeight()) {
+		// // 3
+		// dest.y = (int) (_mapArea.y + _mapArea.getHeight() - y);
+		// if (dest.y < yy3)
+		// yy3 = dest.y;
+		// }
+		//
+		// }
+		// }
+		//
+		// if ((xx2 != 0 && xx3 != 0) || (yy2 != 0 && yy3 != 0)) {
+		// isOK = false;
+		// LOGGER.info("ALL DESTINATIONS CAN'T BE IN THE ZONE!!!");
+		// } else {
+		// // can be fixed by dragging
+		// int xxx = (xx2 != 0) ? xx2 : xx3;
+		// int yyy = (yy2 != 0) ? yy2 : yy3;
+		// if (xxx != 0 || yyy != 0) {
+		// if (xxx > 0)
+		// xxx += 35;
+		// else
+		// xxx -= 35;
+		// if (yyy > 0)
+		// yyy += 35;
+		// else
+		// yyy -= 35;
+		//
+		// _scanner.getMouse().drag4(_smallTownPos.x + 40, _smallTownPos.y - 70, _smallTownPos.x + xxx,
+		// _smallTownPos.y + yyy - 70, true, true);
+		// _scanner.getMouse().click();
+		// _scanner.getMouse().click();
+		// _scanner.getMouse().delay(1200);
+		// _smallTownPos.x += xxx;
+		// _smallTownPos.y += yyy;
+		// findSmallTownAgain();
+		// }
+		// }
+		//
+		// return isOK;
 	}
 
-	private void findSmallTown() throws AWTException, RobotInterruptedException {
+	private Pixel findSmallTown() throws AWTException, RobotInterruptedException {
 		LOGGER.info("Looking for Small Town for the first time");
-		
+		Pixel smallTownPos = null;
 		Destination smallTownDEST = getSmallTown();
-		int xx = _scanner.getGameWidth() / 3;
-		int yy = _scanner.getGameHeight() / 2;
-		Rectangle smallerArea = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y
-		    + yy / 2, xx, yy);
-		//Rectangle smallerArea = _mapArea;
-		_smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), smallerArea, false);
-		if (_smallTownPos == null) {
-			_smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
-			LOGGER.info("DAMMMMMMMMMMMN");
-		} else {
-			LOGGER.info("BINGOOOOOOOOOO");
+		int xx = _scanner.getGameWidth() / 2;
+		Rectangle area = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y + 164, 240, 255);
+		smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), area, false);
+		int attempt = 1;
+		if (smallTownPos == null) {
+			attempt++;
+			xx = _scanner.getGameWidth() / 3;
+			area = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y + 70, xx,
+			    _scanner.getGameHeight() - 140);
+			smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), area, false);
+			if (smallTownPos == null) {
+				attempt++;
+				area = _mapArea;
+				smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), area, false);
+				if (smallTownPos == null) {
+					attempt++;
+					smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
+				}
+			}
 		}
+		// Rectangle smallerArea = _mapArea;
+		if (smallTownPos != null) {
+			LOGGER.info("found Small Town " + attempt);
+		}
+		return smallTownPos;
 	}
 
 	private void findSmallTownAgain() throws AWTException, RobotInterruptedException {
 		Destination smallTownDEST = getSmallTown();
-		Rectangle areaSpec = new Rectangle(_smallTownPos.x - 20, _smallTownPos.y - 20, smallTownDEST.getImageData().getImage()
-		    .getWidth() + 40, smallTownDEST.getImageData().getImage().getHeight() + 40);
+		if (_smallTownPos != null) {
+			Rectangle areaSpec = new Rectangle(_smallTownPos.x - 20, _smallTownPos.y - 20, smallTownDEST.getImageData()
+			    .getImage().getWidth() + 40, smallTownDEST.getImageData().getImage().getHeight() + 40);
 
-		Pixel newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), areaSpec, false);
-		if (newSmallTownPos == null) {
-			LOGGER.info("COULDN'T FIND Small Town at once. Trying again...");
-			newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
-		}
+			Pixel newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), areaSpec, false);
+			if (newSmallTownPos == null) {
+				newSmallTownPos = findSmallTown();
+			}
 
-		if (Math.abs(_smallTownPos.x - newSmallTownPos.x) < 7 && Math.abs(_smallTownPos.y - newSmallTownPos.y) < 7) {
-			LOGGER.info("Small Town found in the same place.");
-		}
-		_smallTownPos = newSmallTownPos;
+			if (Math.abs(_smallTownPos.x - newSmallTownPos.x) < 7 && Math.abs(_smallTownPos.y - newSmallTownPos.y) < 7) {
+				LOGGER.info("Small Town found in the same place.");
+			}
+			_smallTownPos = newSmallTownPos;
+		} else
+			_smallTownPos = findSmallTown();
 	}
 
 	public Pixel getSmallTownPos() {
@@ -302,7 +316,7 @@ public class MapManager {
 	public void reset() {
 		_smallTownPos = null;
 	}
-	
+
 	public void resetDispatchEntries() throws IOException {
 		JsonStorage jsonStorage = new JsonStorage();
 		jsonStorage.saveDispatchEntries(new ArrayList<DispatchEntry>());
@@ -313,9 +327,9 @@ public class MapManager {
 	private Rectangle _mapArea;
 
 	public void amendShipProtocol(Ship ship, Destination dest) throws IOException {
-	  //TODO	
+		// TODO
 	}
-	
+
 	public void registerTrip(Ship ship, Destination dest) throws IOException {
 		JsonStorage jsonStorage = new JsonStorage();
 		List<DispatchEntry> des = jsonStorage.loadDispatchEntries();
@@ -361,6 +375,47 @@ public class MapManager {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Pixel ensureDestination(Destination dest) throws RobotInterruptedException, AWTException {
+		if (dest != null && _smallTownPos != null) {
+			int x = _smallTownPos.x + dest.getRelativePosition().x;
+			int y = _smallTownPos.y + dest.getRelativePosition().y;
+			int x1 = _mapArea.x;
+			int y1 = _mapArea.y;
+			int x2 = x1 + _mapArea.width;
+			int y2 = y1 + _mapArea.height;
+			int dragX = 0;
+			if (x < x1) {
+				dragX = x1 - x + 7;// positive -> drag east
+			} else if (x > x2) {
+				dragX = x2 - x - 7;// negative -> drag west
+			}
+
+			int dragY = 0;
+			if (y < y1) {
+				dragX = y1 - y + 7;// positive -> drag south
+			} else if (y > y2) {
+				dragX = y2 - y - 7;// negative -> drag north
+			}
+
+			if (dragX != 0 || dragY != 0) {
+				LOGGER.info("Dragging to " + dest.getName());
+				int startX = _smallTownPos.x + 41;
+				int startY = _smallTownPos.x + 65;
+				_scanner.getMouse().drag4(startX, startY, startX + dragX, startY + dragY, true, true);
+				_scanner.getMouse().delay(2000);
+				_scanner.getMouse().click();// to stop inertia
+				_smallTownPos.x += dragX;
+				_smallTownPos.y += dragY;
+				findSmallTownAgain();
+				x = _smallTownPos.x + dest.getRelativePosition().x;
+				y = _smallTownPos.y + dest.getRelativePosition().y;
+				
+			}
+			return new Pixel(x, y);
 		}
 		return null;
 	}
