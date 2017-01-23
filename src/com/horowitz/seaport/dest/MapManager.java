@@ -403,8 +403,8 @@ public class MapManager {
 
 			if (dragX != 0 || dragY != 0) {
 				LOGGER.info("Dragging to " + dest.getName());
-				int startX = _smallTownPos.x + 41;
-				int startY = _smallTownPos.x + 65;
+				int startX = _smallTownPos.x + 1;
+				int startY = _smallTownPos.x + 25;
 				_scanner.getMouse().drag4(startX, startY, startX + dragX, startY + dragY, true, true);
 				_scanner.getMouse().delay(2000);
 				_scanner.getMouse().click();// to stop inertia

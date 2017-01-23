@@ -1705,7 +1705,7 @@ public class MainFrame extends JFrame {
 
 				_mouse.checkUserMovement();
 				// 1. SCAN
-				if (turn % 3 == 0)
+				//if (turn % 3 == 0)
 					handlePopups();
 
 				// 2. REFRESH

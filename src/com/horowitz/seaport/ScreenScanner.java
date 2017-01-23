@@ -207,7 +207,7 @@ public class ScreenScanner {
 		area = new Rectangle(_br.x - 110, _br.y - 110, 70, 75);
 		getImageData("anchor.bmp", area, 11, 46);
 
-		_anchorButton = getImageData("anchor.bmp", area, 11, 46);
+		_anchorButton = getImageData("anchor.bmp", area, 11, 36);
 		_mapButton = getImageData("mapButton.bmp", area, 20, 7);
 
 		area = new Rectangle(_br.x - 30, _tl.y + 100, 30, getGameHeight() / 2 - 100);
@@ -240,7 +240,7 @@ public class ScreenScanner {
 		getImageData("dest/setSail.bmp", _popupArea, 27, 5);
 		getImageData("dest/setSail2.bmp", _popupArea, 27, 5);
 		area = generateWindowedArea(228, 495);
-		area.y = _tl.y + 74;
+		//area.y = _tl.y + 74;
 		area.height = 38;
 		getImageData("dest/MarketTownTitle2.bmp", area, 0, 0);
 		getImageData("dest/MerchantTitle.bmp", area, 0, 0);
@@ -423,7 +423,10 @@ public class ScreenScanner {
 		
 		if (screenSize.width > 1900) {
 			//HD mode
-			area =  new Rectangle(_tl.x + 760, _tl.y + 318, 107, 173);
+			if (isFullScreen()) {
+				area =  new Rectangle(_tl.x + 685, _tl.y + 562, 472, 250);
+			} else
+			  area =  new Rectangle(_tl.x + 760, _tl.y + 318, 107, 173);
 		} else if (screenSize.width > 1590) {
 			//1600x1200
 			area =  new Rectangle(_tl.x + 622, _tl.y + 148, 75, 134);
