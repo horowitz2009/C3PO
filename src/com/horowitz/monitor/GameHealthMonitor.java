@@ -17,6 +17,7 @@ public class GameHealthMonitor {
 	private boolean _stopIt;
 	private PropertyChangeSupport _support;
 
+	private Runnable _runnable;
 	private long _lastTime;
 
 	public GameHealthMonitor() {
@@ -76,10 +77,10 @@ public class GameHealthMonitor {
 			LOGGER
 			    .info("Time since last activity: " + DateUtils.fancyTime2(time) + "  <  " + DateUtils.fancyTime2(threshold));
 			// LOGGER.info("time since no ship sent: " + ((now - _lastTime) / 60000) + " < " + minTime / 60000);
+			checkHealth();
 			if (time >= threshold) {
 				// ALERT!!!!!
-				_support.firePropertyChange("NO_ACTIVITY", null, true);
-				_lastTime = System.currentTimeMillis();
+				triggerAlert();
 			}
 		}
 		LOGGER.info("Monitor stopped!");
@@ -87,6 +88,10 @@ public class GameHealthMonitor {
 
 	public void pingActivity() {
 		_lastTime = System.currentTimeMillis();
+	}
+	
+	public void checkHealth() {
+		new Thread(_runnable).start();
 	}
 
 	public void addPropertyChangeListener(PropertyChangeListener arg0) {
@@ -108,5 +113,18 @@ public class GameHealthMonitor {
 	public boolean isRunning() {
 		return !_stopIt && isRunning("MONITOR");
 	}
+
+	public Runnable getRunnable() {
+		return _runnable;
+	}
+
+	public void setRunnable(Runnable runnable) {
+		_runnable = runnable;
+	}
+
+	public void triggerAlert() {
+		_support.firePropertyChange("NO_ACTIVITY", null, true);
+		_lastTime = System.currentTimeMillis();
+  }
 
 }

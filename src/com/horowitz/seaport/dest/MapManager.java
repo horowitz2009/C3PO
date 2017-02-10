@@ -286,7 +286,7 @@ public class MapManager {
 		return smallTownPos;
 	}
 
-	private void findSmallTownAgain() throws AWTException, RobotInterruptedException {
+	private void findSmallTownAgain() throws AWTException, RobotInterruptedException, GameErrorException {
 		Destination smallTownDEST = getSmallTown();
 		if (_smallTownPos != null) {
 			Rectangle areaSpec = new Rectangle(_smallTownPos.x - 20, _smallTownPos.y - 20, smallTownDEST.getImageData()
@@ -296,7 +296,17 @@ public class MapManager {
 			if (newSmallTownPos == null) {
 				newSmallTownPos = findSmallTown();
 			}
-
+			if (newSmallTownPos == null) {
+				//still null
+				_scanner.handlePopups();
+				newSmallTownPos = findSmallTown();
+				if (newSmallTownPos == null)
+				  LOGGER.info("CRITICAL! Still can't find Small Town!");
+			}
+			
+			if (newSmallTownPos == null)
+				throw new GameErrorException(3, "Small Town can't be found", null);
+			
 			if (Math.abs(_smallTownPos.x - newSmallTownPos.x) < 7 && Math.abs(_smallTownPos.y - newSmallTownPos.y) < 7) {
 				LOGGER.info("Small Town found in the same place.");
 			}
@@ -379,7 +389,7 @@ public class MapManager {
 		return null;
 	}
 
-	public Pixel ensureDestination(Destination dest) throws RobotInterruptedException, AWTException {
+	public Pixel ensureDestination(Destination dest) throws RobotInterruptedException, AWTException, GameErrorException {
 		if (dest != null && _smallTownPos != null) {
 			int x = _smallTownPos.x + dest.getRelativePosition().x;
 			int y = _smallTownPos.y + dest.getRelativePosition().y;

@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v116";
+	private static String APP_TITLE = "Seaport v117RC2";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -258,6 +258,15 @@ public class MainFrame extends JFrame {
 
 		runSettingsListener();
 		_monitor = new GameHealthMonitor(_settings);
+//		_monitor.setRunnable(new Runnable() {
+//	    public void run() {
+//	    	try {
+//	        _scanner.handleErrorPopups();
+//        } catch (RobotInterruptedException | GameErrorException e) {
+//	        _monitor.triggerAlert();
+//        }
+//	    }
+//    });
 		_monitor.addPropertyChangeListener("NO_ACTIVITY", new PropertyChangeListener() {
 
 			@Override
@@ -659,9 +668,10 @@ public class MainFrame extends JFrame {
 	 * @param click
 	 * @param attempt
 	 * @throws RobotInterruptedException
+	 * @throws GameErrorException 
 	 * @deprecated
 	 */
-	private void recalcPositions(boolean click, int attempt) throws RobotInterruptedException {
+	private void recalcPositions(boolean click, int attempt) throws RobotInterruptedException, GameErrorException {
 		try {
 			if (!_scanner.isOptimized()) {
 				scan();
@@ -1371,7 +1381,12 @@ public class MainFrame extends JFrame {
 
 							if (_scanner.isOptimized()) {
 								// DO THE JOB
-								test();
+								try {
+	                test();
+                } catch (GameErrorException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+                }
 							} else {
 								LOGGER.info("I need to know where the game is!");
 							}
@@ -1602,7 +1617,7 @@ public class MainFrame extends JFrame {
 
 	}
 
-	private void test() {
+	private void test() throws GameErrorException {
 		setTitle(APP_TITLE + " testing");
 
 		try {
@@ -2074,7 +2089,7 @@ public class MainFrame extends JFrame {
 		_shipProtocolManagerUI.setShipProtocol(shipProtocolName);
 	}
 
-	private void handlePopups() throws RobotInterruptedException {
+	private void handlePopups() throws RobotInterruptedException, GameErrorException {
 		try {
 			LOGGER.info("Popups...");
 			boolean found = false;
@@ -2087,87 +2102,9 @@ public class MainFrame extends JFrame {
 
 			if (found) {
 				return;
-			}
-			// reload
-			long start = System.currentTimeMillis();
-			long now, t1 = 0, t2 = 0, t3, t4;
-			Rectangle area = _scanner.generateWindowedArea(400, 400);
-			area.y = _scanner.getBottomRight().y - 175;
-			area.height = 50;
-			p = _scanner.scanOneFast("reload2.bmp", area, false);
-			if (p != null) {
-				LOGGER.info("RELOAD2...");
-			}
-			now = System.currentTimeMillis();
-
-			t1 = now - start;
-			t2 = now;
-			if (p == null) {
-				area.y -= 72;
-				p = _scanner.scanOneFast("reload.bmp", area, false);
-				if (p != null) {
-					LOGGER.info("RELOAD1...");
-				}
-
-				now = System.currentTimeMillis();
-				t2 = now - t2;
-			}
-
-			found = p != null;
-			if (found) {
-				// check is this 'logged twice' message
-				area.y = _scanner.getTopLeft().y + 168;
-				area.x += 118;
-				area.width = 69;
-				area.height = 33;
-				Pixel pp = _scanner.scanOne("accountLoggedTwice2.bmp", area, false);
-				int which = 2;
-				if (pp == null) {
-					pp = _scanner.scanOne("accountLoggedTwice.bmp", area, false);
-					which = 0;
-				}
-				if (pp == null) {
-					pp = _scanner.scanOne("accountLoggedTwice3.bmp", area, false);
-					which = 3;
-				}
-				if (pp != null) {
-					LOGGER.info("Logged somewhere else. I'm done here! " + which);
-					_stopAllThreads = true;
-					_monitor.stopMonitoring();
-					throw new RobotInterruptedException();
-				}
-
-				LOGGER.info("Game crashed. Reloading...");
-				_scanner.captureScreen("CRASH ", true);
-				boolean success = false;
-				do {
-					success = refresh(false);
-					if (!success) {
-						LOGGER.info("REFRESH FAILED. SLEEPING 30s...");
-						_scanner.captureScreen("DAMN ", true);
-						try {
-							Thread.sleep(30000);
-						} catch (InterruptedException e) {
-						}
-					}
-				} while (!success);
-			}
-
-			t3 = now = System.currentTimeMillis();
-			found = _scanner.scanOneFast("buildings/x.bmp", null, true) != null;
-			now = System.currentTimeMillis();
-			t3 = now - t3;
-			_mouse.delay(150);
-			t4 = now = System.currentTimeMillis();
-			found = _scanner.scanOne(_scanner.getAnchorButton(), null, true) != null;
-			now = System.currentTimeMillis();
-			t4 = now - t4;
-			if (found)
-				_mouse.delay(450);
-			now = System.currentTimeMillis();
-			LOGGER.info("[" + t1 + ",  " + t2 + ",  " + t3 + ",  " + t4 + "], TOTAL: " + (now - start) + " - " + found);
-		} catch (IOException e) {
-			e.printStackTrace();
+			} 
+			
+			found = _scanner.handlePopups();
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}

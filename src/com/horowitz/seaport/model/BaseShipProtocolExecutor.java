@@ -189,11 +189,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						LOGGER.info("LOOKING for shipwreck...");
 						// locate the shipwreck
 						int t = 2;
-						Pixel p = _scanner.scanOne("dest/shipwreck2.bmp", null, false);
-						if (p == null) {
-							p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
-							t = 3;
-						}
+						Pixel p = _scanner.scanOne("dest/question.bmp", null, false);
+//						if (p == null) {
+//							p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
+//							t = 3;
+//						}
 						if (p != null) {
 							LOGGER.info("FOUND IT! " + t);
 							good = true;
@@ -504,6 +504,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			do {
 				pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
 				if (pc != null) {
+					_mouse.delay(1000);
+					pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
 					_mouse.click(pc.x + 13, pc.y + 9);
 					_mouse.delay(200);
 					found = true;
@@ -512,7 +514,9 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					scrollDown(mt, 2);
 					_mouse.delay(333);
 				}
-			} while (!found && turns < 37);
+			} while (!found && turns < 20);
+			if (turns >=20)
+				LOGGER.info("reached limit of 20 scroll turns...");
 			return found;
 		}
 	}
