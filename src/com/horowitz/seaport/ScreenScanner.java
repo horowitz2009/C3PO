@@ -893,6 +893,11 @@ public class ScreenScanner {
 	    RobotInterruptedException {
 		if (area == null) {
 			area = imageData.getDefaultArea();
+			if (area == null) {
+				// not recommended
+				Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+				area = new Rectangle(0, 0, d.width - 1, d.height - 1);
+			}
 		}
 		BufferedImage screen = new Robot().createScreenCapture(area);
 		if (_debugMode) {
@@ -912,6 +917,9 @@ public class ScreenScanner {
 
 	}
 
+	/*
+	 * if (imageData.getFilename().endsWith("F.bmp")) { FastBitmap fb = new FastBitmap(screen); fb.toGrayscale(); new Threshold(200).applyInPlace(fb); fb.toRGB(); // fb.saveAsBMP("ship_area.bmp"); }
+	 */
 	public Pixel scanOneFast(String filename, Rectangle area, boolean click) throws RobotInterruptedException,
 	    IOException, AWTException {
 		ImageData imageData = getImageData(filename);
