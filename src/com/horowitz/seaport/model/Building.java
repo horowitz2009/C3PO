@@ -16,6 +16,7 @@ public class Building extends GameUnit implements Cloneable, Serializable, Compa
   private Pixel _relativePosition;
   private transient Macros _macros;
   private String _macrosClass;
+  private String _material;
   private int _level;
   private int _time;
   private boolean _enabled;
@@ -121,4 +122,12 @@ public class Building extends GameUnit implements Cloneable, Serializable, Compa
   public void setTime(int time) {
     _time = time;
   }
+
+	public String getMaterial() {
+		return _material;
+	}
+
+	public void setMaterial(String material) {
+		_material = material;
+	}
 }
