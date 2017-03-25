@@ -444,11 +444,10 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			areaBonus.height = 30;
 
 			String sc = _scanner.ocrScanMarket(areaSend);
-			String bonus = _scanner.ocrScanMarketBonus(areaBonus);
+			String bonus = dest.getBonus();
 			if (bonus == null || bonus.isEmpty()) {
-				bonus = dest.getBonus();
+				bonus = _scanner.ocrScanMarketBonus(areaBonus);
 			}
-
 			LOGGER.info("MARKET: [" + sc + "][" + bonus + "]");
 			if (sc != null && !sc.isEmpty() && bonus != null && !bonus.isEmpty()) {
 				try {

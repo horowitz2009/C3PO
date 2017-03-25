@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="copy-jar" name="Create Runnable Jar for Project Mickey2">
 
-	<property name="versionNumber" value="118rc4" />
+	<property name="versionNumber" value="118rc5" />
 
 	<property name="jarname" value="Seaport${versionNumber}.jar" description="" />
 	<property name="dropboxjarname" value="DropboxRemote${versionNumber}.jar" description="" />
