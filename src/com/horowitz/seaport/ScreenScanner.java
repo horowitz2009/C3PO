@@ -57,8 +57,8 @@ public class ScreenScanner {
 	private MouseRobot _mouse;
 	private OCRMarket _ocrMarket;
 	private OCRMarketBonus _ocrMarketBonus;
-	private Pixel _br = null;
-	private Pixel _tl = null;
+	public Pixel _br = null;
+	public Pixel _tl = null;
 	private boolean _optimized = false;
 	private boolean _debugMode = false;
 

@@ -91,7 +91,18 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						// _scanner.writeImage(miniArea, "pin.bmp");
 						Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
 						if (pin != null) {
-							doShip(pin);
+							
+							try {
+	              doShip(pin);
+              } catch (GameErrorException e) {
+	              if (e.getCode() == 44) {
+	              	LOGGER.info("HMM. MAP ISSUES...");
+	              	LOGGER.info("TRY AGAIN...");
+	              	//doShip(pin);
+	              } else {
+	              	//throw new GameErrorException(9);
+	              }
+              }
 
 						} else {
 							// 2. check for shipwreck award

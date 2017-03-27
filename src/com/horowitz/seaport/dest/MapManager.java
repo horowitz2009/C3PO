@@ -31,6 +31,8 @@ public class MapManager {
 	private List<Destination> _destinations;
 	private List<Ship> _ships;
 	private Pixel _smallTownPos = null;
+	private Pixel _blacksmithPos = null;
+	private Pixel _tailorPos = null;
 	private List<Rectangle> _forbiddenAreas;
 
 	public MapManager(ScreenScanner scanner) {
@@ -255,39 +257,110 @@ public class MapManager {
 		// return isOK;
 	}
 
-	private Pixel findSmallTown() throws AWTException, RobotInterruptedException {
+	private Pixel findSmallTown() throws AWTException, RobotInterruptedException, GameErrorException, IOException {
 		LOGGER.info("Looking for Small Town for the first time");
 		Pixel smallTownPos = null;
 		Destination smallTownDEST = getSmallTown();
+		Destination blacksmithDest = getDestination("Blacksmith");
+		Destination tailorDest = getDestination("Tailor");
+
 		int xx = _scanner.getGameWidth() / 2;
-		Rectangle area = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y + 164, 240, 255);
+		Rectangle area = new Rectangle(_scanner._tl.x + xx - 200, _scanner._tl.y + 164, 400, 255);
 		smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), area, false);
 		int attempt = 1;
 		if (smallTownPos == null) {
 			attempt++;
-			xx = _scanner.getGameWidth() / 3;
-			area = new Rectangle(_scanner.getTopLeft().x + xx, _scanner.getTopLeft().y + 70, xx,
-			    _scanner.getGameHeight() - 140);
+			area = new Rectangle(_scanner._tl.x + 511, _scanner.getTopLeft().y + 70, 540, _scanner.getGameHeight() - 70);
 			smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), area, false);
+
 			if (smallTownPos == null) {
-				attempt++;
-				area = _mapArea;
-				smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), area, false);
-				if (smallTownPos == null) {
-					attempt++;
-					smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
+				// small town can't be found. try blacksmith or tailor
+				area = new Rectangle(_scanner._tl.x + 340, _scanner.getTopLeft().y + 70, 400, _scanner.getGameHeight() - 140);
+				Pixel tailorPos = _scanner.scanOneFast(tailorDest.getImageData(), area, false);
+				if (tailorPos != null) {
+					attempt = 100;
+					LOGGER.info("Tailor found: " + tailorPos);
+					smallTownPos = new Pixel(tailorPos.x + 155, tailorPos.y + 165);
+					LOGGER.info("Small Town calculated: " + smallTownPos);
+
+					_tailorPos = tailorPos;
+					_blacksmithPos = new Pixel(smallTownPos.x - 150, smallTownPos.y + 285);
+				} else {
+					// try blacksmith
+					area = new Rectangle(_scanner._tl.x + 340, _scanner.getTopLeft().y + 70, 400, _scanner.getGameHeight() - 140);
+					Pixel blacksmithPos = _scanner.scanOneFast(blacksmithDest.getImageData(), area, false);
+					if (blacksmithPos != null) {
+						attempt = 200;
+						LOGGER.info("Blacksmith found: " + blacksmithPos);
+						smallTownPos = new Pixel(blacksmithPos.x + 150, blacksmithPos.y - 285);
+						LOGGER.info("Small Town calculated: " + smallTownPos);
+
+						_blacksmithPos = blacksmithPos;
+						_tailorPos = new Pixel(smallTownPos.x - 155, smallTownPos.y - 165);
+					} else {
+						LOGGER.info("HMM, probably blacksmith is not available.");
+						// HMM, probably blacksmith is not available.
+						// try reopening map and look again
+						Pixel anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, true);
+						if (anchor != null) {
+							_scanner.getMouse().delay(2000);
+							_scanner.getMouse().click(_scanner.getBottomRight().x - 80, _scanner.getBottomRight().y - 53);
+							_scanner.getMouse().delay(2000);
+							_scanner.captureScreen("ping map ERR ", true);
+
+							blacksmithPos = _scanner.scanOneFast(blacksmithDest.getImageData(), area, false);
+							LOGGER.info("black again: " + blacksmithPos);
+							if (blacksmithPos != null) {
+								attempt = 202;
+								LOGGER.fine("Blacksmith found: " + blacksmithPos);
+								smallTownPos = new Pixel(blacksmithPos.x + 150, blacksmithPos.y - 285);
+								LOGGER.fine("Small Town calculated: " + smallTownPos);
+								_smallTownPos = smallTownPos;
+								_blacksmithPos = blacksmithPos;
+								_tailorPos = new Pixel(smallTownPos.x - 155, smallTownPos.y - 165);
+								Destination smallCopy = new Destination();
+								Destination orig = getSmallTown();
+								smallCopy.setName("smalltown fake");
+
+								smallCopy.setRelativePosition(new Pixel(orig.getRelativePosition()));
+								smallCopy.getRelativePosition().x -= (41 + 10);
+								smallCopy.getRelativePosition().y -= (45 + 40);
+								LOGGER.info("ensuring small town...");
+								ensureDestination(smallCopy);
+								_scanner.handlePopups();
+								_scanner.getMouse().delay(500);
+								throw new GameErrorException(44, "Map issues", null);
+							}
+						}
+
+					}
+
 				}
+				// attempt++;
+				// area = _mapArea;
+				// smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), area, false);
+				// if (smallTownPos == null) {
+				// attempt++;
+				// smallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), null, false);
+				// }
 			}
 		}
 		// Rectangle smallerArea = _mapArea;
 		if (smallTownPos != null) {
+			if (attempt < 100) {
+				// smalltown is directly found.
+				// calculate tailor and blacksmith
+				_tailorPos = new Pixel(smallTownPos.x - 155, smallTownPos.y - 165);
+				_blacksmithPos = new Pixel(smallTownPos.x - 150, smallTownPos.y + 285);
+			}
 			LOGGER.info("found Small Town " + attempt);
 		}
 		return smallTownPos;
 	}
 
-	private void findSmallTownAgain() throws AWTException, RobotInterruptedException, GameErrorException {
+	private void findSmallTownAgain() throws AWTException, RobotInterruptedException, GameErrorException, IOException {
 		Destination smallTownDEST = getSmallTown();
+
 		if (_smallTownPos != null) {
 			Rectangle areaSpec = new Rectangle(_smallTownPos.x - 20, _smallTownPos.y - 20, smallTownDEST.getImageData()
 			    .getImage().getWidth() + 40, smallTownDEST.getImageData().getImage().getHeight() + 40);
@@ -297,22 +370,31 @@ public class MapManager {
 				newSmallTownPos = findSmallTown();
 			}
 			if (newSmallTownPos == null) {
-				//still null
+				// still null
 				_scanner.handlePopups();
 				newSmallTownPos = findSmallTown();
 				if (newSmallTownPos == null)
-				  LOGGER.info("CRITICAL! Still can't find Small Town!");
+					LOGGER.info("CRITICAL! Still can't find Small Town!");
 			}
-			
+
 			if (newSmallTownPos == null)
 				throw new GameErrorException(3, "Small Town can't be found", null);
-			
+
 			if (Math.abs(_smallTownPos.x - newSmallTownPos.x) < 7 && Math.abs(_smallTownPos.y - newSmallTownPos.y) < 7) {
 				LOGGER.info("Small Town found in the same place.");
 			}
 			_smallTownPos = newSmallTownPos;
+
 		} else
 			_smallTownPos = findSmallTown();
+
+		// TODO optimize it
+		_tailorPos = new Pixel(_smallTownPos.x - 155, _smallTownPos.y - 165);
+		_blacksmithPos = new Pixel(_smallTownPos.x - 150, _smallTownPos.y + 285);
+
+		LOGGER.info("ST: " + _smallTownPos);
+		LOGGER.info("BS: " + _blacksmithPos);
+		LOGGER.info("JK: " + _tailorPos);
 	}
 
 	public Pixel getSmallTownPos() {
@@ -389,45 +471,162 @@ public class MapManager {
 		return null;
 	}
 
-	public Pixel ensureDestination(Destination dest) throws RobotInterruptedException, AWTException, GameErrorException {
+	public Pixel ensureDestination(Destination dest) throws RobotInterruptedException, AWTException, GameErrorException,
+	    IOException {
 		if (dest != null && _smallTownPos != null) {
-			int x = _smallTownPos.x + dest.getRelativePosition().x;
 			int y = _smallTownPos.y + dest.getRelativePosition().y;
-			int x1 = _mapArea.x;
-			int y1 = _mapArea.y;
-			int x2 = x1 + _mapArea.width;
-			int y2 = y1 + _mapArea.height;
-			int dragX = 0;
-			if (x < x1) {
-				dragX = x1 - x + 7;// positive -> drag east
-			} else if (x > x2) {
-				dragX = x2 - x - 7;// negative -> drag west
-			}
+			final int x1 = _mapArea.x;
+			final int y1 = _mapArea.y;
+			final int x2 = x1 + _mapArea.width;
+			final int y2 = y1 + _mapArea.height;
+			Pixel startPos;
+
+			// startPos = new Pixel(_smallTownPos.x + 6, _smallTownPos.y - 12);
 
 			int dragY = 0;
 			if (y < y1) {
-				dragX = y1 - y + 7;// positive -> drag south
+				dragY = y1 - y + 12;// positive -> drag south
 			} else if (y > y2) {
-				dragX = y2 - y - 7;// negative -> drag north
+				dragY = y2 - y - 12;// negative -> drag north
 			}
 
-			if (dragX != 0 || dragY != 0) {
-				LOGGER.info("Dragging to " + dest.getName());
-				int startX = _smallTownPos.x + 1;
-				int startY = _smallTownPos.x + 25;
-				_scanner.getMouse().drag4(startX, startY, startX + dragX, startY + dragY, true, true);
+			// Y AXIS FIRST
+			if (dragY != 0) {
+				if (dragY > 0) {
+					// must drag south
+					if (_smallTownPos.y - 12 > y1)
+						startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
+					else
+						startPos = new Pixel(_blacksmithPos.x - 5, _blacksmithPos.y);
+					int dragYPart = y2 - startPos.y;
+					if (dragY - dragYPart > 0) {
+						LOGGER.info("drag south");
+						// will need one more drag
+						int startX = startPos.x;
+						int startY = startPos.y;
+						_scanner.getMouse().drag4(startX, startY, startX, startY + dragYPart, true, false);
+						_scanner.getMouse().delay(2000);
+						_scanner.getMouse().click();// to stop inertia
+						_scanner.handlePopupsFast();
+						dragY -= dragYPart;
+						_smallTownPos.y += dragYPart;
+						findSmallTownAgain();
+						startPos = new Pixel(_tailorPos.x + 50, _tailorPos.y);
+					}
+				} else {
+					// drag < 0
+					// must drag north
+					if (_smallTownPos.y - 12 < y2)
+						startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
+					else
+						startPos = new Pixel(_tailorPos.x + 50, _tailorPos.y);
+					int dragYPart = y1 - startPos.y;
+					if (dragY - dragYPart < 0) {
+						LOGGER.info("drag north");
+						// will need one more drag
+						int startX = startPos.x;
+						int startY = startPos.y;
+						_scanner.getMouse().drag4(startX, startY, startX, startY + dragYPart, true, false);
+						_scanner.getMouse().delay(2000);
+						_scanner.getMouse().click();// to stop inertia
+						_scanner.handlePopupsFast();
+						dragY -= dragYPart;
+						_smallTownPos.y += dragYPart;
+						findSmallTownAgain();
+						startPos = new Pixel(_blacksmithPos.x - 5, _blacksmithPos.y);
+					}
+				}
+				// drag the rest
+				LOGGER.info("drag rest");
+				int startX = startPos.x;
+				int startY = startPos.y;
+				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);
+				_scanner.getMouse().click();// to stop inertia
+				_scanner.getMouse().delay(2000);
+				_scanner.handlePopupsFast();
+				_smallTownPos.y += dragY;
+				findSmallTownAgain();
+				y = _smallTownPos.y + dest.getRelativePosition().y;
+
+			}// END OF Y AXIS
+
+			int x = _smallTownPos.x + dest.getRelativePosition().x;
+			int dragX = 0;
+			if (x < x1) {
+				dragX = x1 - x + 12;// positive -> drag east
+			} else if (x > x2) {
+				dragX = x2 - x - 12;// negative -> drag west
+			}
+
+			// X AXIS
+			if (dragX != 0) {
+				startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
+				LOGGER.info("drag east/west");
+				int startX = startPos.x;
+				int startY = startPos.y;
+				_scanner.getMouse().drag4(startX, startY, startX + dragX, startY, true, false);
 				_scanner.getMouse().delay(2000);
 				_scanner.getMouse().click();// to stop inertia
+				_scanner.handlePopupsFast();
+
 				_smallTownPos.x += dragX;
+				findSmallTownAgain();
+				x = _smallTownPos.x + dest.getRelativePosition().x;
+				y = _smallTownPos.y + dest.getRelativePosition().y;
+
+			}// END OF X AXIS
+
+			// ship area issue
+			final int y11 = _scanner._tl.y + 64;
+			final int y22 = y11 + 290;
+			final int x11 = _scanner._tl.x + 47;
+			final int x22 = x11 + 212;
+
+			dragY = 0;
+			if (y11 < y && y < y22 && x11 < x && x < x22) {
+				LOGGER.info("Ship zone! Dragging south...");
+				dragY = y22 - y - 12;
+				startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
+				int startX = startPos.x;
+				int startY = startPos.y;
+				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);
+				_scanner.getMouse().delay(2000);
+				_scanner.getMouse().click();// to stop inertia
+				_scanner.handlePopupsFast();
+				
 				_smallTownPos.y += dragY;
 				findSmallTownAgain();
 				x = _smallTownPos.x + dest.getRelativePosition().x;
 				y = _smallTownPos.y + dest.getRelativePosition().y;
-				
 			}
+			
+			//SHIP BUTTON ISSUE
+			final int y111 = _scanner._br.y - 100;
+			final int y222 = y111 + 87;
+			final int x111 = _scanner._tl.x + 19;
+			final int x222 = x111 + 120;
+
+			dragY = 0;
+			if (y111 < y && y < y222 && x111 < x && x < x222) {
+				LOGGER.info("Ship button zone! Dragging north...");
+				dragY = y111 - y - 12;
+				startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
+				int startX = startPos.x;
+				int startY = startPos.y;
+				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);
+				_scanner.getMouse().delay(2000);
+				_scanner.getMouse().click();// to stop inertia
+				_scanner.handlePopupsFast();
+				
+				_smallTownPos.y += dragY;
+				findSmallTownAgain();
+				x = _smallTownPos.x + dest.getRelativePosition().x;
+				y = _smallTownPos.y + dest.getRelativePosition().y;
+			}
+			
+			
 			return new Pixel(x, y);
 		}
 		return null;
 	}
-
 }
