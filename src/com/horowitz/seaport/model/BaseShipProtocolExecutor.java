@@ -275,10 +275,6 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 							destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
 						}
 						if (destButton == null) {
-							opt = 2;
-							destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
-						}
-						if (destButton == null) {
 							// check for got it button
 							LOGGER.info("CHECK FOR BLUE GOT IT...");
 							buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,

@@ -237,8 +237,6 @@ public class ScreenScanner {
 
 		// getImageData("dest/missing.bmp", _scanArea, 41, 45);
 		getImageData("dest/setSail4.bmp", _popupArea, 27, 5);
-		getImageData("dest/setSail.bmp", _popupArea, 27, 5);
-		getImageData("dest/setSail2.bmp", _popupArea, 27, 5);
 		area = generateWindowedArea(228, 495);
 		// area.y = _tl.y + 74;
 		area.height = 38;
