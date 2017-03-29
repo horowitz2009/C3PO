@@ -497,7 +497,7 @@ public class MapManager {
 					if (_smallTownPos.y - 12 > y1)
 						startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
 					else
-						startPos = new Pixel(_blacksmithPos.x - 5, _blacksmithPos.y);
+						startPos = new Pixel(_blacksmithPos.x -10, _blacksmithPos.y);
 					int dragYPart = y2 - startPos.y;
 					if (dragY - dragYPart > 0) {
 						LOGGER.info("drag south");
@@ -533,7 +533,7 @@ public class MapManager {
 						dragY -= dragYPart;
 						_smallTownPos.y += dragYPart;
 						findSmallTownAgain();
-						startPos = new Pixel(_blacksmithPos.x - 5, _blacksmithPos.y);
+						startPos = new Pixel(_blacksmithPos.x -10, _blacksmithPos.y);
 					}
 				}
 				// drag the rest

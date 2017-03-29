@@ -237,9 +237,9 @@ public class ScreenScanner {
 
 		// getImageData("dest/missing.bmp", _scanArea, 41, 45);
 		getImageData("dest/setSail4.bmp", _popupArea, 27, 5);
-		area = generateWindowedArea(228, 495);
+		area = generateWindowedArea(228, 508);
 		// area.y = _tl.y + 74;
-		area.height = 38;
+		area.height = 48;
 		getImageData("dest/MarketTownTitle2.bmp", area, 0, 0);
 		getImageData("dest/MerchantTitle.bmp", area, 0, 0);
 
@@ -1320,6 +1320,14 @@ public class ScreenScanner {
 		MyImageIO.writeImage(image, filename);
 	}
 
+	public boolean scanMarket(Rectangle area) throws RobotInterruptedException, IOException, AWTException {
+		int err = _comparator.getErrors();
+		_comparator.setErrors(0);
+		boolean value =  scanOneFast("market/whitePixels.bmp", area, false) != null;
+		_comparator.setErrors(err);
+		return value;
+	}
+	
 	public String ocrScanMarket(Rectangle area) throws AWTException {
 		if (_ocrMarket != null) {
 			BufferedImage image = new Robot().createScreenCapture(area);

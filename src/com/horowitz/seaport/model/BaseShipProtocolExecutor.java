@@ -327,7 +327,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 	private boolean doMarket(LinkedList<Destination> chain, Destination dest)
 	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
-		Pixel mt = _scanner.scanOne("dest/MarketTownTitle2.bmp", null, false);
+		Pixel mt = _scanner.scanOneFast("dest/MarketTownTitle2.bmp", null, false);
 		boolean good = false;
 		if (mt != null) {
 			// FIXME the hardcoded approach
@@ -440,42 +440,15 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 		if (good && _lastShip != null) {// && _settings.getBoolean("doOCR", true)
 			Rectangle areaSend = new Rectangle();
-			areaSend.x = mt.x - 91;
-			areaSend.y = mt.y + 301;
-			areaSend.width = 110;
-			areaSend.height = 64;
-			Rectangle areaBonus = new Rectangle();
-			areaBonus.x = mt.x - 216;
-			areaBonus.y = mt.y + 423;
-			areaBonus.width = 68;
-			areaBonus.height = 30;
+			areaSend.x = mt.x - 73;
+			areaSend.y = mt.y + 320;
+			areaSend.width = 59;
+			areaSend.height = 27;
 
-			String sc = _scanner.ocrScanMarket(areaSend);
-			String bonus = dest.getBonus();
-			if (bonus == null || bonus.isEmpty()) {
-				bonus = _scanner.ocrScanMarketBonus(areaBonus);
-			}
-			LOGGER.info("MARKET: [" + sc + "][" + bonus + "]");
-			if (sc != null && !sc.isEmpty() && bonus != null && !bonus.isEmpty()) {
-				try {
-					int n = Integer.parseInt(sc);
-					int b = Integer.parseInt(bonus);
-					int fullLoad = _lastShip.getCapacity() * b;
-					LOGGER.info("n = " + n + ", b = " + b);
-					if (fullLoad != n) {
-						LOGGER.info("SHIP NOT FULLY LOADED. SKIPPING!");
-						return false;
-					}
-				} catch (NumberFormatException e) {
-					LOGGER.info("ERROR SCANNING NUMBERS. SKIPPING!");
-					return false;
-				}
-			} else {
-				LOGGER.info("CAN'T SCAN NUMBERS. SKIPPING!");
+			if (!_scanner.scanMarket(areaSend)) {
+				LOGGER.info("SHIP NOT FULLY LOADED. SKIPPING!");
 				return false;
 			}
-
-			// _scanner.writeAreaTS(areaBonus, "ocr/areaBonus.bmp");
 		}
 		return good;
 	}
