@@ -85,7 +85,7 @@ public class MapManager {
 		Rectangle shipZone = new Rectangle(tl.x + 23, tl.y + 62, 261, 374);
 		_forbiddenAreas.add(anchorZone);
 		_forbiddenAreas.add(shipZone);
-		_mapArea = new Rectangle(tl.x, tl.y + 69, _scanner.getGameWidth() - 29, _scanner.getGameHeight() - 69);
+		_mapArea = new Rectangle(tl.x, tl.y + 70, _scanner.getGameWidth() - 29, _scanner.getGameHeight() - 70);
 	}
 
 	public Destination getSmallTown() {
@@ -494,10 +494,11 @@ public class MapManager {
 			if (dragY != 0) {
 				if (dragY > 0) {
 					// must drag south
-					if (_smallTownPos.y - 12 > y1)
+					if (_smallTownPos.y - 17 > y1)
 						startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
 					else
 						startPos = new Pixel(_blacksmithPos.x -10, _blacksmithPos.y);
+					
 					int dragYPart = y2 - startPos.y;
 					if (dragY - dragYPart > 0) {
 						LOGGER.info("drag south");
@@ -516,7 +517,7 @@ public class MapManager {
 				} else {
 					// drag < 0
 					// must drag north
-					if (_smallTownPos.y - 12 < y2)
+					if (_smallTownPos.y - 15 < y2)
 						startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
 					else
 						startPos = new Pixel(_tailorPos.x + 50, _tailorPos.y);
@@ -560,7 +561,13 @@ public class MapManager {
 
 			// X AXIS
 			if (dragX != 0) {
-				startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
+				if (_smallTownPos.y - 17 > y1) {
+					if (_smallTownPos.y - 15 < y2)
+						startPos = new Pixel(_smallTownPos.x + 11, _smallTownPos.y - 16);
+					else
+						startPos = new Pixel(_tailorPos.x + 50, _tailorPos.y);
+				}	else 
+					startPos = new Pixel(_blacksmithPos.x - 10, _blacksmithPos.y);
 				LOGGER.info("drag east/west");
 				int startX = startPos.x;
 				int startY = startPos.y;

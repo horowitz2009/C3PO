@@ -228,9 +228,9 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				if (good) {
 
 					_mouse.click(x, y);
-					_mouse.delay(750);
-					if (_mouse.getMode() == MouseRobot.SLOW)
-						_mouse.delay(_settings.getInt("slow.delay", 500));
+					_mouse.delay(500);
+//					if (_mouse.getMode() == MouseRobot.SLOW)
+//						_mouse.delay(_settings.getInt("slow.delay", 500));
 
 					// assume the dialog is open
 					if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
@@ -266,14 +266,16 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						Rectangle buttonArea = _scanner.generateWindowedArea(340, 505);
 						// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
 						// _scanner.getBottomRight().y - 175, 255, 90);
-						buttonArea.y += 410;
-						buttonArea.height -= 410;
+						buttonArea.y += 411;
+						buttonArea.x += 130;
+						buttonArea.width -= 130;
+						buttonArea.height = 59;
 						int opt = 4;
 						Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-						if (destButton == null) {
-							opt = 0;
-							destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
-						}
+//						if (destButton == null) {
+//							opt = 0;
+//							destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
+//						}
 						if (destButton == null) {
 							// check for got it button
 							LOGGER.info("CHECK FOR BLUE GOT IT...");
@@ -301,7 +303,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 							_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
 							_mouse.checkUserMovement();
-							_mouse.delay(1300);
+							_mouse.delay(1000);
 							if (_mouse.getMode() == MouseRobot.SLOW)
 								_mouse.delay(_settings.getInt("slow.delay", 500) + 400);
 
