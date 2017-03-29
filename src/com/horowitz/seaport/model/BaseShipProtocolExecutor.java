@@ -230,7 +230,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					_mouse.click(x, y);
 					_mouse.delay(750);
 					if (_mouse.getMode() == MouseRobot.SLOW)
-						_mouse.delay(500);
+						_mouse.delay(_settings.getInt("slow.delay", 500));
 
 					// assume the dialog is open
 					if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
@@ -238,7 +238,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						_mouse.click(x, y);
 						_mouse.delay(750);
 						if (_mouse.getMode() == MouseRobot.SLOW)
-							_mouse.delay(500);
+							_mouse.delay(_settings.getInt("slow.delay", 500));
 					}
 
 					// manage market
@@ -303,7 +303,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 							_mouse.checkUserMovement();
 							_mouse.delay(1300);
 							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(1000);
+								_mouse.delay(_settings.getInt("slow.delay", 500) + 400);
 
 							return true;
 						} else {
@@ -384,7 +384,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				_mouse.click(x, y);
 				_mouse.delay(300);
 				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(700);
+					_mouse.delay(_settings.getInt("slow.delay", 500));
 
 				// now prize options
 				int pr = 2;// default to 2, as most probably gem is there
@@ -410,7 +410,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				_mouse.click(x, y);
 				_mouse.delay(300);
 				if (_mouse.getMode() == MouseRobot.SLOW)
-					_mouse.delay(600);
+					_mouse.delay(_settings.getInt("slow.delay", 500));
 
 				// end of old approach
 			} else {
@@ -423,9 +423,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				Pixel pc = _scanner.scanOneFast("market/" + commodity + "M2.bmp", sendIconArea, false);
 				if (pc == null) {
 					// need to find it in scrollmenu and click it
-					good = locateCommodity(mt, commodity);
+					good = locateCommodityScroll(mt, commodity);
 				}
 				if (good) {
+					if (_mouse.getMode() == MouseRobot.SLOW)
+						_mouse.delay(_settings.getInt("slow.delay", 500));
 					// check prize
 					Pixel pp = _scanner.scanOneFast("market/" + prize + "M2.bmp", getIconArea, false);
 					if (pp == null) {
@@ -465,6 +467,47 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return pp != null;
 	}
 
+	private boolean locateCommodityScroll(Pixel mt, String commodity)
+			throws RobotInterruptedException, IOException, AWTException {
+		
+		//1. scroll up first until scrollbar is at the top
+		
+		//2. if not found, scroll down until scrollbar gets to bottom
+		
+		
+		int x = mt.x - 220;
+		int y = mt.y + 144;
+		Rectangle menuArea = new Rectangle(x, y, 80, 234);
+		Pixel pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
+		if (pc != null) {
+			_mouse.click(pc.x + 13, pc.y + 9);
+			_mouse.delay(200);
+			return true;
+		} else {
+			boolean found = false;
+			scrollUpNew(mt);
+			_mouse.delay(450);
+			int turns = 0;
+			do {
+				pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
+				if (pc != null) {
+					_mouse.delay(1000);
+					pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
+					_mouse.click(pc.x + 13, pc.y + 9);
+					_mouse.delay(200);
+					found = true;
+				} else {
+					turns++;
+					scrollDown(mt, 2);
+					_mouse.delay(333);
+				}
+			} while (!found && turns < 20);
+			if (turns >=20)
+				LOGGER.info("reached limit of 20 scroll turns...");
+			return found;
+		}
+	}
+	
 	private boolean locateCommodity(Pixel mt, String commodity)
 	    throws RobotInterruptedException, IOException, AWTException {
 		int x = mt.x - 220;
@@ -524,6 +567,24 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		_mouse.delay(33);
 		if (_mouse.getMode() == MouseRobot.SLOW)
 			_mouse.delay(66);
+	}
+	
+	private void scrollUpNew(Pixel mt) throws RobotInterruptedException, IOException, AWTException {
+		Pixel top = new Pixel(mt.x - 136, mt.y + 145);
+		Rectangle scrollArea = new Rectangle(top.x, top.y, 10, 234);
+		Pixel sb = _scanner.scanOneFast("market/scrollbar.bmp", scrollArea, false);
+		
+		if (sb != null) {
+			//good. I have the scrollbar
+			if (sb.y - top.y <= 5) {
+				//it's at the top. nothing to do
+			} else {
+				_mouse.drag4(sb.x + 4, sb.y + 80, sb.x + 4, sb.y - 260, true, false);
+				_mouse.delay(200);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(_settings.getInt("slow.delay", 500));
+			}
+		}
 	}
 
 	private boolean doNext(LinkedList<Destination> chain, Destination dest)

@@ -1903,6 +1903,8 @@ public class MainFrame extends JFrame {
 				_mouse.delay(200);
 				_mouse.mouseMove(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2, _scanner.getTopLeft().y + 49);
 				_mouse.delay(2000);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(_settings.getInt("slow.delay", 500));
 			}
 			_scanner.captureScreen(null, true);
 			if (_scanner.getScoreBoard() != null) {
@@ -1920,7 +1922,7 @@ public class MainFrame extends JFrame {
 			_mouse.click(_scanner.getBottomRight().x - 80, _scanner.getBottomRight().y - 53);
 			_mouse.delay(2000);
 			if (_mouse.getMode() == MouseRobot.SLOW)
-				_mouse.delay(2000);
+				_mouse.delay(_settings.getInt("slow.delay", 500) + 500);
 
 			_scanner.captureScreen("ping map ", true);
 			try {

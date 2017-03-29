@@ -72,11 +72,11 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		_mouse.mouseMove(_scanner.getParkingPoint());
 		_mouse.delay(100);
 		if (_mouse.getMode() == MouseRobot.SLOW)
-			_mouse.delay(500);
+			_mouse.delay(_settings.getInt("slow.delay", 500));
 
 		Pixel anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
 		if (anchor == null && _mouse.getMode() == MouseRobot.SLOW) {
-			_mouse.delay(1000);
+			_mouse.delay(_settings.getInt("slow.delay", 500) + 500);
 			// try again
 			anchor = _scanner.scanOne(_scanner.getAnchorButton(), null, false);
 		}
