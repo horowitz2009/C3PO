@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project default="copy-jar" name="Create Runnable Jar for Project Mickey2">
 
-	<property name="versionNumber" value="121rc3BAR2" />
+	<property name="versionNumber" value="122Brc5" />
 
 	<property name="jarname" value="Seaport${versionNumber}.jar" description="" />
 	<property name="dropboxjarname" value="DropboxRemote${versionNumber}.jar" description="" />
@@ -24,11 +24,11 @@
 		<mkdir dir="${dropbox}/${dir1}" />
 		<copy todir="${dropbox}/${dir1}" file="${jarname}" />
 
-<!--		<property name="dir2" value="SeaportROSKO" />
-		<mkdir dir="${dropbox}/${dir2}" />
-		<copy todir="${dropbox}/${dir2}" file="${jarname}" />
+		<property name="dir2" value="SeaportROSKO" />
+		<mkdir dir="C:/prj/share" />
+		<copy todir="C:/prj/share" file="${jarname}" />
 		
-		<property name="dir3" value="SeaportROSEN" />
+<!--		<property name="dir3" value="SeaportROSEN" />
 		<mkdir dir="${dropbox}/${dir3}" />
 		<copy todir="${dropbox}/${dir3}" file="${jarname}" />
 -->		

@@ -237,10 +237,11 @@ public class ScreenScanner {
 
 		// getImageData("dest/missing.bmp", _scanArea, 41, 45);
 		getImageData("dest/setSail4.bmp", _popupArea, 27, 5);
+		getImageData("dest/setSail2.bmp", _popupArea, 27, 5);
 		area = generateWindowedArea(228, 508);
 		// area.y = _tl.y + 74;
 		area.height = 48;
-		getImageData("dest/MarketTownTitle2.bmp", area, 0, 0);
+		getImageData("dest/MarketTownTitle3.bmp", area, 0, 0);
 		getImageData("dest/MerchantTitle.bmp", area, 0, 0);
 
 		ImageData gear2 = getImageData("buildings/gears2.bmp", _popupArea, 0, 0);

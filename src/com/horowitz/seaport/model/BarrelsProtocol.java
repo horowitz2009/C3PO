@@ -147,7 +147,7 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 					IntPoint c = blob.getCenter();
 					Pixel p = new Pixel(c.y + area.x + 0, c.x + area.y + 0);
 					LOGGER.fine("BARREL: " + p);
-					if (((p.x > _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 169)
+					if (((p.x > _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 167)
 							|| (p.x <= _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 69))
 							&& p.y < _scanner.getRock().y + 126) {//to avoid store ship icon was 72
 						_mouse.click(p);

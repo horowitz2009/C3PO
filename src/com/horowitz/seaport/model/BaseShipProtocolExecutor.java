@@ -272,10 +272,10 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						buttonArea.height = 59;
 						int opt = 4;
 						Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-//						if (destButton == null) {
-//							opt = 0;
-//							destButton = _scanner.scanOne("dest/setSail.bmp", buttonArea, false);
-//						}
+						if (destButton == null) {
+							opt = 0;
+							destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+						}
 						if (destButton == null) {
 							// check for got it button
 							LOGGER.info("CHECK FOR BLUE GOT IT...");
@@ -329,7 +329,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 	private boolean doMarket(LinkedList<Destination> chain, Destination dest)
 	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
-		Pixel mt = _scanner.scanOneFast("dest/MarketTownTitle2.bmp", null, false);
+		Pixel mt = _scanner.scanOneFast("dest/MarketTownTitle3.bmp", null, false);
 		boolean good = false;
 		if (mt != null) {
 			// FIXME the hardcoded approach
