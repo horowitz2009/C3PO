@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v122B";
+	private static String APP_TITLE = "Seaport v122";
 
 	private Settings _settings;
 	private Stats _stats;
