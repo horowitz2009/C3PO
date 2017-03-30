@@ -135,7 +135,9 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 					// finally extract the result in form of dest chain
 					LinkedList<Destination> chainList = new LinkedList<Destination>();
 					for (DispatchEntry de : des) {
-						chainList.add(_mapManager.getDestinationByAbbr(de.getDest()));
+						Destination dest = _mapManager.getDestinationByAbbr(de.getDest());
+						if (dest != null)
+						  chainList.add(dest);
 					}
 
 					// use this chain
