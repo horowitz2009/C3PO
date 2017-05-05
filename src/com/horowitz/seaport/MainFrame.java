@@ -97,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v122";
+	private static String APP_TITLE = "Seaport v123";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -237,7 +237,7 @@ public class MainFrame extends JFrame {
 			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
-			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse);
+			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
 			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
 			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
 			_barrelsTask.setProtocol(_barrelsProtocol);

@@ -22,6 +22,7 @@ import Catalano.Imaging.Tools.BlobDetection;
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
 import com.horowitz.commons.RobotInterruptedException;
+import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 
 public class BarrelsProtocol extends AbstractGameProtocol {
@@ -37,11 +38,14 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 	private int blobMin;
 	private int blobMax;
 
-	public BarrelsProtocol(ScreenScanner scanner, MouseRobot mouse) throws IOException {
+	private Settings _settings;
+
+	public BarrelsProtocol(ScreenScanner scanner, MouseRobot mouse, Settings settings) throws IOException {
 		blobMin = 15 * 20;
 		blobMax = 28 * 32;
 		_scanner = scanner;
 		_mouse = mouse;
+		_settings = settings;
 	}
 
 	@Override
@@ -93,8 +97,18 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 				fb.saveAsPNG("IMAGE.PNG");
 
 			// FILTER BROWN
-			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 255), new IntRange(30, 255), new IntRange(0,
-			    110));
+//			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 255), new IntRange(30, 255), new IntRange(0,
+//					110));
+			//FILTER AMPHORAS
+			int rmin = _settings.getInt("barrels.rmin", 98);
+			int rmax = _settings.getInt("barrels.rmax", 255);
+			int gmin = _settings.getInt("barrels.gmin", 148);
+			int gmax = _settings.getInt("barrels.gmax", 250);
+			int bmin = _settings.getInt("barrels.bmin", 178);
+			int bmax = _settings.getInt("barrels.bmax", 242);
+			
+			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(rmin, rmax), new IntRange(gmin, gmax), new IntRange(bmin,
+			    bmax));
 			colorFiltering.applyInPlace(fb);
 
 			if (fb.isRGB())
