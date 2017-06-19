@@ -194,6 +194,17 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 			// }
 			// _mouse.delay(100);
 			// }
+			 if (isNotInterrupted()) {
+			 // additional clicks to gem area
+			 int x = _scanner.getRock().x;
+			 int y = _scanner.getRock().y;
+		 	 _mouse.click(x - 62, y + 3);
+		 	 _mouse.click(x + 34, y + 14);
+		 	 _mouse.click(x - 34, y - 11);
+		 	 _mouse.click(x + 233, y + 33);
+			 
+			 _mouse.delay(100);
+			 }
 			LOGGER.info("BARRELS CNT: " + cnt);
 
 		} catch (RobotInterruptedException e) {

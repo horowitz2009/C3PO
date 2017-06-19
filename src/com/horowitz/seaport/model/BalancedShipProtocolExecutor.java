@@ -137,7 +137,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 					for (DispatchEntry de : des) {
 						Destination dest = _mapManager.getDestinationByAbbr(de.getDest());
 						if (dest != null)
-						  chainList.add(dest);
+							chainList.add(dest);
 					}
 
 					// use this chain
@@ -184,9 +184,13 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 
 		// 1
 		for (ProtocolEntry protocolEntry : entries) {
-			if (protocolEntry.getShipName().startsWith("[")) {
-				String ss = protocolEntry.getShipName();
+			String ss = protocolEntry.getShipName();
+			if (ss.equalsIgnoreCase(ship.getName()) || ss.equals("<ALL>")) {
+				pe = protocolEntry;
+				break;
+			}
 
+			if (ss.startsWith("[")) {
 				String sss[] = ss.split(" ");
 				String sc = sss[0].substring(1, 2);
 				ss = sss[1].replace("]", "");
@@ -198,45 +202,17 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 						pe = protocolEntry;
 						break;
 					}
-				}
-			}
-		}
-
-		// 2
-		if (pe == null) {
-			for (ProtocolEntry protocolEntry : entries) {
-				if (protocolEntry.getShipName().startsWith("[")) {
-					String ss = protocolEntry.getShipName();
-
-					String sss[] = ss.split(" ");
-					String sc = sss[0].substring(1, 2);
-					ss = sss[1].replace("]", "");
-
-					int n = Integer.parseInt(ss);
-					if (sc.equalsIgnoreCase("s")) {
-						// sailors crew
-						if (ship.getCrew() == n) {
-							pe = protocolEntry;
-							break;
-						}
+				} else if (sc.equalsIgnoreCase("s")) {
+					// crew
+					if (ship.getCrew() == n) {
+						pe = protocolEntry;
+						break;
 					}
 				}
 			}
 		}
 
-		// 3
-		if (pe == null) {
-
-			for (ProtocolEntry protocolEntry : entries) {
-				if (protocolEntry.getShipName().equals(ship.getName()) || protocolEntry.getShipName().equals("<ALL>")) {
-					pe = protocolEntry;
-					break;
-				}
-			}
-
-		}
-
-		// 4
+		// the rest
 		if (pe == null) {
 			// find rest
 			for (ProtocolEntry protocolEntry : entries) {
