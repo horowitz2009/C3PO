@@ -63,7 +63,7 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 		boolean debug = false;
 		try {
 
-			BufferedImage image = _scanner.getImageData("LAND5.bmp").getImage();
+			BufferedImage image = _scanner.getImageData("LAND_VINTAGE2.bmp").getImage();//was LAND5.bmp
 
 			Pixel rock = _scanner.getRock();
 			int topY = _scanner.getTopLeft().y;
