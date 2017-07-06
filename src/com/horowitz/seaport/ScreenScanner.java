@@ -1151,6 +1151,7 @@ public class ScreenScanner {
 
 				LOGGER.info("Game crashed.");
 				captureScreen("CRASH ", true);
+				deleteOlder("CRASH", 15);
 				throw new GameErrorException(2);
 			}
 		} catch (IOException e) {
