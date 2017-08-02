@@ -3,6 +3,7 @@ package com.horowitz.seaport.model;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.Robot;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -10,6 +11,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+
+import Catalano.Core.IntRange;
+import Catalano.Imaging.FastBitmap;
+import Catalano.Imaging.Filters.ColorFiltering;
+import Catalano.Imaging.Filters.Threshold;
 
 import com.horowitz.commons.MouseRobot;
 import com.horowitz.commons.Pixel;
@@ -75,6 +81,71 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		_shipLocationDelaySlow = _settings.getInt("shipProtocol.shipLocationDelay.slow", 1200);
 	}
 
+	
+  private int countPixels(FastBitmap fb) {
+    int cnt = 0;
+    for (int x = 0; x < fb.getHeight(); x++) {
+      for (int y = 0; y < fb.getWidth(); y++) {
+        if (fb.getGray(x, y) > 0)
+          cnt++;
+
+      }
+    }
+    return cnt;
+  }
+  
+  private boolean isShipHere(Rectangle area) throws AWTException {
+  	int minWhites = 12;
+  	int minBlacks = 12;
+  	int cntWhite = 0;int cntBlack = 0;
+  	FastBitmap fb =  new FastBitmap(new Robot().createScreenCapture(area));
+    for (int x = 0; x < fb.getHeight(); x++) {
+      for (int y = 0; y < fb.getWidth(); y++) {
+        if (fb.getRed(x, y) > 250 && fb.getGreen(x, y) > 250 && fb.getBlue(x, y) > 250)
+          cntWhite++;
+        if (fb.getRed(x, y) < 5 && fb.getGreen(x, y) < 5 && fb.getBlue(x, y) < 5)
+        	cntBlack++;
+
+      }
+    }
+  	return cntWhite > minWhites && cntBlack > minBlacks;
+  }
+  
+  private boolean isBoom(FastBitmap fb) {
+
+    FastBitmap fb2 = new FastBitmap(fb);
+
+    int r = 196;
+    int g = 166;
+    int b = 79;
+    int offset = 20;
+
+    ColorFiltering colorFiltering = new ColorFiltering(new IntRange(r - offset, r + offset),
+        new IntRange(g - offset, g + offset), new IntRange(b - offset, b + offset));
+    colorFiltering.applyInPlace(fb);
+    fb.toGrayscale();
+    Threshold t = new Threshold(10);
+    t.applyInPlace(fb);
+    // fb.saveAsBMP("hmm2t.bmp");
+
+    int cnt1 = countPixels(fb);
+
+    if (cnt1 > 100) {
+      colorFiltering = new ColorFiltering(new IntRange(250, 255), new IntRange(250, 255), new IntRange(250, 255));
+      colorFiltering.applyInPlace(fb2);
+      // fb2.saveAsBMP("hmm3.bmp");
+      fb2.toGrayscale();
+      t.applyInPlace(fb2);
+      // fb2.saveAsBMP("hmm3t.bmp");
+      int cnt2 = countPixels(fb2);
+      return cnt2 > 100;
+    }
+    return false;
+
+  }
+
+	
+	
 	public void execute() throws RobotInterruptedException, GameErrorException {
 		if (_shipLocations != null && !_shipLocations.isEmpty()) {
 			for (Pixel pixel : _shipLocations) {
@@ -87,9 +158,13 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 							_mouse.delay(_shipLocationDelaySlow);
 
 						// 1. check for pin
-						Rectangle miniArea = new Rectangle(pixel.x - 15, pixel.y + 50, 44, 60);
-						// _scanner.writeImage(miniArea, "pin.bmp");
-						Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
+						Rectangle miniArea = new Rectangle(pixel.x - 40, pixel.y + 20, 80, 12);
+						//_scanner.writeArea(miniArea, "pin.bmp");
+						Pixel pin = null;
+						if(isShipHere(miniArea)) {
+							pin = new Pixel (pixel.x+5, pixel.y+90);
+						}
+						//Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
 						if (pin != null) {
 							
 							try {
