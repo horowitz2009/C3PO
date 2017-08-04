@@ -81,71 +81,69 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		_shipLocationDelaySlow = _settings.getInt("shipProtocol.shipLocationDelay.slow", 1200);
 	}
 
-	
-  private int countPixels(FastBitmap fb) {
-    int cnt = 0;
-    for (int x = 0; x < fb.getHeight(); x++) {
-      for (int y = 0; y < fb.getWidth(); y++) {
-        if (fb.getGray(x, y) > 0)
-          cnt++;
+	private int countPixels(FastBitmap fb) {
+		int cnt = 0;
+		for (int x = 0; x < fb.getHeight(); x++) {
+			for (int y = 0; y < fb.getWidth(); y++) {
+				if (fb.getGray(x, y) > 0)
+					cnt++;
 
-      }
-    }
-    return cnt;
-  }
-  
-  private boolean isShipHere(Rectangle area) throws AWTException {
-  	int minWhites = 12;
-  	int minBlacks = 12;
-  	int cntWhite = 0;int cntBlack = 0;
-  	FastBitmap fb =  new FastBitmap(new Robot().createScreenCapture(area));
-    for (int x = 0; x < fb.getHeight(); x++) {
-      for (int y = 0; y < fb.getWidth(); y++) {
-        if (fb.getRed(x, y) > 250 && fb.getGreen(x, y) > 250 && fb.getBlue(x, y) > 250)
-          cntWhite++;
-        if (fb.getRed(x, y) < 5 && fb.getGreen(x, y) < 5 && fb.getBlue(x, y) < 5)
-        	cntBlack++;
+			}
+		}
+		return cnt;
+	}
 
-      }
-    }
-  	return cntWhite > minWhites && cntBlack > minBlacks;
-  }
-  
-  private boolean isBoom(FastBitmap fb) {
+	private boolean isShipHere(Rectangle area) throws AWTException {
+		int minWhites = 12;
+		int minBlacks = 12;
+		int cntWhite = 0;
+		int cntBlack = 0;
+		FastBitmap fb = new FastBitmap(new Robot().createScreenCapture(area));
+		for (int x = 0; x < fb.getHeight(); x++) {
+			for (int y = 0; y < fb.getWidth(); y++) {
+				if (fb.getRed(x, y) > 250 && fb.getGreen(x, y) > 250 && fb.getBlue(x, y) > 250)
+					cntWhite++;
+				if (fb.getRed(x, y) < 5 && fb.getGreen(x, y) < 5 && fb.getBlue(x, y) < 5)
+					cntBlack++;
 
-    FastBitmap fb2 = new FastBitmap(fb);
+			}
+		}
+		return cntWhite > minWhites && cntBlack > minBlacks;
+	}
 
-    int r = 196;
-    int g = 166;
-    int b = 79;
-    int offset = 20;
+	private boolean isBoom(FastBitmap fb) {
 
-    ColorFiltering colorFiltering = new ColorFiltering(new IntRange(r - offset, r + offset),
-        new IntRange(g - offset, g + offset), new IntRange(b - offset, b + offset));
-    colorFiltering.applyInPlace(fb);
-    fb.toGrayscale();
-    Threshold t = new Threshold(10);
-    t.applyInPlace(fb);
-    // fb.saveAsBMP("hmm2t.bmp");
+		FastBitmap fb2 = new FastBitmap(fb);
 
-    int cnt1 = countPixels(fb);
+		int r = 196;
+		int g = 166;
+		int b = 79;
+		int offset = 20;
 
-    if (cnt1 > 100) {
-      colorFiltering = new ColorFiltering(new IntRange(250, 255), new IntRange(250, 255), new IntRange(250, 255));
-      colorFiltering.applyInPlace(fb2);
-      // fb2.saveAsBMP("hmm3.bmp");
-      fb2.toGrayscale();
-      t.applyInPlace(fb2);
-      // fb2.saveAsBMP("hmm3t.bmp");
-      int cnt2 = countPixels(fb2);
-      return cnt2 > 100;
-    }
-    return false;
+		ColorFiltering colorFiltering = new ColorFiltering(new IntRange(r - offset, r + offset), new IntRange(g - offset, g
+		    + offset), new IntRange(b - offset, b + offset));
+		colorFiltering.applyInPlace(fb);
+		fb.toGrayscale();
+		Threshold t = new Threshold(10);
+		t.applyInPlace(fb);
+		// fb.saveAsBMP("hmm2t.bmp");
 
-  }
+		int cnt1 = countPixels(fb);
 
-	
-	
+		if (cnt1 > 100) {
+			colorFiltering = new ColorFiltering(new IntRange(250, 255), new IntRange(250, 255), new IntRange(250, 255));
+			colorFiltering.applyInPlace(fb2);
+			// fb2.saveAsBMP("hmm3.bmp");
+			fb2.toGrayscale();
+			t.applyInPlace(fb2);
+			// fb2.saveAsBMP("hmm3t.bmp");
+			int cnt2 = countPixels(fb2);
+			return cnt2 > 100;
+		}
+		return false;
+
+	}
+
 	public void execute() throws RobotInterruptedException, GameErrorException {
 		if (_shipLocations != null && !_shipLocations.isEmpty()) {
 			for (Pixel pixel : _shipLocations) {
@@ -159,25 +157,25 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 						// 1. check for pin
 						Rectangle miniArea = new Rectangle(pixel.x - 40, pixel.y + 20, 80, 12);
-						//_scanner.writeArea(miniArea, "pin.bmp");
+						// _scanner.writeArea(miniArea, "pin.bmp");
 						Pixel pin = null;
-						if(isShipHere(miniArea)) {
-							pin = new Pixel (pixel.x+5, pixel.y+90);
+						if (isShipHere(miniArea)) {
+							pin = new Pixel(pixel.x + 5, pixel.y + 90);
 						}
-						//Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
+						// Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
 						if (pin != null) {
-							
+
 							try {
-	              doShip(pin);
-              } catch (GameErrorException e) {
-	              if (e.getCode() == 44) {
-	              	LOGGER.info("HMM. MAP ISSUES...");
-	              	LOGGER.info("TRY AGAIN...");
-	              	//doShip(pin);
-	              } else {
-	              	//throw new GameErrorException(9);
-	              }
-              }
+								doShip(pin);
+							} catch (GameErrorException e) {
+								if (e.getCode() == 44) {
+									LOGGER.info("HMM. MAP ISSUES...");
+									LOGGER.info("TRY AGAIN...");
+									// doShip(pin);
+								} else {
+									// throw new GameErrorException(9);
+								}
+							}
 
 						} else {
 							// 2. check for shipwreck award
@@ -206,7 +204,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 	protected Ship scanShipName(Pixel pin) throws AWTException, RobotInterruptedException {
 		// scan the name
-		Rectangle nameArea = new Rectangle(pin.x - 75, pin.y - 67, 150, 40);
+		Rectangle nameArea = new Rectangle(pin.x - 95, pin.y - 67 - 10, 190, 60);
 		List<Ship> ships = _mapManager.getShips();
 		_lastShip = null;
 		for (Ship ship : ships) {
@@ -252,8 +250,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return false;
 	}
 
-	protected boolean sendShip(LinkedList<Destination> chain)
-	    throws AWTException, RobotInterruptedException, IOException, GameErrorException {
+	protected boolean sendShip(LinkedList<Destination> chain) throws AWTException, RobotInterruptedException,
+	    IOException, GameErrorException {
 		LOGGER.info("CHAIN: " + chain);
 		_mouse.checkUserMovement();
 		Destination dest = chain.poll();
@@ -276,10 +274,10 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						// locate the shipwreck
 						int t = 2;
 						Pixel p = _scanner.scanOne("dest/question.bmp", null, false);
-//						if (p == null) {
-//							p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
-//							t = 3;
-//						}
+						// if (p == null) {
+						// p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
+						// t = 3;
+						// }
 						if (p != null) {
 							LOGGER.info("FOUND IT! " + t);
 							good = true;
@@ -304,8 +302,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 					_mouse.click(x, y);
 					_mouse.delay(500);
-//					if (_mouse.getMode() == MouseRobot.SLOW)
-//						_mouse.delay(_settings.getInt("slow.delay", 500));
+					// if (_mouse.getMode() == MouseRobot.SLOW)
+					// _mouse.delay(_settings.getInt("slow.delay", 500));
 
 					// assume the dialog is open
 					if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
@@ -402,8 +400,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return false;
 	}
 
-	private boolean doMarket(LinkedList<Destination> chain, Destination dest)
-	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
+	private boolean doMarket(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
+	    IOException, AWTException, GameErrorException {
 		Pixel mt = _scanner.scanOneFast("dest/MarketTownTitle3.bmp", null, false);
 		boolean good = false;
 		if (mt != null) {
@@ -544,14 +542,13 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		return pp != null;
 	}
 
-	private boolean locateCommodityScroll(Pixel mt, String commodity)
-			throws RobotInterruptedException, IOException, AWTException {
-		
-		//1. scroll up first until scrollbar is at the top
-		
-		//2. if not found, scroll down until scrollbar gets to bottom
-		
-		
+	private boolean locateCommodityScroll(Pixel mt, String commodity) throws RobotInterruptedException, IOException,
+	    AWTException {
+
+		// 1. scroll up first until scrollbar is at the top
+
+		// 2. if not found, scroll down until scrollbar gets to bottom
+
 		int x = mt.x - 220;
 		int y = mt.y + 144;
 		Rectangle menuArea = new Rectangle(x, y, 80, 234);
@@ -579,14 +576,14 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					_mouse.delay(333);
 				}
 			} while (!found && turns < 20);
-			if (turns >=20)
+			if (turns >= 20)
 				LOGGER.info("reached limit of 20 scroll turns...");
 			return found;
 		}
 	}
-	
-	private boolean locateCommodity(Pixel mt, String commodity)
-	    throws RobotInterruptedException, IOException, AWTException {
+
+	private boolean locateCommodity(Pixel mt, String commodity) throws RobotInterruptedException, IOException,
+	    AWTException {
 		int x = mt.x - 220;
 		int y = mt.y + 144;
 		Rectangle menuArea = new Rectangle(x, y, 80, 234);
@@ -614,7 +611,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					_mouse.delay(333);
 				}
 			} while (!found && turns < 20);
-			if (turns >=20)
+			if (turns >= 20)
 				LOGGER.info("reached limit of 20 scroll turns...");
 			return found;
 		}
@@ -645,16 +642,16 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		if (_mouse.getMode() == MouseRobot.SLOW)
 			_mouse.delay(66);
 	}
-	
+
 	private void scrollUpNew(Pixel mt) throws RobotInterruptedException, IOException, AWTException {
 		Pixel top = new Pixel(mt.x - 136, mt.y + 145);
 		Rectangle scrollArea = new Rectangle(top.x, top.y, 10, 234);
 		Pixel sb = _scanner.scanOneFast("market/scrollbar.bmp", scrollArea, false);
-		
+
 		if (sb != null) {
-			//good. I have the scrollbar
+			// good. I have the scrollbar
 			if (sb.y - top.y <= 5) {
-				//it's at the top. nothing to do
+				// it's at the top. nothing to do
 			} else {
 				_mouse.drag4(sb.x + 4, sb.y + 80, sb.x + 4, sb.y - 260, true, false);
 				_mouse.delay(200);
@@ -664,8 +661,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		}
 	}
 
-	private boolean doNext(LinkedList<Destination> chain, Destination dest)
-	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
+	private boolean doNext(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,
+	    IOException, AWTException, GameErrorException {
 		LOGGER.info(dest.getName() + " can't be done!");
 		_scanner.scanOneFast("buildings/x.bmp", null, true);
 		_mouse.checkUserMovement();
