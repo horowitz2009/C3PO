@@ -336,13 +336,13 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					}
 
 					if (good) {
-						Rectangle buttonArea = _scanner.generateWindowedArea(340, 505);
+						Rectangle buttonArea = _scanner.generateWindowedArea(624, 505);
 						// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
 						// _scanner.getBottomRight().y - 175, 255, 90);
 						buttonArea.y += 411;
 						buttonArea.x += 130;
 						buttonArea.width -= 130;
-						buttonArea.height = 59;
+						buttonArea.height = 67;
 						int opt = 4;
 						Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
 						if (destButton == null) {
