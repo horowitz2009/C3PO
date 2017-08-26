@@ -273,7 +273,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						LOGGER.info("LOOKING for shipwreck...");
 						// locate the shipwreck
 						int t = 2;
-						Pixel p = _scanner.scanOne("dest/question.bmp", null, false);
+						Pixel p = _scanner.scanOne("ships/chest.bmp", null, false);
 						// if (p == null) {
 						// p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
 						// t = 3;
