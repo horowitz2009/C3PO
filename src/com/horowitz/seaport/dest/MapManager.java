@@ -326,7 +326,7 @@ public class MapManager {
 								smallCopy.getRelativePosition().x -= (41 + 10);
 								smallCopy.getRelativePosition().y -= (45 + 40);
 								LOGGER.info("ensuring small town...");
-								ensureDestination(smallCopy);
+								ensureDestination(smallCopy.getRelativePosition());
 								_scanner.handlePopups();
 								_scanner.getMouse().delay(500);
 								throw new GameErrorException(44, "Map issues", null);
@@ -471,10 +471,10 @@ public class MapManager {
 		return null;
 	}
 
-	public Pixel ensureDestination(Destination dest) throws RobotInterruptedException, AWTException, GameErrorException,
+	public Pixel ensureDestination(Pixel relativePosition) throws RobotInterruptedException, AWTException, GameErrorException,
 	    IOException {
-		if (dest != null && _smallTownPos != null) {
-			int y = _smallTownPos.y + dest.getRelativePosition().y;
+		if (_smallTownPos != null) {
+			int y = _smallTownPos.y + relativePosition.y;
 			final int x1 = _mapArea.x;
 			final int y1 = _mapArea.y;
 			final int x2 = x1 + _mapArea.width;
@@ -547,11 +547,11 @@ public class MapManager {
 				_scanner.handlePopupsFast();
 				_smallTownPos.y += dragY;
 				findSmallTownAgain();
-				y = _smallTownPos.y + dest.getRelativePosition().y;
+				y = _smallTownPos.y + relativePosition.y;
 
 			}// END OF Y AXIS
 
-			int x = _smallTownPos.x + dest.getRelativePosition().x;
+			int x = _smallTownPos.x + relativePosition.x;
 			int dragX = 0;
 			if (x < x1) {
 				dragX = x1 - x + 12;// positive -> drag east
@@ -578,8 +578,8 @@ public class MapManager {
 
 				_smallTownPos.x += dragX;
 				findSmallTownAgain();
-				x = _smallTownPos.x + dest.getRelativePosition().x;
-				y = _smallTownPos.y + dest.getRelativePosition().y;
+				x = _smallTownPos.x + relativePosition.x;
+				y = _smallTownPos.y + relativePosition.y;
 
 			}// END OF X AXIS
 
@@ -603,8 +603,8 @@ public class MapManager {
 				
 				_smallTownPos.y += dragY;
 				findSmallTownAgain();
-				x = _smallTownPos.x + dest.getRelativePosition().x;
-				y = _smallTownPos.y + dest.getRelativePosition().y;
+				x = _smallTownPos.x + relativePosition.x;
+				y = _smallTownPos.y + relativePosition.y;
 			}
 			
 			//SHIP BUTTON ISSUE
@@ -627,8 +627,8 @@ public class MapManager {
 				
 				_smallTownPos.y += dragY;
 				findSmallTownAgain();
-				x = _smallTownPos.x + dest.getRelativePosition().x;
-				y = _smallTownPos.y + dest.getRelativePosition().y;
+				x = _smallTownPos.x + relativePosition.x;
+				y = _smallTownPos.y + relativePosition.y;
 			}
 			
 			

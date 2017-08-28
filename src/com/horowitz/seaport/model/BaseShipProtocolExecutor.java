@@ -266,6 +266,58 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			if (smallTownPos != null) {
 				int x = -1;
 				int y = -1;
+
+				if (dest.getAbbr().startsWith("EXA")) {
+					LOGGER.info("LOOKING for explore destinations...");
+					Pixel p = null;//_scanner.scanOne("ships/explore.bmp", null, false);
+					if (p == null) {
+						LOGGER.info("no exploration found so far...");
+
+						// try moving the map
+
+						// //where???
+						// String[] dd = dest.getOption().split(".");
+						// if (dd.length > 1) {
+						// //ahaaaaa. we have directions
+						// String d = dd[1];
+						// //String dir1 = d.substring(1,2);
+						// //DAMN IT. TOO COMPLICATED
+						// }
+
+						// try everywhere
+						
+						//EAST
+						Pixel p1 = new Pixel(861, -576);
+						_mapManager.ensureDestination(p1);
+						LOGGER.info("explore NE");
+						p = _scanner.scanOne("ships/explore.bmp", null, false);
+						if (p == null) {
+							p1 = new Pixel(861, 709);
+							LOGGER.info("explore SE");
+							p = _scanner.scanOne("ships/explore.bmp", null, false);
+						}
+						if (p == null) {
+							p1 = new Pixel(-768, 709);
+							LOGGER.info("explore SW");
+							p = _scanner.scanOne("ships/explore.bmp", null, false);
+						}
+						if (p == null) {
+							p1 = new Pixel(-768, -576);
+							LOGGER.info("explore NW");
+							p = _scanner.scanOne("ships/explore.bmp", null, false);
+						}
+						
+					}
+					
+					if (p != null) {
+						x = p.x + 22;
+						y = p.y + 3;
+						LOGGER.info("Found exploration...");
+						good = true;
+					}
+
+				}
+
 				// what if dest is shipwreck
 				if (dest.getAbbr().equalsIgnoreCase("SW")) {
 					good = false;
@@ -291,7 +343,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					}
 				}
 				if (x < 0) {
-					Pixel pos = _mapManager.ensureDestination(dest);
+					Pixel pos = _mapManager.ensureDestination(dest.getRelativePosition());
 					// int x = smallTownPos.x + dest.getRelativePosition().x;
 					// int y = smallTownPos.y + dest.getRelativePosition().y;
 					x = pos.x;
