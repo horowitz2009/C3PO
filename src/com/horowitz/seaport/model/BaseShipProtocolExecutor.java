@@ -269,7 +269,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 				if (dest.getAbbr().startsWith("EXA")) {
 					LOGGER.info("LOOKING for explore destinations...");
-					Pixel p = null;//_scanner.scanOne("ships/explore.bmp", null, false);
+					Pixel p = _scanner.scanOne("ships/explore.bmp", null, false);
 					if (p == null) {
 						LOGGER.info("no exploration found so far...");
 
