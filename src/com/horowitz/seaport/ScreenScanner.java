@@ -199,7 +199,9 @@ public class ScreenScanner {
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
 		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
 		getImageData("dest/mapNotification.bmp", area, 0, 0);
-
+		
+		getImageData("ships/explore.bmp", _scanArea, 0, 0);
+		
 		getImageData("pin.bmp", _scanArea, 6, 6);
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
 		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);

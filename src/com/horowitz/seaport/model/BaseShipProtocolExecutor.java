@@ -266,10 +266,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			if (smallTownPos != null) {
 				int x = -1;
 				int y = -1;
-
+				Pixel p = null;
 				if (dest.getAbbr().startsWith("EXA")) {
+					good = false;
 					LOGGER.info("LOOKING for explore destinations...");
-					Pixel p = _scanner.scanOne("ships/explore.bmp", null, false);
+					p = _scanner.scanOne("ships/explore.bmp", null, false);
 					if (p == null) {
 						LOGGER.info("no exploration found so far...");
 
@@ -294,16 +295,19 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						if (p == null) {
 							p1 = new Pixel(861, 709);
 							LOGGER.info("explore SE");
+							_mapManager.ensureDestination(p1);
 							p = _scanner.scanOne("ships/explore.bmp", null, false);
 						}
 						if (p == null) {
 							p1 = new Pixel(-768, 709);
 							LOGGER.info("explore SW");
+							_mapManager.ensureDestination(p1);
 							p = _scanner.scanOne("ships/explore.bmp", null, false);
 						}
 						if (p == null) {
 							p1 = new Pixel(-768, -576);
 							LOGGER.info("explore NW");
+							_mapManager.ensureDestination(p1);
 							p = _scanner.scanOne("ships/explore.bmp", null, false);
 						}
 						
@@ -316,16 +320,14 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						good = true;
 					}
 
-				}
-
-				// what if dest is shipwreck
-				if (dest.getAbbr().equalsIgnoreCase("SW")) {
+				} else if (dest.getAbbr().equalsIgnoreCase("SW")) {
+					// what if dest is shipwreck
 					good = false;
 					if (_shipwreckAvailable) {
 						LOGGER.info("LOOKING for shipwreck...");
 						// locate the shipwreck
 						int t = 2;
-						Pixel p = _scanner.scanOne("ships/chest.bmp", null, false);
+						p = _scanner.scanOne("ships/chest.bmp", null, false);
 						// if (p == null) {
 						// p = _scanner.scanOne("dest/shipwreck3.bmp", null, false);
 						// t = 3;
@@ -341,8 +343,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 					} else {
 						LOGGER.info("No shipwreck available right now. Moving on...");
 					}
-				}
-				if (x < 0) {
+				} else {
+					//ORDINARY DESTINATION
 					Pixel pos = _mapManager.ensureDestination(dest.getRelativePosition());
 					// int x = smallTownPos.x + dest.getRelativePosition().x;
 					// int y = smallTownPos.y + dest.getRelativePosition().y;
