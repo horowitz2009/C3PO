@@ -62,7 +62,7 @@ public class ScreenScanner {
 	private boolean _optimized = false;
 	private boolean _debugMode = false;
 
-	private Rectangle _scanArea = null;
+	public Rectangle _scanArea = null;
 
 	private GameLocator _gameLocator;
 
@@ -200,7 +200,7 @@ public class ScreenScanner {
 		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
 		getImageData("dest/mapNotification.bmp", area, 0, 0);
 		
-		getImageData("ships/explore.bmp", _scanArea, 0, 0);
+		getImageData("ships/explore.bmp", _scanArea, 22, 3);
 		
 		getImageData("pin.bmp", _scanArea, 6, 6);
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);

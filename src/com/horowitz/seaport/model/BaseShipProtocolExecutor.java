@@ -267,56 +267,23 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				int x = -1;
 				int y = -1;
 				Pixel p = null;
+				List<Pixel> ps = new ArrayList<Pixel>();
 				if (dest.getAbbr().startsWith("EXA")) {
 					good = false;
 					LOGGER.info("LOOKING for explore destinations...");
-					p = _scanner.scanOne("ships/explore.bmp", null, false);
-					if (p == null) {
+					ps = _scanner.scanMany("ships/explore.bmp", null, false);
+					if (ps.isEmpty()) {
 						LOGGER.info("no exploration found so far...");
 
-						// try moving the map
-
-						// //where???
-						// String[] dd = dest.getOption().split(".");
-						// if (dd.length > 1) {
-						// //ahaaaaa. we have directions
-						// String d = dd[1];
-						// //String dir1 = d.substring(1,2);
-						// //DAMN IT. TOO COMPLICATED
-						// }
-
-						// try everywhere
-						
-						//EAST
-						Pixel p1 = new Pixel(861, -576);
-						_mapManager.ensureDestination(p1);
+						Pixel p1 = dest.getRelativePosition();
+						_mapManager.ensureDestination(p1, false);
 						LOGGER.info("explore NE");
-						p = _scanner.scanOne("ships/explore.bmp", null, false);
-						if (p == null) {
-							p1 = new Pixel(861, 709);
-							LOGGER.info("explore SE");
-							_mapManager.ensureDestination(p1);
-							p = _scanner.scanOne("ships/explore.bmp", null, false);
-						}
-						if (p == null) {
-							p1 = new Pixel(-768, 709);
-							LOGGER.info("explore SW");
-							_mapManager.ensureDestination(p1);
-							p = _scanner.scanOne("ships/explore.bmp", null, false);
-						}
-						if (p == null) {
-							p1 = new Pixel(-768, -576);
-							LOGGER.info("explore NW");
-							_mapManager.ensureDestination(p1);
-							p = _scanner.scanOne("ships/explore.bmp", null, false);
-						}
-						
+						ps = _scanner.scanMany("ships/explore.bmp", null, false);
+
 					}
-					
-					if (p != null) {
-						x = p.x + 22;
-						y = p.y + 3;
-						LOGGER.info("Found exploration...");
+
+					if (!ps.isEmpty()) {
+						LOGGER.info("Explorations found: " + ps.size());
 						good = true;
 					}
 
@@ -344,8 +311,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						LOGGER.info("No shipwreck available right now. Moving on...");
 					}
 				} else {
-					//ORDINARY DESTINATION
-					Pixel pos = _mapManager.ensureDestination(dest.getRelativePosition());
+					// ORDINARY DESTINATION
+					Pixel pos = _mapManager.ensureDestination(dest.getRelativePosition(), true);
 					// int x = smallTownPos.x + dest.getRelativePosition().x;
 					// int y = smallTownPos.y + dest.getRelativePosition().y;
 					x = pos.x;
@@ -353,93 +320,16 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				}
 
 				if (good) {
-
-					_mouse.click(x, y);
-					_mouse.delay(500);
-					// if (_mouse.getMode() == MouseRobot.SLOW)
-					// _mouse.delay(_settings.getInt("slow.delay", 500));
-
-					// assume the dialog is open
-					if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
-						// if friend and collected, need to click again
-						_mouse.click(x, y);
-						_mouse.delay(750);
-						if (_mouse.getMode() == MouseRobot.SLOW)
-							_mouse.delay(_settings.getInt("slow.delay", 500));
+					if (!ps.isEmpty()) {
+						for (Pixel px : ps) {
+							LOGGER.info("trying " + px);
+							good = clickDestination(px, chain, dest);
+							if (good)
+								return true;
+						}
+					} else {
+						good = clickDestination(new Pixel(x, y), chain, dest);
 					}
-
-					// manage market
-					if (dest.getName().startsWith("Market"))
-						good = doMarket(chain, dest);
-					else if (dest.getName().startsWith("Merchant")) {
-						Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
-						if (merchantTitle != null) {
-							int option = Integer.parseInt(dest.getOption());
-							Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
-
-							// click the 'go back' button first
-							_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
-							_mouse.delay(250);
-
-							// click the desired commodity
-							_mouse.click(commodityP);
-							_mouse.delay(250);
-
-							// look for send button
-						}
-					}
-
-					if (good) {
-						Rectangle buttonArea = _scanner.generateWindowedArea(624, 505);
-						// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
-						// _scanner.getBottomRight().y - 175, 255, 90);
-						buttonArea.y += 411;
-						buttonArea.x += 130;
-						buttonArea.width -= 130;
-						buttonArea.height = 67;
-						int opt = 4;
-						Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-						if (destButton == null) {
-							opt = 0;
-							destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
-						}
-						if (destButton == null) {
-							// check for got it button
-							LOGGER.info("CHECK FOR BLUE GOT IT...");
-							buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
-							    _scanner.getBottomRight().y - 240, 205, 240);
-							Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
-							if (gotitButtonBlue == null) {
-								gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
-							}
-							if (gotitButtonBlue != null) {
-								_mouse.click(gotitButtonBlue);
-								LOGGER.info("DESTINATION COMPLETED!");
-								_mouse.delay(800);
-								if (_mouse.getMode() == MouseRobot.SLOW)
-									_mouse.delay(1000);
-
-								return false;
-							}
-						}
-						if (destButton != null) {
-							LOGGER.info("set sail " + opt);
-
-							_mouse.checkUserMovement();
-							_mouse.click(destButton);
-
-							_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
-							_mouse.checkUserMovement();
-							_mouse.delay(1000);
-							if (_mouse.getMode() == MouseRobot.SLOW)
-								_mouse.delay(_settings.getInt("slow.delay", 500) + 400);
-
-							return true;
-						} else {
-							good = false;
-						} // no Set sail button
-					} // probably market not good
-
 					if (!good && isNotInterrupted()) {
 						return doNext(chain, dest);
 					}
@@ -452,6 +342,132 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			}
 		}
 		return false;
+	}
+
+	private boolean clickDestination(Pixel p, LinkedList<Destination> chain, Destination dest)
+	    throws RobotInterruptedException, IOException, AWTException, GameErrorException {
+		boolean good = true;
+		int x = p.x;
+		int y = p.y;
+		_mouse.click(x, y);
+		_mouse.delay(500);
+		// if (_mouse.getMode() == MouseRobot.SLOW)
+		// _mouse.delay(_settings.getInt("slow.delay", 500));
+
+		if (dest.getAbbr().equalsIgnoreCase("EXA")) {
+			// check is already done
+			Rectangle buttonArea = _scanner.generateWindowedArea(624, 505);
+			// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
+			// _scanner.getBottomRight().y - 175, 255, 90);
+			buttonArea.y += 411;
+			buttonArea.x += 130;
+			buttonArea.width -= 130;
+			buttonArea.height = 67;
+			Pixel b = _scanner.scanOne("dest/discover.bmp", buttonArea, false);
+			if (b != null) {
+				_mouse.click(b);
+				return false;
+			} else {
+				Pixel gotitButtonRED = _scanner.scanOne("dest/gotitButton.bmp", buttonArea, false);
+				if (gotitButtonRED != null) {
+					LOGGER.info("got it...");
+					_mouse.click(gotitButtonRED);
+					_mouse.delay(1000);
+					return false;
+				}
+			}
+
+		}
+
+		// assume the dialog is open
+		if (manageContractCases(dest) && dest.getAbbr().equalsIgnoreCase("F")) {
+			// if friend and collected, need to click again
+			_mouse.click(x, y);
+			_mouse.delay(750);
+			if (_mouse.getMode() == MouseRobot.SLOW)
+				_mouse.delay(_settings.getInt("slow.delay", 500));
+		}
+
+		// manage market
+		if (dest.getName().startsWith("Market"))
+			good = doMarket(chain, dest);
+		else if (dest.getName().startsWith("Merchant")) {
+			Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
+			if (merchantTitle != null) {
+				int option = Integer.parseInt(dest.getOption());
+				Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
+
+				// click the 'go back' button first
+				_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
+				_mouse.delay(250);
+
+				// click the desired commodity
+				_mouse.click(commodityP);
+				_mouse.delay(250);
+
+				// look for send button
+			}
+		}
+
+		if (good) {
+			Rectangle buttonArea = _scanner.generateWindowedArea(624, 505);
+			// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
+			// _scanner.getBottomRight().y - 175, 255, 90);
+			buttonArea.y += 411;
+			buttonArea.x += 130;
+			buttonArea.width -= 130;
+			buttonArea.height = 67;
+			int opt = 4;
+			Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
+			if (destButton == null) {
+				opt = 0;
+				destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+			}
+			if (destButton == null) {
+				// check for got it button
+				LOGGER.info("CHECK FOR BLUE GOT IT...");
+				buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
+				    _scanner.getBottomRight().y - 240, 205, 240);
+				Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
+				if (gotitButtonBlue == null) {
+					gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+				}
+				if (gotitButtonBlue != null) {
+					_mouse.click(gotitButtonBlue);
+					LOGGER.info("DESTINATION COMPLETED!");
+					_mouse.delay(800);
+					if (_mouse.getMode() == MouseRobot.SLOW)
+						_mouse.delay(1000);
+
+					return false;
+				}
+			} else {
+				Pixel gotitButtonRED = _scanner.scanOne("dest/gotitButton.bmp", buttonArea, false);
+				if (gotitButtonRED != null) {
+					LOGGER.info("got it...");
+					_mouse.click(gotitButtonRED);
+					_mouse.delay(1000);
+					return false;
+				}
+			}
+			if (destButton != null) {
+				LOGGER.info("set sail " + opt);
+
+				_mouse.checkUserMovement();
+				_mouse.click(destButton);
+
+				_support.firePropertyChange("SHIP_SENT", dest, _lastShip);
+				_mouse.checkUserMovement();
+				_mouse.delay(1000);
+				if (_mouse.getMode() == MouseRobot.SLOW)
+					_mouse.delay(_settings.getInt("slow.delay", 500) + 400);
+
+				return true;
+			} else {
+				good = false;
+			} // no Set sail button
+		} // probably market not good
+		return good;
 	}
 
 	private boolean doMarket(LinkedList<Destination> chain, Destination dest) throws RobotInterruptedException,

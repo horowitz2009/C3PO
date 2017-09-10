@@ -258,15 +258,15 @@ public class MainFrame extends JFrame {
 
 		runSettingsListener();
 		_monitor = new GameHealthMonitor(_settings);
-//		_monitor.setRunnable(new Runnable() {
-//	    public void run() {
-//	    	try {
-//	        _scanner.handleErrorPopups();
-//        } catch (RobotInterruptedException | GameErrorException e) {
-//	        _monitor.triggerAlert();
-//        }
-//	    }
-//    });
+		// _monitor.setRunnable(new Runnable() {
+		// public void run() {
+		// try {
+		// _scanner.handleErrorPopups();
+		// } catch (RobotInterruptedException | GameErrorException e) {
+		// _monitor.triggerAlert();
+		// }
+		// }
+		// });
 		_monitor.addPropertyChangeListener("NO_ACTIVITY", new PropertyChangeListener() {
 
 			@Override
@@ -668,7 +668,7 @@ public class MainFrame extends JFrame {
 	 * @param click
 	 * @param attempt
 	 * @throws RobotInterruptedException
-	 * @throws GameErrorException 
+	 * @throws GameErrorException
 	 * @deprecated
 	 */
 	private void recalcPositions(boolean click, int attempt) throws RobotInterruptedException, GameErrorException {
@@ -964,6 +964,27 @@ public class MainFrame extends JFrame {
 			};
 			mainToolbar1.add(action);
 		}
+		// TEST Button
+		{
+			AbstractAction action = new AbstractAction("T") {
+				public void actionPerformed(ActionEvent e) {
+					Thread myThread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								testMap();
+							} catch (RobotInterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+
+					});
+
+					myThread.start();
+				}
+			};
+			mainToolbar1.add(action);
+		}
 
 		return mainToolbar1;
 	}
@@ -1026,7 +1047,7 @@ public class MainFrame extends JFrame {
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
 					// if (b && _barrelsAToggle.isSelected())
-			    // _barrelsAToggle.setSelected(false);
+					// _barrelsAToggle.setSelected(false);
 
 					_barrelsTask.setEnabled(b);
 					_settings.setProperty("barrelsS", "" + b);
@@ -1382,11 +1403,11 @@ public class MainFrame extends JFrame {
 							if (_scanner.isOptimized()) {
 								// DO THE JOB
 								try {
-	                test();
-                } catch (GameErrorException e) {
-	                // TODO Auto-generated catch block
-	                e.printStackTrace();
-                }
+									test();
+								} catch (GameErrorException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							} else {
 								LOGGER.info("I need to know where the game is!");
 							}
@@ -1450,7 +1471,7 @@ public class MainFrame extends JFrame {
 						} else {
 							_endPoint = e.getPoint();
 							// LOGGER.info("clicked twice " + e.getButton() +
-			        // " (" + e.getX() + ", " + e.getY() + ")");
+							// " (" + e.getX() + ", " + e.getY() + ")");
 							setVisible(false);
 							LOGGER.info("AREA: " + _rect);
 						}
@@ -1467,7 +1488,7 @@ public class MainFrame extends JFrame {
 
 					if (inDrag && _endPoint != null && _startPoint != null) {
 						// LOGGER.info("end of drag " + e.getButton() + " (" +
-			      // e.getX() + ", " + e.getY() + ")");
+						// e.getX() + ", " + e.getY() + ")");
 						inDrag = false;
 						setVisible(false);
 						LOGGER.info("AREA: " + _rect);
@@ -1720,8 +1741,8 @@ public class MainFrame extends JFrame {
 
 				_mouse.checkUserMovement();
 				// 1. SCAN
-				//if (turn % 3 == 0)
-					handlePopups();
+				// if (turn % 3 == 0)
+				handlePopups();
 
 				// 2. REFRESH
 				LOGGER.fine("refresh ? " + _settings.getBoolean("autoRefresh", false) + " - " + mandatoryRefresh + " < "
@@ -1944,7 +1965,7 @@ public class MainFrame extends JFrame {
 							smallTownPos = _mapManager.getSmallTownPos();
 						}
 						if (smallTownPos != null) {
-							//TODO ensure dest
+							// TODO ensure dest
 							int x = smallTownPos.x + dest.getRelativePosition().x;
 							int y = smallTownPos.y + dest.getRelativePosition().y;
 							_mouse.click(x, y);
@@ -1962,6 +1983,42 @@ public class MainFrame extends JFrame {
 			_lastPing3 = System.currentTimeMillis();
 		}
 
+	}
+
+	private void testMap() throws RobotInterruptedException {
+		_mapManager.setSmallTownPos(null);
+		_mouse.click(_scanner.getBottomRight().x - 80, _scanner.getBottomRight().y - 53);
+		_mouse.delay(2000);
+
+		try {
+			Pixel pp = _scanner.scanOneFast("ships/fleetOverviewX.bmp", null, false);
+			if (pp != null) {
+				_mouse.click(pp.x + 7, pp.y + 7);
+				_mouse.delay(1000);
+			}
+			Pixel smallTownPos = _mapManager.getSmallTownPos();
+			if (smallTownPos == null) {
+				_mapManager.ensureMap();
+				smallTownPos = _mapManager.getSmallTownPos();
+				LOGGER.info("smallown: " + smallTownPos);
+			}
+
+			_mapManager.ensureDestination(_mapManager.getSmallTown().getRelativePosition(), true);
+
+			Pixel p;
+			// EAST
+			Pixel p1 = new Pixel(861, -576);
+			p1 = new Pixel(861, 709);
+			LOGGER.info("explore SE");
+			_mapManager.ensureDestination(p1, false);
+			p = _scanner.scanOne("ships/explore.bmp", null, false);
+
+			if (p != null)
+				_mouse.mouseMove(p);
+
+		} catch (AWTException | IOException | GameErrorException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void ping2New() throws RobotInterruptedException, IOException, AWTException {
@@ -2104,8 +2161,8 @@ public class MainFrame extends JFrame {
 
 			if (found) {
 				return;
-			} 
-			
+			}
+
 			found = _scanner.handlePopups();
 		} catch (AWTException e) {
 			e.printStackTrace();
