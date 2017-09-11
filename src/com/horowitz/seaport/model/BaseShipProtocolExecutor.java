@@ -354,7 +354,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		// if (_mouse.getMode() == MouseRobot.SLOW)
 		// _mouse.delay(_settings.getInt("slow.delay", 500));
 
-		if (dest.getAbbr().equalsIgnoreCase("EXA")) {
+		if (dest.getAbbr().startsWith("EXA")) {
 			// check is already done
 			Rectangle buttonArea = _scanner.generateWindowedArea(624, 505);
 			// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
@@ -368,7 +368,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				_mouse.click(b);
 				return false;
 			} else {
-				Pixel gotitButtonRED = _scanner.scanOne("dest/gotitButton.bmp", buttonArea, false);
+				_scanner.writeAreaTS(buttonArea, "buttonArea.bmp");
+				Pixel gotitButtonRED = _scanner.scanOne("ships/gotitButton.bmp", buttonArea, false);
 				if (gotitButtonRED != null) {
 					LOGGER.info("got it...");
 					_mouse.click(gotitButtonRED);
