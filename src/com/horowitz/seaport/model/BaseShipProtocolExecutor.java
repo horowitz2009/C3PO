@@ -368,7 +368,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				_mouse.click(b);
 				return false;
 			} else {
-				_scanner.writeAreaTS(buttonArea, "buttonArea.bmp");
+				//_scanner.writeAreaTS(buttonArea, "buttonArea.bmp");
 				Pixel gotitButtonRED = _scanner.scanOne("ships/gotitButton.bmp", buttonArea, false);
 				if (gotitButtonRED != null) {
 					LOGGER.info("got it...");
