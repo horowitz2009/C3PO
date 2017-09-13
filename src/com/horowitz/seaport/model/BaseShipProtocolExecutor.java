@@ -276,7 +276,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						LOGGER.info("no exploration found so far...");
 
 						Pixel p1 = dest.getRelativePosition();
-						_mapManager.ensureDestination(p1, false);
+						_mapManager.ensureDestination(p1, true);
 						LOGGER.info("explore NE");
 						ps = _scanner.scanMany("ships/explore.bmp", null, false);
 
