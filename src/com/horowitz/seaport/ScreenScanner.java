@@ -1351,8 +1351,16 @@ public class ScreenScanner {
 	public BufferedImage scanStorage() throws AWTException, IOException, RobotInterruptedException {
 		if (getRock() != null) {
 			Pixel p = new Pixel(getRock());
-			p.x += 53;
-			p.y -= 127;
+			try {
+	      String coords = _settings.getProperty("storageCoords", "53,-127");
+	      String ss[] = coords.split(",");
+	      p.x = p.x + Integer.parseInt(ss[0]);
+	      p.y = p.y + Integer.parseInt(ss[1]);
+      } catch (NumberFormatException e) {
+	      p.x = p.x + 53;
+	      p.x = p.y - 127;
+      }
+			
 			if (ensureHome()) {
 				_mouse.click(p);
 				_mouse.delay(500);
