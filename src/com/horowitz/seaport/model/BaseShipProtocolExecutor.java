@@ -229,8 +229,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 	}
 
 	protected boolean manageContractCases(Destination dest) throws IOException, AWTException, RobotInterruptedException {
-		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 60,
-		    _scanner.getBottomRight().y - 240, 270, 240);
+		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 180,
+		    _scanner.getBottomRight().y - 240, 310, 240);
 		Pixel destButton = null;
 		// if (dest.getAbbr().equalsIgnoreCase("F")) {
 		// destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
