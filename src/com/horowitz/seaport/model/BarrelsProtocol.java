@@ -67,20 +67,20 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 
 			Pixel rock = _scanner.getRock();
 			int topY = _scanner.getTopLeft().y;
-			int yy = rock.y - topY;
-			int y1 = rock.y - 263;
+			//int yy = rock.y - topY;
+			int yy1 = rock.y - 263;
 
-			int x1 = rock.x - 114;
-			int x2 = _scanner.getBottomRight().x - 28;
+			int xx1 = rock.x - 114;
+			int xx2 = _scanner.getBottomRight().x - 28;
 
 			// if (yy < 263) {//outside the game area => need to cut off the land5
 			// int toCut = 263 - yy;
 			// image = image.getSubimage(0, toCut, image.getWidth(), image.getHeight() - toCut);
 			// }
 
-			image = image.getSubimage(0, 0, Math.min(image.getWidth(), x2 - x1), image.getHeight());
+			image = image.getSubimage(0, 0, Math.min(image.getWidth(), xx2 - xx1), image.getHeight());
 
-			Rectangle area = new Rectangle(x1, y1, image.getWidth(), image.getHeight());
+			Rectangle area = new Rectangle(xx1, yy1, image.getWidth(), image.getHeight());
 
 			FastBitmap landFB = new FastBitmap(image);
 			if (landFB.isRGB())
@@ -194,17 +194,26 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 			// }
 			// _mouse.delay(100);
 			// }
-			 if (isNotInterrupted()) {
-			 // additional clicks to gem area
-			 int x = _scanner.getRock().x;
-			 int y = _scanner.getRock().y;
-		 	 _mouse.click(x - 62, y + 3);
-		 	 _mouse.click(x + 34, y + 14);
-		 	 _mouse.click(x - 34, y - 11);
-		 	 _mouse.click(x + 233, y + 33);
-			 
-			 _mouse.delay(100);
-			 }
+			if (isNotInterrupted()) {
+				// additional clicks to gem area
+				int x = _scanner.getRock().x;
+				int y = _scanner.getRock().y;
+				int x1 = _settings.getInt("barrels.x1", 0);
+				int y1 = _settings.getInt("barrels.y1", 0);
+				int x2 = _settings.getInt("barrels.x2", 0);
+				int y2 = _settings.getInt("barrels.y2", 0);
+				int x3 = _settings.getInt("barrels.x3", 0);
+				int y3 = _settings.getInt("barrels.y3", 0);
+				
+				if (x1 != 0 && y1 != 0)
+  				_mouse.click(x + x1, y + y1);
+				if (x2 != 0 && y2 != 0)
+					_mouse.click(x + x2, y + y2);
+				if (x3 != 0 && y3 != 0)
+					_mouse.click(x + x3, y + y3);
+				
+				_mouse.delay(100);
+			}
 			LOGGER.info("BARRELS CNT: " + cnt);
 
 		} catch (RobotInterruptedException e) {
