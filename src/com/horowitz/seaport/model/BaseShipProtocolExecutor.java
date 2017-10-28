@@ -37,7 +37,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 	private boolean _shipwreckAvailable;
 	private int _shipLocationDelay = 800;
 	private int _shipLocationDelaySlow = 1200;
-
+	private long lastTime = 0l;
+	
 	private PropertyChangeSupport _support;
 	protected Ship _lastShip;
 
@@ -65,7 +66,12 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			_shipwreckAvailable = p != null;
 		} else
 			_shipwreckAvailable = true;
-		return _scanner.ensureHome();
+
+		boolean home = _scanner.ensureHome();
+		if (home) {
+
+		}
+		return home;
 	}
 
 	public void update() {
@@ -156,7 +162,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 							_mouse.delay(_shipLocationDelaySlow);
 
 						// 1. check for pin
-						Rectangle miniArea = new Rectangle(pixel.x - 40, pixel.y + 20, 80, 12);
+						Rectangle miniArea = new Rectangle(pixel.x - 40, pixel.y + 15, 80, 12+10);
 						// _scanner.writeArea(miniArea, "pin.bmp");
 						Pixel pin = null;
 						if (isShipHere(miniArea)) {
@@ -368,7 +374,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				_mouse.click(b);
 				return false;
 			} else {
-				//_scanner.writeAreaTS(buttonArea, "buttonArea.bmp");
+				// _scanner.writeAreaTS(buttonArea, "buttonArea.bmp");
 				Pixel gotitButtonRED = _scanner.scanOne("ships/gotitButton.bmp", buttonArea, false);
 				if (gotitButtonRED != null) {
 					LOGGER.info("got it...");
