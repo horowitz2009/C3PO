@@ -1136,14 +1136,14 @@ public class ScreenScanner {
 			if (found) {
 				// check is this 'logged twice' message
 				area.y -= 233;
-				Pixel pp = scanOne("accountLoggedTwice2.bmp", area, false);
+				Pixel pp = scanOne("accountLoggedTwice.bmp", area, false);
 				int which = 2;
 				if (pp == null) {
 					pp = scanOne("accountLoggedTwice3.bmp", area, false);
 					which = 3;
 				}
 				if (pp == null) {
-					pp = scanOne("accountLoggedTwice.bmp", area, false);
+					pp = scanOne("accountLoggedTwice2.bmp", area, false);
 					which = 0;
 				}
 				if (pp != null) {
