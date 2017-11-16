@@ -201,6 +201,7 @@ public class ScreenScanner {
 		getImageData("dest/mapNotification.bmp", area, 0, 0);
 		
 		getImageData("ships/explore.bmp", _scanArea, 22, 3);
+		getImageData("ships/wheel.bmp", _scanArea, 9, 9).setColorToBypass(Color.RED);
 		
 		getImageData("pin.bmp", _scanArea, 6, 6);
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);

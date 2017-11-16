@@ -162,15 +162,19 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 							_mouse.delay(_shipLocationDelaySlow);
 
 						// 1. check for pin
-						Rectangle miniArea = new Rectangle(pixel.x - 40, pixel.y + 15, 80, 12+10);
-						// _scanner.writeArea(miniArea, "pin.bmp");
+						Rectangle pinArea = new Rectangle(pixel.x - 34, pixel.y + 64, 68, 58);
+						//Rectangle miniArea = new Rectangle(pixel.x - 40, pixel.y + 15, 80, 12+10);
+						//_scanner.writeArea(pinArea, "pinArea.bmp");
 						Pixel pin = null;
-						if (isShipHere(miniArea)) {
-							pin = new Pixel(pixel.x + 5, pixel.y + 90);
-						}
+						pin = _scanner.scanOneFast(_scanner.getImageData("ships/wheel.bmp"), pinArea, false);
+						
+//						//THIS IS VERY SLOW
+//						if (isShipHere(miniArea)) {
+//							pin = new Pixel(pixel.x + 5, pixel.y + 90);
+//						}
+						
 						// Pixel pin = _scanner.scanOneFast(_scanner.getImageData("pin.bmp"), miniArea, false);
 						if (pin != null) {
-
 							try {
 								doShip(pin);
 							} catch (GameErrorException e) {
@@ -210,7 +214,8 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 	protected Ship scanShipName(Pixel pin) throws AWTException, RobotInterruptedException {
 		// scan the name
-		Rectangle nameArea = new Rectangle(pin.x - 95, pin.y - 67 - 10, 190, 60);
+		//Rectangle nameArea = new Rectangle(pin.x - 95, pin.y - 67 - 10, 190, 60);
+		Rectangle nameArea = new Rectangle(pin.x - 60, pin.y - 80, 122, 20);
 		List<Ship> ships = _mapManager.getShips();
 		_lastShip = null;
 		for (Ship ship : ships) {
