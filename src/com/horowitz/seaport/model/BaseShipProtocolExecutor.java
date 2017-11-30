@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -215,7 +216,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 	protected Ship scanShipName(Pixel pin) throws AWTException, RobotInterruptedException {
 		// scan the name
 		//Rectangle nameArea = new Rectangle(pin.x - 95, pin.y - 67 - 10, 190, 60);
-		Rectangle nameArea = new Rectangle(pin.x - 60, pin.y - 80, 122, 20);
+		Rectangle nameArea = new Rectangle(pin.x - 60, pin.y - 46, 122, 20);
 		List<Ship> ships = _mapManager.getShips();
 		_lastShip = null;
 		for (Ship ship : ships) {
@@ -282,14 +283,14 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				if (dest.getAbbr().startsWith("EXA")) {
 					good = false;
 					LOGGER.info("LOOKING for explore destinations...");
-					ps = _scanner.scanMany("ships/explore.bmp", null, false);
+					ps = _scanner.scanMany("ships/explore.bmp", (BufferedImage) null, false);
 					if (ps.isEmpty()) {
 						LOGGER.info("no exploration found so far...");
 
 						Pixel p1 = dest.getRelativePosition();
 						_mapManager.ensureDestination(p1, true);
 						LOGGER.info("explore NE");
-						ps = _scanner.scanMany("ships/explore.bmp", null, false);
+						ps = _scanner.scanMany("ships/explore.bmp", (BufferedImage) null, false);
 
 					}
 

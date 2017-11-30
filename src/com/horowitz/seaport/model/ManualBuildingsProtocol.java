@@ -74,8 +74,9 @@ public class ManualBuildingsProtocol extends AbstractGameProtocol {
 
 	private void doBuilding(Building b) throws IOException, AWTException, RobotInterruptedException {
 		Pixel p1 = b.getPosition();
-		Rectangle miniArea = new Rectangle(p1.x - 28, p1.y - 22, 28 * 2, 22 * 2);
-		Pixel p = _scanner.scanOneFast("buildings/whiteArrow.bmp", miniArea, false);
+		//Rectangle miniArea = new Rectangle(p1.x - 28, p1.y - 22, 28 * 2, 22 * 2);
+		Rectangle miniArea = new Rectangle(p1.x - 75, p1.y - 21, 35, 35);
+		Pixel p = _scanner.scanOneFast("buildings/produce_" + b.getMaterial() + ".bmp", miniArea, false);
 		if (p != null) {
 			LOGGER.info(b.getName() + " busy! Moving on...");
 		} else {

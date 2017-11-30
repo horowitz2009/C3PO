@@ -80,6 +80,7 @@ import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.FishingProtocol;
+import com.horowitz.seaport.model.ImageBarrelsProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
 import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.Ship;
@@ -97,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v134";
+	private static String APP_TITLE = "Seaport v136";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -240,7 +241,9 @@ public class MainFrame extends JFrame {
 			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
 			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
 			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
-			_barrelsTask.setProtocol(_barrelsProtocol);
+			
+			ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
+			_barrelsTask.setProtocol(imageBarrelsProtocol);
 			_tasks.add(_barrelsTask);
 
 			_stopAllThreads = false;

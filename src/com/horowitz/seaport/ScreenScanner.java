@@ -759,6 +759,43 @@ public class ScreenScanner {
 		return matches;
 	}
 
+	public List<Pixel> scanMany(String filename, Rectangle area, boolean click)
+	    throws RobotInterruptedException, IOException, AWTException {
+		ImageData imageData = getImageData(filename);
+		if (imageData == null)
+			return new ArrayList<Pixel>(0);
+		BufferedImage	screen = new Robot().createScreenCapture(area);
+		List<Pixel> matches = _matcher.findMatches(imageData.getImage(), screen, imageData.getColorToBypass());
+		if (!matches.isEmpty()) {
+			Collections.sort(matches);
+			Collections.reverse(matches);
+
+			// filter similar
+			if (matches.size() > 1) {
+				for (int i = matches.size() - 1; i > 0; --i) {
+					for (int j = i - 1; j >= 0; --j) {
+						Pixel p1 = matches.get(i);
+						Pixel p2 = matches.get(j);
+						if (Math.abs(p1.x - p2.x) <= 3 && Math.abs(p1.y - p2.y) <= 3) {
+							// too close to each other
+							// remove one
+							matches.remove(j);
+							--i;
+						}
+					}
+				}
+			}
+
+			for (Pixel pixel : matches) {
+				pixel.x += (area.x + imageData.get_xOff());
+				pixel.y += (area.y + imageData.get_yOff());
+				if (click)
+					_mouse.click(pixel.x, pixel.y);
+			}
+		}
+		return matches;
+	}
+	
 	public List<Pixel> scanManyFast(ImageData imageData, BufferedImage screen, boolean click)
 	    throws RobotInterruptedException, IOException, AWTException {
 		if (imageData == null)
