@@ -353,8 +353,10 @@ public class MapManager {
 				_scanner.scanOneFast("buildings/x.bmp", null, true);
 				_scanner.getMouse().delay(150);
 				newSmallTownPos = findSmallTown();
-				if (newSmallTownPos == null)
+				if (newSmallTownPos == null) {
 					LOGGER.info("CRITICAL! Still can't find Small Town!");
+          return; //try without having it				
+				}
 			}
 
 			if (newSmallTownPos == null)
@@ -521,7 +523,7 @@ public class MapManager {
 						int startY = startPos.y;
 						_scanner.getMouse().drag4(startX, startY, startX, startY + dragYPart, true, false);
 						_scanner.getMouse().delay(2000);
-						//_scanner.getMouse().click();// to stop inertia
+						// _scanner.getMouse().click();// to stop inertia
 						_scanner.handlePopupsFast();
 						dragY -= dragYPart;
 						_smallTownPos.y += dragYPart;
@@ -545,7 +547,7 @@ public class MapManager {
 						int startY = startPos.y;
 						_scanner.getMouse().drag4(startX, startY, startX, startY + dragYPart, true, false);
 						_scanner.getMouse().delay(2000);
-						//_scanner.getMouse().click();// to stop inertia
+						// _scanner.getMouse().click();// to stop inertia
 						_scanner.handlePopupsFast();
 						dragY -= dragYPart;
 						_smallTownPos.y += dragYPart;
@@ -560,7 +562,7 @@ public class MapManager {
 				int startX = startPos.x;
 				int startY = startPos.y;
 				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);
-				//_scanner.getMouse().click();// to stop inertia
+				// _scanner.getMouse().click();// to stop inertia
 				_scanner.getMouse().delay(2000);
 				_scanner.handlePopupsFast();
 				_smallTownPos.y += dragY;
@@ -581,7 +583,7 @@ public class MapManager {
 			// X AXIS
 			if (dragX != 0) {
 				if (_smallTownPos.y + soff - 3 > y1) {
-					if (_smallTownPos.y +soff + 3 < y2)
+					if (_smallTownPos.y + soff + 3 < y2)
 						startPos = new Pixel(_smallTownPos.x + soff, _smallTownPos.y + soff);
 					else
 						startPos = new Pixel(_tailorPos.x + 50, _tailorPos.y);
@@ -593,7 +595,7 @@ public class MapManager {
 				int startY = startPos.y;
 				_scanner.getMouse().drag4(startX, startY, startX + dragX, startY, true, false);
 				_scanner.getMouse().delay(2000);
-				//_scanner.getMouse().click();// to stop inertia
+				// _scanner.getMouse().click();// to stop inertia
 				_scanner.handlePopupsFast();
 
 				_smallTownPos.x += dragX;
@@ -619,7 +621,7 @@ public class MapManager {
 				int startY = startPos.y;
 				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);
 				_scanner.getMouse().delay(2000);
-				//_scanner.getMouse().click();// to stop inertia
+				// _scanner.getMouse().click();// to stop inertia
 				_scanner.handlePopupsFast();
 
 				_smallTownPos.y += dragY;
@@ -644,7 +646,7 @@ public class MapManager {
 				int startY = startPos.y;
 				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);
 				_scanner.getMouse().delay(2000);
-				//_scanner.getMouse().click();// to stop inertia
+				// _scanner.getMouse().click();// to stop inertia
 				_scanner.handlePopupsFast();
 
 				_smallTownPos.y += dragY;
