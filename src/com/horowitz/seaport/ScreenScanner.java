@@ -489,38 +489,7 @@ public class ScreenScanner {
 		}
 		return p;
 	}
-
-	public Pixel locateImageCoords(String imageName, Rectangle[] area, int xOff, int yOff) throws AWTException,
-	    IOException, RobotInterruptedException {
-
-		final Robot robot = new Robot();
-		final BufferedImage image = ImageIO.read(ImageManager.getImageURL(imageName));
-		Pixel[] mask = new ImageMask(imageName).getMask();
-		BufferedImage screen;
-		int turn = 0;
-		Pixel resultPixel = null;
-		// MouseRobot mouse = new MouseRobot();
-		// mouse.saveCurrentPosition();
-		while (turn < area.length) {
-
-			screen = robot.createScreenCapture(area[turn]);
-			List<Pixel> foundEdges = findEdge(image, screen, _comparator, null, mask);
-			if (foundEdges.size() >= 1) {
-				// found
-				// AppConsole.print("found it! ");
-				int y = area[turn].y;
-				int x = area[turn].x;
-				resultPixel = new Pixel(foundEdges.get(0).x + x + xOff, foundEdges.get(0).y + y + yOff);
-				// System.err.println("AREA: [" + turn + "] " + area[turn]);
-				break;
-			}
-			turn++;
-		}
-		// mouse.checkUserMovement();
-		// AppConsole.println();
-		return resultPixel;
-	}
-
+	
 	public boolean isOptimized() {
 		return _optimized && _br != null && _tl != null;
 	}
