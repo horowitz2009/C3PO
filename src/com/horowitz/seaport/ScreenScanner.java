@@ -403,9 +403,9 @@ public class ScreenScanner {
 			} else
 				LOGGER.info("NO NEED TO MOVE ROCK");
 		} else {
-			Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 - 25, _tl.y + 188);//was 209 + 3 // was 219
+			Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 - 25, _tl.y + 187);//was 209 + 3 // was 219
 
-			if (Math.abs(_rock.x - goodRock.x) > 52 || Math.abs(_rock.y - goodRock.y) > 8) {
+			if (Math.abs(_rock.y - goodRock.y) > 8) {
 				// need adjusting
 				_mouse.drag4(_rock.x, _rock.y, goodRock.x, goodRock.y, true, true);
 				_mouse.click();

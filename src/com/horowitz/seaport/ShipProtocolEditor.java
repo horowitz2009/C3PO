@@ -250,12 +250,14 @@ public class ShipProtocolEditor extends JPanel {
 			}
 
 			// Ship select = new Ship("-- choose ship --");
-			Ship all = new Ship("<ALL>");
+			//Ship all = new Ship("<ALL>");
 			Ship rest = new Ship("<Rest>");
 			Ship unknown = new Ship("<Unknown>");
-			ships.add(0, all);
-			ships.add(1, rest);
-			ships.add(2, unknown);
+			Ship custom = new Ship("<CUSTOM>");
+			//ships.add(0, all);
+			ships.add(0, rest);
+			ships.add(1, unknown);
+			ships.add(2, custom);
 			// ships.add(0, select);
 
 			_shipFieldCB = new JComboBox<Ship>(ships.toArray(new Ship[0]));

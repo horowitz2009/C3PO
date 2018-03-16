@@ -185,9 +185,56 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		// 1
 		for (ProtocolEntry protocolEntry : entries) {
 			String ss = protocolEntry.getShipName();
-			if (ss.equalsIgnoreCase(ship.getName()) || ss.equals("<ALL>")) {
-				pe = protocolEntry;
-				break;
+			if (ss.equalsIgnoreCase("<CUSTOM>")) {
+				String ch = protocolEntry.getChainStr();
+				int index = ch.indexOf("-");
+				if (index > 1) {
+					// good. take first
+					String s = ch.substring(0, index).trim();
+					int value = ship.getCapacity();
+					if (s.endsWith("s")) {
+						// sailors
+						s = s.replace("s", "");
+						value = ship.getCrew();
+					}
+
+					if (s.startsWith("<=")) {
+						s = s.substring(2);
+						int value2 = Integer.parseInt(s);
+						if (value <= value2) {
+							pe = protocolEntry;
+						}
+					} else if (s.startsWith("<")) {
+						s = s.substring(1);
+						int value2 = Integer.parseInt(s);
+						if (value < value2) {
+							pe = protocolEntry;
+						}
+					} else if (s.startsWith(">=")) {
+						s = s.substring(2);
+						int value2 = Integer.parseInt(s);
+						if (value >= value2) {
+							pe = protocolEntry;
+						}
+					} else if (s.startsWith(">")) {
+						s = s.substring(1);
+						int value2 = Integer.parseInt(s);
+						if (value > value2) {
+							pe = protocolEntry;
+						}
+					}
+
+					if (pe != null) {
+						String newChain = ch.substring(index + 1);
+						// copy
+						ProtocolEntry pe2 = new ProtocolEntry();
+						// pe2.setShip(pe.getShip());
+						pe2.setShipName(pe.getShipName());
+						pe2.setChainStr(newChain);
+						pe = pe2;
+						break;
+					}
+				}
 			}
 
 			if (ss.startsWith("[")) {

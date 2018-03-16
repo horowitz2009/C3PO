@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v136";
+	private static String APP_TITLE = "Seaport v139";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -238,9 +238,9 @@ public class MainFrame extends JFrame {
 			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
-			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
-			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
-			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
+//			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
+//			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
+//			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
 			
 			ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
 			_barrelsTask.setProtocol(imageBarrelsProtocol);
@@ -1183,7 +1183,7 @@ public class MainFrame extends JFrame {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					_barrelsProtocol.setCapture(false);// TODO OFF FOR GOOD!!!! move it to settings, motherfucker!
+					//_barrelsProtocol.setCapture(false);// TODO OFF FOR GOOD!!!! move it to settings, motherfucker!
 					LOGGER.info("Ping2: " + (b ? "on" : "off"));
 					_settings.setProperty("ping2", "" + b);
 					_settings.saveSettingsSorted();
@@ -2089,7 +2089,7 @@ public class MainFrame extends JFrame {
 
 	private Long _speedTime = null;
 
-	private BarrelsProtocol _barrelsProtocol;
+	//private BarrelsProtocol _barrelsProtocol;
 
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
@@ -2269,8 +2269,8 @@ public class MainFrame extends JFrame {
 			setProtocol(sp);
 		}
 
-		_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
-		_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
+//		_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
+//		_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
 
 	}
 
