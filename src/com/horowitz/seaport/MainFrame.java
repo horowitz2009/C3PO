@@ -75,7 +75,6 @@ import com.horowitz.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
-import com.horowitz.seaport.model.BarrelsProtocol;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
@@ -98,7 +97,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v139";
+	private static String APP_TITLE = "Seaport v140";
 
 	private Settings _settings;
 	private Stats _stats;

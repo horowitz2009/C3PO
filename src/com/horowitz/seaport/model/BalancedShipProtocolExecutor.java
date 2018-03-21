@@ -185,6 +185,12 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 		// 1
 		for (ProtocolEntry protocolEntry : entries) {
 			String ss = protocolEntry.getShipName();
+			
+			if (ss.equalsIgnoreCase(ship.getName())) {
+				pe = protocolEntry;
+				break;
+			}
+			
 			if (ss.equalsIgnoreCase("<CUSTOM>")) {
 				String ch = protocolEntry.getChainStr();
 				int index = ch.indexOf("-");
@@ -213,6 +219,7 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 					} else if (s.startsWith(">=")) {
 						s = s.substring(2);
 						int value2 = Integer.parseInt(s);
+						LOGGER.info(value + " >= " + value2);
 						if (value >= value2) {
 							pe = protocolEntry;
 						}
