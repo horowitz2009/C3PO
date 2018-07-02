@@ -75,6 +75,7 @@ import com.horowitz.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
+import com.horowitz.seaport.model.BarrelsProtocol;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
@@ -97,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v140";
+	private static String APP_TITLE = "Seaport v148";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -144,6 +145,8 @@ public class MainFrame extends JFrame {
 	private OCRB _ocr;
 
 	private boolean _doOCR;
+
+	private BarrelsProtocol _barrelsProtocol;
 
 	public static void main(String[] args) {
 
@@ -237,12 +240,13 @@ public class MainFrame extends JFrame {
 			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
-//			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
-//			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
-//			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
+			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
+			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
+			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
+			_barrelsTask.setProtocol(_barrelsProtocol);
 			
-			ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
-			_barrelsTask.setProtocol(imageBarrelsProtocol);
+//			ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
+//			_barrelsTask.setProtocol(imageBarrelsProtocol);
 			_tasks.add(_barrelsTask);
 
 			_stopAllThreads = false;
@@ -2182,9 +2186,10 @@ public class MainFrame extends JFrame {
 		}
 
 		boolean ships = "true".equalsIgnoreCase(_settings.getProperty("ships"));
-		if (ships != _shipsToggle.isSelected()) {
-			_shipsToggle.setSelected(ships);
-		}
+		//if (ships != _shipsToggle.isSelected()) {
+		_shipsToggle.setSelected(ships);
+		_shipsTask.setEnabled(ships);
+		//}
 
 		boolean industries = "true".equalsIgnoreCase(_settings.getProperty("industries"));
 		if (industries != _industriesToggle.isSelected()) {

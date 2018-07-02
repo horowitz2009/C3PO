@@ -160,7 +160,7 @@ public class ScreenScanner {
 		_sailorsPos = scanOne("sailors.bmp", _rightNumbersArea, false);
 
 		_fishes = new Pixel[] { new Pixel(-94, 14), new Pixel(-169, -13), new Pixel(-223, -49), new Pixel(-282, -89),
-		    new Pixel(-354, -120), new Pixel(-148, -158) };
+		    new Pixel(-354, -120), new Pixel(-94, -129) };
 
 		_shipLocations = new Pixel[] { new Pixel(103, 83), new Pixel(103, 187), new Pixel(103, 278) };
 		// _buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147,
@@ -195,7 +195,7 @@ public class ScreenScanner {
 		_safePoint = new Pixel(_br.x - 15, _br.y - 115);
 		_parkingPoint = new Pixel(_br.x, _br.y - 100);
 
-		getImageData("ROCK.bmp", _scanArea, 10, 44);
+		getImageData("market/ROCK.bmp", _scanArea, 10, 44);
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
 		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
 		getImageData("dest/mapNotification.bmp", area, 0, 0);
@@ -206,6 +206,11 @@ public class ScreenScanner {
 		getImageData("pin.bmp", _scanArea, 6, 6);
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
 		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
+		getImageData("market/barrel1.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+		getImageData("market/barrel2.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+		getImageData("market/barrel3.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+		getImageData("market/barrel4.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+		
 
 		area = new Rectangle(_br.x - 110, _br.y - 110, 70, 75);
 		getImageData("anchor.bmp", area, 11, 46);
@@ -439,7 +444,7 @@ public class ScreenScanner {
 		do {
 			tries++;
 			LOGGER.info("looking for rock " + tries);
-			p = scanOne("ROCK.bmp", area, false);
+			p = scanOne("market/ROCK.bmp", area, false);
 			// writeImage(area, "admArea1.png");
 			if (p == null) {
 				LOGGER.info("Rock try 2 ...");
@@ -451,7 +456,7 @@ public class ScreenScanner {
 					area = new Rectangle(_tl.x + 570, _tl.y + 133, 75, 111);
 				}
 
-				p = scanOne("ROCK.bmp", area, false);
+				p = scanOne("market/ROCK.bmp", area, false);
 				if (p == null) {
 					LOGGER.info("Rock try 3 ...");
 					if (screenSize.width > 1900) {
@@ -461,9 +466,9 @@ public class ScreenScanner {
 						// 1600x1200
 						area = new Rectangle(_tl.x + 567, _tl.y + 70, 244, getGameHeight() - 70);
 					}
-					p = scanOne("ROCK.bmp", area, false);
+					p = scanOne("market/ROCK.bmp", area, false);
 					if (p == null)
-						p = scanOne("ROCK.bmp", getScanArea(), false);
+						p = scanOne("market/ROCK.bmp", getScanArea(), false);
 				}
 			}
 			// _rock = p;
@@ -472,14 +477,14 @@ public class ScreenScanner {
 	}
 
 	public Pixel findRockAgain(Pixel oldRock) throws IOException, AWTException, RobotInterruptedException {
-		ImageData rockData = getImageData("ROCK.bmp");
+		ImageData rockData = getImageData("market/ROCK.bmp");
 		Rectangle area = rockData.getDefaultArea();
 		if (oldRock != null) {
 			int x = oldRock.x - rockData.get_xOff();
 			int y = oldRock.y - rockData.get_yOff();
 			area = new Rectangle(x - 50, y - 50, 31 + 140, 28 + 140);
 		}
-		Pixel p = scanOne("ROCK.bmp", area, false);
+		Pixel p = scanOne("market/ROCK.bmp", area, false);
 		if (p == null) {
 			LOGGER.info("Rock not found in the same place.");
 			LOGGER.info("Looking again for the rock...");
