@@ -98,7 +98,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v148";
+	private static String APP_TITLE = "Seaport v149";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -978,8 +978,9 @@ public class MainFrame extends JFrame {
 						@Override
 						public void run() {
 							try {
-								testMap();
-							} catch (RobotInterruptedException e) {
+								//testMap();
+								_scanner.findRockAgain(_scanner.getRock());
+							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}

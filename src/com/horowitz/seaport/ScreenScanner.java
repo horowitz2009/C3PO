@@ -159,8 +159,8 @@ public class ScreenScanner {
 
 		_sailorsPos = scanOne("sailors.bmp", _rightNumbersArea, false);
 
-		_fishes = new Pixel[] { new Pixel(-94, 14), new Pixel(-169, -13), new Pixel(-223, -49), new Pixel(-282, -89),
-		    new Pixel(-354, -120), new Pixel(-94, -129) };
+		_fishes = new Pixel[] { new Pixel(-96, 37), new Pixel(-171, 10), new Pixel(-234, -30), new Pixel(-295, -73),
+		    new Pixel(-365, -105) }; // museum off , new Pixel(-94, -129)
 
 		_shipLocations = new Pixel[] { new Pixel(103, 83), new Pixel(103, 187), new Pixel(103, 278) };
 		// _buildingLocations = new Pixel[] { new Pixel(54, -71), new Pixel(147,
@@ -199,10 +199,10 @@ public class ScreenScanner {
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
 		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
 		getImageData("dest/mapNotification.bmp", area, 0, 0);
-		
+
 		getImageData("ships/explore.bmp", _scanArea, 22, 3);
 		getImageData("ships/wheel.bmp", _scanArea, 9, 9).setColorToBypass(Color.RED);
-		
+
 		getImageData("pin.bmp", _scanArea, 6, 6);
 		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
 		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
@@ -210,7 +210,6 @@ public class ScreenScanner {
 		getImageData("market/barrel2.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
 		getImageData("market/barrel3.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
 		getImageData("market/barrel4.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
-		
 
 		area = new Rectangle(_br.x - 110, _br.y - 110, 70, 75);
 		getImageData("anchor.bmp", area, 11, 46);
@@ -385,13 +384,16 @@ public class ScreenScanner {
 
 	public boolean checkAndAdjustRock() throws IOException, AWTException, RobotInterruptedException {
 		boolean needRecalc = true;
+		boolean needAdjusting = false;
 		if (_rock == null) {
 			_rock = findRock();
 			LOGGER.info("rock found for the first time.");
 			needRecalc = true;
+			needAdjusting = true;
 		} else {
 			Pixel newRock = findRockAgain(_rock);
 			needRecalc = !_rock.equals(newRock);
+			needAdjusting = needRecalc;
 			_rock = newRock;
 			if (!needRecalc) {
 				LOGGER.info("rock found in the same place.");
@@ -399,17 +401,10 @@ public class ScreenScanner {
 			}
 		}
 
-		if (_fsMode) {
-			// TODO
-			int diff = (_br.y - _rock.y);
-			if (diff < 440) {
-				diff = 440 - diff;
-				_mouse.drag4(_rock.x, _rock.y, _rock.x, _rock.y - diff, true, true);
-			} else
-				LOGGER.info("NO NEED TO MOVE ROCK");
-		} else {
-			Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 - 25, _tl.y + 187);//was 209 + 3 // was 219
-
+		if (needAdjusting) {
+			//NEW ONE Pixel goodRock = new Pixel(_tl.x + 925, _tl.y + 146);
+			Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 - 25, _tl.y + 187);// was 209 + 3 // was 219
+			
 			if (Math.abs(_rock.x - goodRock.x) > 8 || Math.abs(_rock.y - goodRock.y) > 8) {
 				// need adjusting
 				_mouse.drag4(_rock.x, _rock.y, goodRock.x, goodRock.y, true, true);
@@ -420,7 +415,6 @@ public class ScreenScanner {
 				needRecalc = true;
 			}
 		}
-
 		return needRecalc;
 	}
 
@@ -439,41 +433,55 @@ public class ScreenScanner {
 			area = new Rectangle(_tl.x + 622, _tl.y + 148, 75, 134);
 		}
 
-		int tries = 0;
+		area = new Rectangle(_tl.x + 533, _tl.y + 50, getGameWidth() - 533 - 551, getGameHeight() - 50 - 18);
+		long start = System.currentTimeMillis();
 		Pixel p = null;
-		do {
-			tries++;
-			LOGGER.info("looking for rock " + tries);
-			p = scanOne("market/ROCK.bmp", area, false);
-			// writeImage(area, "admArea1.png");
-			if (p == null) {
-				LOGGER.info("Rock try 2 ...");
-				if (screenSize.width > 1900) {
-					// HD mode
-					area = new Rectangle(_tl.x + 768, _tl.y + 155, 75, 153);
-				} else if (screenSize.width > 1590) {
-					// 1600x1200
-					area = new Rectangle(_tl.x + 570, _tl.y + 133, 75, 111);
-				}
+		LOGGER.info("looking for rock " + 1);
+		p = scanOne("market/ROCK.bmp", area, false);
 
-				p = scanOne("market/ROCK.bmp", area, false);
-				if (p == null) {
-					LOGGER.info("Rock try 3 ...");
-					if (screenSize.width > 1900) {
-						// HD mode
-						area = new Rectangle(_tl.x + 700, _tl.y + 70, 230, getGameHeight() - 70);
-					} else if (screenSize.width > 1590) {
-						// 1600x1200
-						area = new Rectangle(_tl.x + 567, _tl.y + 70, 244, getGameHeight() - 70);
-					}
-					p = scanOne("market/ROCK.bmp", area, false);
-					if (p == null)
-						p = scanOne("market/ROCK.bmp", getScanArea(), false);
-				}
-			}
-			// _rock = p;
-		} while (p == null && tries < 17);
+		if (p == null) {
+			LOGGER.info("looking for rock " + 2);
+
+			area = new Rectangle(_tl.x, _tl.y, getGameWidth(), getGameHeight());
+			p = scanOne("market/ROCK.bmp", area, false);
+		}
+		LOGGER.info("time: " + (System.currentTimeMillis() - start));
 		return p;
+
+		// int tries = 0;
+		// do {
+		// tries++;
+		// LOGGER.info("looking for rock " + tries);
+		// p = scanOne("market/ROCK.bmp", area, false);
+		// // writeImage(area, "admArea1.png");
+		// if (p == null) {
+		// LOGGER.info("Rock try 2 ...");
+		// if (screenSize.width > 1900) {
+		// // HD mode
+		// area = new Rectangle(_tl.x + 768, _tl.y + 155, 75, 153);
+		// } else if (screenSize.width > 1590) {
+		// // 1600x1200
+		// area = new Rectangle(_tl.x + 570, _tl.y + 133, 75, 111);
+		// }
+		//
+		// p = scanOne("market/ROCK.bmp", area, false);
+		// if (p == null) {
+		// LOGGER.info("Rock try 3 ...");
+		// if (screenSize.width > 1900) {
+		// // HD mode
+		// area = new Rectangle(_tl.x + 700, _tl.y + 70, 230, getGameHeight() - 70);
+		// } else if (screenSize.width > 1590) {
+		// // 1600x1200
+		// area = new Rectangle(_tl.x + 567, _tl.y + 70, 244, getGameHeight() - 70);
+		// }
+		// p = scanOne("market/ROCK.bmp", area, false);
+		// if (p == null)
+		// p = scanOne("market/ROCK.bmp", getScanArea(), false);
+		// }
+		// }
+		// // _rock = p;
+		// } while (p == null && tries < 17);
+		// return p;
 	}
 
 	public Pixel findRockAgain(Pixel oldRock) throws IOException, AWTException, RobotInterruptedException {
@@ -494,7 +502,7 @@ public class ScreenScanner {
 		}
 		return p;
 	}
-	
+
 	public boolean isOptimized() {
 		return _optimized && _br != null && _tl != null;
 	}
@@ -733,12 +741,12 @@ public class ScreenScanner {
 		return matches;
 	}
 
-	public List<Pixel> scanMany(String filename, Rectangle area, boolean click)
-	    throws RobotInterruptedException, IOException, AWTException {
+	public List<Pixel> scanMany(String filename, Rectangle area, boolean click) throws RobotInterruptedException,
+	    IOException, AWTException {
 		ImageData imageData = getImageData(filename);
 		if (imageData == null)
 			return new ArrayList<Pixel>(0);
-		BufferedImage	screen = new Robot().createScreenCapture(area);
+		BufferedImage screen = new Robot().createScreenCapture(area);
 		List<Pixel> matches = _matcher.findMatches(imageData.getImage(), screen, imageData.getColorToBypass());
 		if (!matches.isEmpty()) {
 			Collections.sort(matches);
@@ -769,7 +777,7 @@ public class ScreenScanner {
 		}
 		return matches;
 	}
-	
+
 	public List<Pixel> scanManyFast(ImageData imageData, BufferedImage screen, boolean click)
 	    throws RobotInterruptedException, IOException, AWTException {
 		if (imageData == null)
@@ -1339,11 +1347,11 @@ public class ScreenScanner {
 	public boolean scanMarket(Rectangle area) throws RobotInterruptedException, IOException, AWTException {
 		int err = _comparator.getErrors();
 		_comparator.setErrors(0);
-		boolean value =  scanOneFast("market/whitePixels.bmp", area, false) != null;
+		boolean value = scanOneFast("market/whitePixels.bmp", area, false) != null;
 		_comparator.setErrors(err);
 		return value;
 	}
-	
+
 	public String ocrScanMarket(Rectangle area) throws AWTException {
 		if (_ocrMarket != null) {
 			BufferedImage image = new Robot().createScreenCapture(area);
@@ -1364,15 +1372,15 @@ public class ScreenScanner {
 		if (getRock() != null) {
 			Pixel p = new Pixel(getRock());
 			try {
-	      String coords = _settings.getProperty("storageCoords", "53,-127");
-	      String ss[] = coords.split(",");
-	      p.x = p.x + Integer.parseInt(ss[0]);
-	      p.y = p.y + Integer.parseInt(ss[1]);
-      } catch (NumberFormatException e) {
-	      p.x = p.x + 53;
-	      p.x = p.y - 127;
-      }
-			
+				String coords = _settings.getProperty("storageCoords", "53,-127");
+				String ss[] = coords.split(",");
+				p.x = p.x + Integer.parseInt(ss[0]);
+				p.y = p.y + Integer.parseInt(ss[1]);
+			} catch (NumberFormatException e) {
+				p.x = p.x + 53;
+				p.x = p.y - 127;
+			}
+
 			if (ensureHome()) {
 				_mouse.click(p);
 				_mouse.delay(500);
