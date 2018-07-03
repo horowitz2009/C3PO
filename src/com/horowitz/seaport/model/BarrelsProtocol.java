@@ -60,7 +60,7 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 	@Override
 	public void execute() throws RobotInterruptedException {
 		// TODO HUNT BARRELS
-		boolean debug = true;
+		boolean debug = false;
 		try {
 
 			BufferedImage image = _scanner.getImageData("ships/LAND_VINTAGE.bmp").getImage();//was LAND5.bmp
