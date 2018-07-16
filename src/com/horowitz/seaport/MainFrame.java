@@ -74,12 +74,14 @@ import com.horowitz.monitor.GameHealthMonitor;
 import com.horowitz.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
+import com.horowitz.seaport.model.AbstractGameProtocol;
 import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
 import com.horowitz.seaport.model.BarrelsProtocol;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.FishingProtocol;
+import com.horowitz.seaport.model.IBarrelsProtocol;
 import com.horowitz.seaport.model.ImageBarrelsProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
 import com.horowitz.seaport.model.ProtocolEntry;
@@ -98,7 +100,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v149";
+	private static String APP_TITLE = "Seaport v150";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -146,7 +148,7 @@ public class MainFrame extends JFrame {
 
 	private boolean _doOCR;
 
-	private BarrelsProtocol _barrelsProtocol;
+	private IBarrelsProtocol _barrelsProtocol;
 
 	public static void main(String[] args) {
 
@@ -240,10 +242,14 @@ public class MainFrame extends JFrame {
 			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
-			_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
+			if (_settings.getBoolean("barrels.image", true)) {
+				_barrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
+			} else {
+				_barrelsProtocol = new BarrelsProtocol(_scanner, _mouse, _settings);
+			}
 			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
 			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
-			_barrelsTask.setProtocol(_barrelsProtocol);
+			_barrelsTask.setProtocol((AbstractGameProtocol)_barrelsProtocol);
 			
 //			ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
 //			_barrelsTask.setProtocol(imageBarrelsProtocol);

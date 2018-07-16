@@ -25,7 +25,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 
-public class BarrelsProtocol extends AbstractGameProtocol {
+public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsProtocol {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
@@ -204,6 +204,10 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 				int y2 = _settings.getInt("barrels.y2", 0);
 				int x3 = _settings.getInt("barrels.x3", 0);
 				int y3 = _settings.getInt("barrels.y3", 0);
+				int x4 = _settings.getInt("barrels.x4", 0);
+				int y4 = _settings.getInt("barrels.y4", 0);
+				int x5 = _settings.getInt("barrels.x5", 0);
+				int y5 = _settings.getInt("barrels.y5", 0);
 				
 				if (x1 != 0 && y1 != 0)
   				_mouse.click(x + x1, y + y1);
@@ -211,6 +215,10 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 					_mouse.click(x + x2, y + y2);
 				if (x3 != 0 && y3 != 0)
 					_mouse.click(x + x3, y + y3);
+				if (x4 != 0 && y4 != 0)
+					_mouse.click(x + x4, y + y4);
+				if (x5 != 0 && y5 != 0)
+					_mouse.click(x + x5, y + y5);
 				
 				_mouse.delay(100);
 			}
@@ -226,26 +234,32 @@ public class BarrelsProtocol extends AbstractGameProtocol {
 
 	}
 
+	@Override
 	public boolean isCapture() {
 		return _capture;
 	}
 
+	@Override
 	public void setCapture(boolean capture) {
 		_capture = capture;
 	}
 
+	@Override
 	public int getBlobMin() {
 		return blobMin;
 	}
 
+	@Override
 	public void setBlobMin(int blobMin) {
 		this.blobMin = blobMin;
 	}
 
+	@Override
 	public int getBlobMax() {
 		return blobMax;
 	}
 
+	@Override
 	public void setBlobMax(int blobMax) {
 		this.blobMax = blobMax;
 	}

@@ -403,7 +403,7 @@ public class ScreenScanner {
 
 		if (needAdjusting) {
 			//NEW ONE Pixel goodRock = new Pixel(_tl.x + 925, _tl.y + 146);
-			Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 - 25, _tl.y + 187);// was 209 + 3 // was 219
+			Pixel goodRock = new Pixel(_tl.x + getGameWidth() / 2 - 25, _tl.y + _settings.getInt("goodRock.y", 177));// was 209 + 3 // was 219
 			
 			if (Math.abs(_rock.x - goodRock.x) > 8 || Math.abs(_rock.y - goodRock.y) > 8) {
 				// need adjusting

@@ -25,7 +25,7 @@ import com.horowitz.commons.RobotInterruptedException;
 import com.horowitz.commons.Settings;
 import com.horowitz.seaport.ScreenScanner;
 
-public class ImageBarrelsProtocol extends AbstractGameProtocol {
+public class ImageBarrelsProtocol extends AbstractGameProtocol implements IBarrelsProtocol {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
@@ -90,6 +90,30 @@ public class ImageBarrelsProtocol extends AbstractGameProtocol {
 
 	public void setCapture(boolean capture) {
 		_capture = capture;
+	}
+
+	@Override
+	public void setBlobMax(int blobMax) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getBlobMax() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setBlobMin(int blobMin) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getBlobMin() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
