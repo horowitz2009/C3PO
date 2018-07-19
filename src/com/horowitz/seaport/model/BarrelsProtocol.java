@@ -63,11 +63,11 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 		boolean debug = false;
 		try {
 
-			BufferedImage image = _scanner.getImageData("ships/LAND_VINTAGE.bmp").getImage();//was LAND5.bmp
+			BufferedImage image = _scanner.getImageData("ships/LAND_VINTAGE.bmp").getImage();// was LAND5.bmp
 
 			Pixel rock = _scanner.getRock();
 			int topY = _scanner.getTopLeft().y;
-			//int yy = rock.y - topY;
+			// int yy = rock.y - topY;
 			int yy1 = rock.y - 263;
 
 			int xx1 = rock.x - 114;
@@ -97,18 +97,18 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 				fb.saveAsPNG("IMAGE.PNG");
 
 			// FILTER BROWN
-//			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 255), new IntRange(30, 255), new IntRange(0,
-//					110));
-			//FILTER AMPHORAS
+			// ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 255), new IntRange(30, 255), new IntRange(0,
+			// 110));
+			// FILTER AMPHORAS
 			int rmin = _settings.getInt("barrels.rmin", 98);
 			int rmax = _settings.getInt("barrels.rmax", 255);
 			int gmin = _settings.getInt("barrels.gmin", 148);
 			int gmax = _settings.getInt("barrels.gmax", 250);
 			int bmin = _settings.getInt("barrels.bmin", 178);
 			int bmax = _settings.getInt("barrels.bmax", 242);
-			
-			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(rmin, rmax), new IntRange(gmin, gmax), new IntRange(bmin,
-			    bmax));
+
+			ColorFiltering colorFiltering = new ColorFiltering(new IntRange(rmin, rmax), new IntRange(gmin, gmax),
+			    new IntRange(bmin, bmax));
 			colorFiltering.applyInPlace(fb);
 
 			if (fb.isRGB())
@@ -161,10 +161,10 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 					IntPoint c = blob.getCenter();
 					Pixel p = new Pixel(c.y + area.x + 0, c.x + area.y + 0);
 					LOGGER.fine("BARREL: " + p);
-					//SHIP WITH CHEST
-//					if (((p.x > _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 167)
-//							|| (p.x <= _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 69))
-//							&& p.y < _scanner.getRock().y + 126) {//to avoid store ship icon was 72
+					// SHIP WITH CHEST
+					// if (((p.x > _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 167)
+					// || (p.x <= _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 69))
+					// && p.y < _scanner.getRock().y + 126) {//to avoid store ship icon was 72
 					if (p.y > _scanner.getTopLeft().y + 69 && p.y < _scanner.getRock().y + 126) {
 						_mouse.click(p);
 						_mouse.delay(50);
@@ -185,42 +185,21 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 				}
 
 			}
-			// if (isNotInterrupted()) {
-			// // additional clicks to gem area
-			// int x = _scanner.getBottomRight().x - 170;
-			// int y = _scanner.getTopLeft().y + 42;
-			// for (int i = 0; i < 16 && isNotInterrupted(); i++) {
-			// _mouse.click(x + i * 10, y);
-			// }
-			// _mouse.delay(100);
-			// }
+
 			if (isNotInterrupted()) {
-				// additional clicks to gem area
-				int x = _scanner.getRock().x;
-				int y = _scanner.getRock().y;
-				int x1 = _settings.getInt("barrels.x1", 0);
-				int y1 = _settings.getInt("barrels.y1", 0);
-				int x2 = _settings.getInt("barrels.x2", 0);
-				int y2 = _settings.getInt("barrels.y2", 0);
-				int x3 = _settings.getInt("barrels.x3", 0);
-				int y3 = _settings.getInt("barrels.y3", 0);
-				int x4 = _settings.getInt("barrels.x4", 0);
-				int y4 = _settings.getInt("barrels.y4", 0);
-				int x5 = _settings.getInt("barrels.x5", 0);
-				int y5 = _settings.getInt("barrels.y5", 0);
-				
-				if (x1 != 0 && y1 != 0)
-  				_mouse.click(x + x1, y + y1);
-				if (x2 != 0 && y2 != 0)
-					_mouse.click(x + x2, y + y2);
-				if (x3 != 0 && y3 != 0)
-					_mouse.click(x + x3, y + y3);
-				if (x4 != 0 && y4 != 0)
-					_mouse.click(x + x4, y + y4);
-				if (x5 != 0 && y5 != 0)
-					_mouse.click(x + x5, y + y5);
-				
+				// additional clicks
+				int n = _settings.getInt("barrels.additional", 5);
+				int x = _scanner.getBottomRight().x;
+				int y = _scanner.getTopLeft().y;
+				for (int i = 0; i < n; i++) {
+					int x1 = _settings.getInt("barrels.x" + (i + 1), 0);
+					int y1 = _settings.getInt("barrels.y" + (i + 1), 0);
+					if (x1 != 0 && y1 != 0) {
+						_mouse.click(x + x1, y + y1);
+					}
+				}
 				_mouse.delay(100);
+
 			}
 			LOGGER.info("BARRELS CNT: " + cnt);
 
