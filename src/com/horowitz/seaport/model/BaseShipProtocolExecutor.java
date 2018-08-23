@@ -270,7 +270,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		// destButton = _scanner.scanOneFast("dest/collect_friend.bmp", buttonArea, false);
 		// } else if (dest.isContract()) {
 
-		destButton = _scanner.scanContractButton("dest/collect_contract_new.bmp", buttonArea);
+		destButton = _scanner.scanContractButton("dest/collect.png", buttonArea);
 		// if (destButton == null) {
 		// destButton = _scanner.scanOneFast("dest/collect_contract.bmp", buttonArea, false);
 		// }
@@ -385,12 +385,18 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		int y = p.y;
 		_mouse.click(x, y);
 		_mouse.delay(500);
-		// if (_mouse.getMode() == MouseRobot.SLOW)
-		// _mouse.delay(_settings.getInt("slow.delay", 500));
+
+		Rectangle buttonArea = _scanner.generateWindowedArea(405, 415);
+		// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
+		// _scanner.getBottomRight().y - 175, 255, 90);
+		buttonArea.y += 309;
+		buttonArea.x += 130;
+		buttonArea.width -= 130;
+		buttonArea.height = 106;
 
 		if (dest.getAbbr().startsWith("EXA")) {
 			// check is already done
-			Rectangle buttonArea = _scanner.generateWindowedArea(624, 505);
+			buttonArea = _scanner.generateWindowedArea(624, 505);
 			// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
 			// _scanner.getBottomRight().y - 175, 255, 90);
 			buttonArea.y += 411;
@@ -431,9 +437,17 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		}
 
 		// manage market
-		if (dest.getName().startsWith("Market"))
+		if (dest.getName().startsWith("Market")) {
 			good = doMarket(chain, dest);
-		else if (dest.getName().startsWith("Merchant")) {
+			buttonArea = _scanner.generateWindowedArea(624, 485);
+			// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
+			// _scanner.getBottomRight().y - 175, 255, 90);
+			buttonArea.y += 390;
+			buttonArea.x += 130;
+			buttonArea.width -= 130;
+			buttonArea.height = 67;
+
+		} else if (dest.getName().startsWith("Merchant")) {
 			Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
 			if (merchantTitle != null) {
 				int option = Integer.parseInt(dest.getOption());
@@ -452,34 +466,39 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		}
 
 		if (good) {
-			Rectangle buttonArea = _scanner.generateWindowedArea(624, 505);
-			// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
-			// _scanner.getBottomRight().y - 175, 255, 90);
-			buttonArea.y += 411;
-			buttonArea.x += 130;
-			buttonArea.width -= 130;
-			buttonArea.height = 67;
-			int opt = 4;
-			Pixel destButton = _scanner.scanOne("dest/setSail4.bmp", buttonArea, false);
-			if (destButton == null) {
-				opt = 0;
-				destButton = _scanner.scanOne("dest/setSail2.bmp", buttonArea, false);
+			String opt = "no";
+			Pixel destButton = _scanner.scanOne("dest/setSail.png", buttonArea, false);
+			if (destButton != null) {
+				opt = "set sail 1";
+			} else {
+				destButton = _scanner.scanOne("dest/setSail2.png", buttonArea, false);
+				if (destButton != null) {
+					opt = "set sail 2";
+				}
 			}
+
 			if (destButton == null) {
+				opt = "got it";
 				// check for got it button
 				LOGGER.info("CHECK FOR BLUE GOT IT...");
-				buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
-				    _scanner.getBottomRight().y - 240, 205, 240);
-				Pixel gotitButtonBlue = _scanner.scanOne("dest/gotitButton3.bmp", buttonArea, false);
-				if (gotitButtonBlue == null) {
-					gotitButtonBlue = _scanner.scanOne("dest/gotitButton2.bmp", buttonArea, false);
+				// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 75,
+				// _scanner.getBottomRight().y - 240, 205, 240);
+				Pixel gotitButton = _scanner.scanOne("dest/gotit.png", buttonArea, false);
+				if (gotitButton == null) {
+					opt = "collect";
+					gotitButton = _scanner.scanOne("dest/collect.png", buttonArea, false);
 				}
-				if (gotitButtonBlue == null) {
-					gotitButtonBlue = _scanner.scanOne("dest/GlobalOpen.bmp", buttonArea, false);
+				if (gotitButton == null) {
+					opt = "warehouses full";
+					gotitButton = _scanner.scanOne("dest/warehousesFull.png", buttonArea, false);
 				}
-				if (gotitButtonBlue != null) {
-					_mouse.click(gotitButtonBlue);
-					LOGGER.info("DESTINATION COMPLETED!");
+				if (gotitButton == null) {
+					opt = "global open";
+					gotitButton = _scanner.scanOne("dest/GlobalOpen.bmp", buttonArea, false);
+				}
+				if (gotitButton != null) {
+					_mouse.click(gotitButton);
+					LOGGER.info("DESTINATION NOT POSSIBLE: " + opt);
 					_mouse.delay(800);
 					if (_mouse.getMode() == MouseRobot.SLOW)
 						_mouse.delay(1000);
@@ -489,14 +508,14 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			} else {
 				Pixel gotitButtonRED = _scanner.scanOne("dest/gotitButton.bmp", buttonArea, false);
 				if (gotitButtonRED != null) {
-					LOGGER.info("got it...");
+					LOGGER.info("got it red ...");
 					_mouse.click(gotitButtonRED);
 					_mouse.delay(1000);
 					return false;
 				}
 			}
 			if (destButton != null) {
-				LOGGER.info("set sail " + opt);
+				LOGGER.info("destination outcome: " + opt);
 
 				_mouse.checkUserMovement();
 				_mouse.click(destButton);
