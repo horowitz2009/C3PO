@@ -241,6 +241,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 	}
 
 	protected boolean manageGlobalCase(Destination dest) throws IOException, AWTException, RobotInterruptedException {
+//		Rectangle buttonArea = _scanner.generateWindowedArea(625, 503);
+//		buttonArea.y += 411;
+//		buttonArea.x += 130;
+//		buttonArea.width -= 130;
+//		buttonArea.height = 67;
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 180,
 		    _scanner.getBottomRight().y - 240, 310, 240);
 		Pixel destButton = null;
@@ -425,6 +430,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				_mouse.delay(750);
 				_scanner.handlePopupsFast();
 			}
+			buttonArea = _scanner.generateWindowedArea(625, 503);
+			buttonArea.y += 411;
+			buttonArea.x += 130;
+			buttonArea.width -= 130;
+			buttonArea.height = 67;
 		}
 
 		// assume the dialog is open
@@ -474,6 +484,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				destButton = _scanner.scanOne("dest/setSail2.png", buttonArea, false);
 				if (destButton != null) {
 					opt = "set sail 2";
+				} else {
+					destButton = _scanner.scanOne("dest/setSail3.png", buttonArea, false);
+					if (destButton != null) {
+						opt = "set sail 3";
+					}
 				}
 			}
 
@@ -487,6 +502,15 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				if (gotitButton == null) {
 					opt = "collect";
 					gotitButton = _scanner.scanOne("dest/collect.png", buttonArea, false);
+				}
+				if (gotitButton == null) {
+					opt = "collect2";
+					Rectangle buttonArea2 = _scanner.generateWindowedArea(625, 503);
+					buttonArea2.y += 411;
+					buttonArea2.x += 130;
+					buttonArea2.width -= 130;
+					buttonArea2.height = 67;
+					gotitButton = _scanner.scanOne("dest/collect2.png", buttonArea2, false);
 				}
 				if (gotitButton == null) {
 					opt = "warehouses full";
