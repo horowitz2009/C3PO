@@ -401,13 +401,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 
 		if (dest.getAbbr().startsWith("EXA")) {
 			// check is already done
-			buttonArea = _scanner.generateWindowedArea(624, 505);
-			// buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 50,
-			// _scanner.getBottomRight().y - 175, 255, 90);
-			buttonArea.y += 411;
-			buttonArea.x += 130;
-			buttonArea.width -= 130;
-			buttonArea.height = 67;
+			//buttonArea = _scanner.generateWindowedArea(624, 505);
+			//buttonArea.y += 411;
+			//buttonArea.x += 130;
+			//buttonArea.width -= 130;
+			//buttonArea.height = 67;
 			Pixel b = _scanner.scanOne("dest/discover.bmp", buttonArea, false);
 			if (b != null) {
 				_mouse.click(b);
