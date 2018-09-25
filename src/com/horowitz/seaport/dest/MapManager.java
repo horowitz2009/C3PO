@@ -505,13 +505,14 @@ public class MapManager {
 			} else if (y > y2) {
 				dragY = y2 - y - 12;// negative -> drag north
 			}
-			int soff = 45;
+			int xoff = getSmallTown().getRelativePosition().x;
+			int yoff = getSmallTown().getRelativePosition().y;
 			// Y AXIS FIRST
 			if (dragY != 0) {
 				if (dragY > 0) {
 					// must drag south
-					if (_smallTownPos.y + soff - 3 > y1)
-						startPos = new Pixel(_smallTownPos.x + soff, _smallTownPos.y + soff);
+					if (_smallTownPos.y + yoff - 3 > y1)
+						startPos = new Pixel(_smallTownPos.x + xoff, _smallTownPos.y + yoff);
 					else
 						startPos = new Pixel(_blacksmithPos.x - 10, _blacksmithPos.y);
 					startPos = ensurePixelInArea(startPos);
@@ -534,8 +535,8 @@ public class MapManager {
 				} else {
 					// drag < 0
 					// must drag north
-					if (_smallTownPos.y + soff + 3 < y2)
-						startPos = new Pixel(_smallTownPos.x + soff, _smallTownPos.y + soff);
+					if (_smallTownPos.y + yoff + 3 < y2)
+						startPos = new Pixel(_smallTownPos.x + xoff, _smallTownPos.y + yoff);
 					else
 						startPos = new Pixel(_tailorPos.x + 50, _tailorPos.y);
 					startPos = ensurePixelInArea(startPos);
@@ -582,9 +583,9 @@ public class MapManager {
 
 			// X AXIS
 			if (dragX != 0) {
-				if (_smallTownPos.y + soff - 3 > y1) {
-					if (_smallTownPos.y + soff + 3 < y2)
-						startPos = new Pixel(_smallTownPos.x + soff, _smallTownPos.y + soff);
+				if (_smallTownPos.y + yoff - 3 > y1) {
+					if (_smallTownPos.y + yoff + 3 < y2)
+						startPos = new Pixel(_smallTownPos.x + xoff, _smallTownPos.y + yoff);
 					else
 						startPos = new Pixel(_tailorPos.x + 50, _tailorPos.y);
 				} else
@@ -616,7 +617,7 @@ public class MapManager {
 			if (y11 < y && y < y22 && x11 < x && x < x22) {
 				LOGGER.info("Ship zone! Dragging south...");
 				dragY = y22 - y - 12;
-				startPos = new Pixel(_smallTownPos.x + soff, _smallTownPos.y + soff);
+				startPos = new Pixel(_smallTownPos.x + xoff, _smallTownPos.y + yoff);
 				int startX = startPos.x;
 				int startY = startPos.y;
 				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);
@@ -641,7 +642,7 @@ public class MapManager {
 			if (y111 < y && y < y222 && x111 < x && x < x222) {
 				LOGGER.info("Ship button zone! Dragging north...");
 				dragY = y111 - y - 12;
-				startPos = new Pixel(_smallTownPos.x + soff, _smallTownPos.y + soff);
+				startPos = new Pixel(_smallTownPos.x + xoff, _smallTownPos.y + yoff);
 				int startX = startPos.x;
 				int startY = startPos.y;
 				_scanner.getMouse().drag4(startX, startY, startX, startY + dragY, true, false);

@@ -400,6 +400,10 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		buttonArea.height = 106;
 
 		if (dest.getAbbr().startsWith("EXA")) {
+			if (y - _scanner.getTopLeft().y < 50) {
+				_mouse.click(x, y + 42);
+				_mouse.delay(500);
+			}
 			// check is already done
 			//buttonArea = _scanner.generateWindowedArea(624, 505);
 			//buttonArea.y += 411;
