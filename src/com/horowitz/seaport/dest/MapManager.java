@@ -341,8 +341,9 @@ public class MapManager {
 		Destination smallTownDEST = getSmallTown();
 
 		if (_smallTownPos != null) {
-			Rectangle areaSpec = new Rectangle(_smallTownPos.x - 20, _smallTownPos.y - 20, smallTownDEST.getImageData()
-			    .getImage().getWidth() + 40, smallTownDEST.getImageData().getImage().getHeight() + 40);
+			Rectangle areaSpec = new Rectangle(_smallTownPos.x - 20, _smallTownPos.y - 20,
+			    smallTownDEST.getImageData().getImage().getWidth() + 40,
+			    smallTownDEST.getImageData().getImage().getHeight() + 40);
 
 			Pixel newSmallTownPos = _scanner.scanOneFast(smallTownDEST.getImageData(), areaSpec, false);
 			if (newSmallTownPos == null) {
@@ -355,7 +356,7 @@ public class MapManager {
 				newSmallTownPos = findSmallTown();
 				if (newSmallTownPos == null) {
 					LOGGER.info("CRITICAL! Still can't find Small Town!");
-          return; //try without having it				
+					return; // try without having it
 				}
 			}
 
@@ -393,7 +394,12 @@ public class MapManager {
 
 	public void resetDispatchEntries() throws IOException {
 		JsonStorage jsonStorage = new JsonStorage();
-		jsonStorage.saveDispatchEntries(new ArrayList<DispatchEntry>());
+		// jsonStorage.saveDispatchEntries(new ArrayList<DispatchEntry>());
+		List<DispatchEntry> allDEs = jsonStorage.loadDispatchEntries();
+		for (DispatchEntry de : allDEs) {
+			de.setTimes(0);
+		}
+		jsonStorage.saveDispatchEntries(allDEs);
 	}
 
 	PropertyChangeSupport _support = new PropertyChangeSupport(this);
@@ -425,7 +431,7 @@ public class MapManager {
 			des.add(theDE);
 		}
 		assert theDE != null;
-
+		theDE.setTime(System.currentTimeMillis());
 		jsonStorage.saveDispatchEntries(des);
 		new TripLogger().log2(ship, dest);
 		_support.firePropertyChange("TRIP_REGISTERED", null, theDE);
@@ -487,8 +493,8 @@ public class MapManager {
 		return p;
 	}
 
-	public Pixel ensureDestination(Pixel relativePosition, boolean findSmallTownAgain) throws RobotInterruptedException,
-	    AWTException, GameErrorException, IOException {
+	public Pixel ensureDestination(Pixel relativePosition, boolean findSmallTownAgain)
+	    throws RobotInterruptedException, AWTException, GameErrorException, IOException {
 		if (_smallTownPos != null) {
 			int y = _smallTownPos.y + relativePosition.y;
 			final int x1 = _mapArea.x;
@@ -571,7 +577,7 @@ public class MapManager {
 					findSmallTownAgain();
 				y = _smallTownPos.y + relativePosition.y;
 
-			}// END OF Y AXIS
+			} // END OF Y AXIS
 
 			int x = _smallTownPos.x + relativePosition.x;
 			int dragX = 0;
@@ -605,7 +611,7 @@ public class MapManager {
 				x = _smallTownPos.x + relativePosition.x;
 				y = _smallTownPos.y + relativePosition.y;
 
-			}// END OF X AXIS
+			} // END OF X AXIS
 
 			// ship area issue
 			final int y11 = _scanner._tl.y + 64;

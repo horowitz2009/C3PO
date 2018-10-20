@@ -14,7 +14,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Mickey/lib/commons-io-2.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="lib/Catalano.Core.jar"/>
 	<classpathentry kind="lib" path="lib/Catalano.Image.jar" sourcepath="/CatalanoImage"/>
 	<classpathentry kind="lib" path="lib/Catalano.Math.jar"/>
