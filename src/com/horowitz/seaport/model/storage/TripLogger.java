@@ -10,6 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.horowitz.seaport.model.Destination;
+import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.Ship;
 
 public class TripLogger {
@@ -29,6 +30,18 @@ public class TripLogger {
 			f.createNewFile();
 		return f;
 	}
+	
+	
+
+	public TripLogger(String filename) {
+		super();
+		_filename = filename;
+	}
+	
+	public TripLogger() {
+	}
+
+
 
 	public void log(Ship ship, Destination dest) throws IOException {
 		File f = getFile();
@@ -50,6 +63,12 @@ public class TripLogger {
 		File f = getFile();
 		String newLog = DateFormatUtils.format(System.currentTimeMillis(), _timePattern) + " " + dest.getAbbr() + " "
 				+ ship.getName();
+		FileUtils.writeStringToFile(f, newLog + System.lineSeparator(), true);
+	}
+
+	public void log3(DispatchEntry de) throws IOException {
+		File f = getFile();
+		String newLog = de.getLastTime() + "," + de.getDest() + "," + de.getShip();
 		FileUtils.writeStringToFile(f, newLog + System.lineSeparator(), true);
 	}
 }

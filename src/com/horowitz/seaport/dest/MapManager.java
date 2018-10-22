@@ -434,6 +434,7 @@ public class MapManager {
 		theDE.setTime(System.currentTimeMillis());
 		jsonStorage.saveDispatchEntries(des);
 		new TripLogger().log2(ship, dest);
+		new TripLogger("triplog2.txt").log3(theDE);
 		_support.firePropertyChange("TRIP_REGISTERED", null, theDE);
 
 	}
