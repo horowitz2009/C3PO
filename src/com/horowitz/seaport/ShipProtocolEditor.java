@@ -1,10 +1,8 @@
 package com.horowitz.seaport;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -35,10 +33,12 @@ import javax.swing.border.EmptyBorder;
 import org.apache.commons.lang.builder.CompareToBuilder;
 
 import com.horowitz.seaport.dest.MapManager;
+import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.JsonStorage;
+import com.horowitz.seaport.optimize.Solution;
 
 public class ShipProtocolEditor extends JPanel {
 
@@ -174,6 +174,26 @@ public class ShipProtocolEditor extends JPanel {
 			setVisible(false);
 		}
 	}
+	
+	public void applySolution(Solution solution) {
+		for (DispatchEntry	de : solution.ships) {
+			ProtocolEntry pe = new ProtocolEntry();
+			pe.setChainStr(solution.destination + "-1,G-199");
+			pe.setShipName(de.getShip());
+			ProtocolEntryView pev = new ProtocolEntryView();
+			ComboBoxModel<Ship> m = pev._shipFieldCB.getModel();
+			int n = m.getSize();
+			for (int i = 0; i < n; i++) {
+				if (m.getElementAt(i).getName().equals(pe.getShipName())) {
+					pev._shipFieldCB.setSelectedIndex(i);
+				}
+			}
+			pev._destField.setText(pe.getChainStr());
+			_box.add(pev);
+			
+		}
+		_box.revalidate();
+	}
 
 	private void addRow() {
 		_box.add(new ProtocolEntryView());
@@ -254,10 +274,12 @@ public class ShipProtocolEditor extends JPanel {
 			Ship rest = new Ship("<Rest>");
 			Ship unknown = new Ship("<Unknown>");
 			Ship custom = new Ship("<CUSTOM>");
+			Ship customLast = new Ship("<CUSTOM-LAST>");
 			//ships.add(0, all);
 			ships.add(0, rest);
 			ships.add(1, unknown);
 			ships.add(2, custom);
+			ships.add(3, customLast);
 			// ships.add(0, select);
 
 			_shipFieldCB = new JComboBox<Ship>(ships.toArray(new Ship[0]));

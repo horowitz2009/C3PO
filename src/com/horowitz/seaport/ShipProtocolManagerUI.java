@@ -2,7 +2,6 @@ package com.horowitz.seaport;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -30,6 +29,7 @@ import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.storage.JsonStorage;
+import com.horowitz.seaport.optimize.Solution;
 
 public class ShipProtocolManagerUI extends JPanel {
 
@@ -375,6 +375,10 @@ public class ShipProtocolManagerUI extends JPanel {
 			}
 		}
 
+	}
+	
+	public void applySolution(Solution solution) {
+		_editor.applySolution(solution);
 	}
 
 }
