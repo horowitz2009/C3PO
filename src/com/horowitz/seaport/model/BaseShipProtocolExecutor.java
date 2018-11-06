@@ -191,7 +191,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 						} else {
 							// 2. check for shipwreck award
 							// _scanner.writeArea(_scanner._popupAreaB, "shipwreck_area.jpg");
-							Pixel cb = _scanner.scanOneFast(_scanner.getImageData("collect.bmp"), _scanner._popupAreaB, false);
+							Pixel cb = _scanner.scanOneFast(_scanner.getImageData("dest/collect3.png"), _scanner._popupAreaB, false);
 
 							if (cb != null) {
 								_scanner.writeAreaTS(_scanner._popupArea, "shipwreck_reward");
