@@ -224,7 +224,8 @@ public class BalancedShipProtocolExecutor extends BaseShipProtocolExecutor {
 			for (ProtocolEntry protocolEntry : entries) {
 				if (protocolEntry.getShipName().equals("<CUSTOM-LAST>")) {
 					pe = doCustom(ship, protocolEntry);
-					break;
+					if (pe != null)
+						break;
 				}
 			}
 		}
