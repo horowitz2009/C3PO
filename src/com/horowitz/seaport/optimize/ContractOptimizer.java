@@ -27,12 +27,15 @@ public class ContractOptimizer {
 	private int min;
 	private int max;
 	private int solutionsLimit;
+	private int precission = 5;
+	private int solutionsLimit2;
 
 	public ContractOptimizer(int min, int max, int solutionsLimit) {
 		super();
 		this.min = min;
 		this.max = max;
 		this.solutionsLimit = solutionsLimit;
+		this.solutionsLimit2 = solutionsLimit;
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -40,11 +43,24 @@ public class ContractOptimizer {
 		co.init();
 		co.loadShipsLog();
 
-		List<Solution> solutions = co.getSolutionFor(276);
+		List<Solution> solutions = co.getSolutionForFAST(4314);
 		co.printSolutions(solutions);
 	}
 
 	public List<Solution> getSolutionFor(int cap) {
+		precission = 5;
+		solutionsLimit = solutionsLimit2;
+		_solutions.clear();
+		List<DispatchEntry> solution = new ArrayList<>();
+		getFirstShipFor(new ArrayList<>(shipsLog), cap, solution);
+		// printLog(solution);
+		return _solutions;
+		
+	}
+	
+	public List<Solution> getSolutionForFAST(int cap) {
+		precission = 0;
+		solutionsLimit = 5;
 		_solutions.clear();
 		List<DispatchEntry> solution = new ArrayList<>();
 		getFirstShipFor(new ArrayList<>(shipsLog), cap, solution);
@@ -106,7 +122,7 @@ public class ContractOptimizer {
 		int sum = calcSum(solution);
 		if (sum >= goal) {
 			// we're done
-			if (sum - goal <= 5)
+			if (sum - goal <= precission)
 				registerSolution(solution);
 		} else {
 			for (DispatchEntry de : log) {
@@ -379,9 +395,19 @@ public class ContractOptimizer {
 				map.put(de.getShip(), de);
 			}
 		}
+		
 
 		shipsLog = new ArrayList<>(map.values());
 
+		//remove not-favorite ones
+		List<DispatchEntry> toRemove = new ArrayList<>();
+		for (DispatchEntry de : shipsLog) {
+			if (!de.getShipObj().isFavorite()) {
+				toRemove.add(de);
+			}
+		}
+		shipsLog.removeAll(toRemove);
+		
 		// sort by arrival
 		sortLogByArrival(shipsLog);
 

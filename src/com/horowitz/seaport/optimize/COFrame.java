@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -24,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
 public class COFrame extends JFrame {
+	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
 	PropertyChangeSupport support;
 
@@ -82,13 +84,29 @@ public class COFrame extends JFrame {
 		toolbar.add(goalTF);
 		reload();
 		// Calculate
+//		{
+//			AbstractAction action = new AbstractAction("Calc") {
+//				public void actionPerformed(ActionEvent e) {
+//					Thread myThread = new Thread(new Runnable() {
+//						@Override
+//						public void run() {
+//							calculate(false);
+//						}
+//
+//					});
+//
+//					myThread.start();
+//				}
+//			};
+//			toolbar.add(action);
+//		}
 		{
-			AbstractAction action = new AbstractAction("Calculate") {
+			AbstractAction action = new AbstractAction("Calc") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
 						@Override
 						public void run() {
-							calculate();
+							calculate(true);
 						}
 
 					});
@@ -109,21 +127,28 @@ public class COFrame extends JFrame {
 
 	}
 
-	private void calculate() {
+	private void calculate(boolean fast) {
 		try {
-			ContractOptimizer co = new ContractOptimizer(Integer.parseInt(minTF.getText()), Integer.parseInt(maxTF.getText()), 500);
+			ContractOptimizer co = new ContractOptimizer(Integer.parseInt(minTF.getText()), Integer.parseInt(maxTF.getText()),
+			    500);
 			co.init();
 			co.loadShipsLog();
+			List<Solution> solutions;
+			if (fast) {
+				solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()));
+			} else {
+				solutions = co.getSolutionFor(Integer.parseInt(goalTF.getText()));
 
-			List<Solution> solutions = co.getSolutionFor(Integer.parseInt(goalTF.getText()));
+			}
 			co.printSolutions(solutions);
 			solutions = sortByPrecission(solutions, 5);
 			for (Solution s : solutions) {
 				s.destination = destTF.getText();
 			}
 			displaySolutions(solutions);
+			LOGGER.info("solutions: " + solutions.size());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			LOGGER.info("Error finding solutions: " + e.getMessage());
 			e.printStackTrace();
 		}
 
