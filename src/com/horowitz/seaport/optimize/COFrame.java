@@ -84,24 +84,24 @@ public class COFrame extends JFrame {
 		toolbar.add(goalTF);
 		reload();
 		// Calculate
-//		{
-//			AbstractAction action = new AbstractAction("Calc") {
-//				public void actionPerformed(ActionEvent e) {
-//					Thread myThread = new Thread(new Runnable() {
-//						@Override
-//						public void run() {
-//							calculate(false);
-//						}
-//
-//					});
-//
-//					myThread.start();
-//				}
-//			};
-//			toolbar.add(action);
-//		}
 		{
-			AbstractAction action = new AbstractAction("Calc") {
+			AbstractAction action = new AbstractAction("Calc1") {
+				public void actionPerformed(ActionEvent e) {
+					Thread myThread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							calculate(false);
+						}
+
+					});
+
+					myThread.start();
+				}
+			};
+			toolbar.add(action);
+		}
+		{
+			AbstractAction action = new AbstractAction("Calc2") {
 				public void actionPerformed(ActionEvent e) {
 					Thread myThread = new Thread(new Runnable() {
 						@Override
@@ -121,25 +121,20 @@ public class COFrame extends JFrame {
 	}
 
 	private void reload() {
-		minTF.setText("100");
-		maxTF.setText("400");
+		minTF.setText("194");
+		maxTF.setText("499");
 		destTF.setText("E");
 
 	}
 
-	private void calculate(boolean fast) {
+	private void calculate(boolean minusMeansLast) {
 		try {
 			ContractOptimizer co = new ContractOptimizer(Integer.parseInt(minTF.getText()), Integer.parseInt(maxTF.getText()),
 			    500);
+			co.setMinusMeansLast(minusMeansLast);
 			co.init();
 			co.loadShipsLog();
-			List<Solution> solutions;
-			if (fast) {
-				solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()));
-			} else {
-				solutions = co.getSolutionFor(Integer.parseInt(goalTF.getText()));
-
-			}
+			List<Solution> solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()));
 			co.printSolutions(solutions);
 			solutions = sortByPrecission(solutions, 5);
 			for (Solution s : solutions) {

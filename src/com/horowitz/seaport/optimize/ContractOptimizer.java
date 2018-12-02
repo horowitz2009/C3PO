@@ -29,6 +29,7 @@ public class ContractOptimizer {
 	private int solutionsLimit;
 	private int precission = 5;
 	private int solutionsLimit2;
+	private boolean minusMeansLast = false;
 
 	public ContractOptimizer(int min, int max, int solutionsLimit) {
 		super();
@@ -43,7 +44,7 @@ public class ContractOptimizer {
 		co.init();
 		co.loadShipsLog();
 
-		List<Solution> solutions = co.getSolutionForFAST(4314);
+		List<Solution> solutions = co.getSolutionForFAST(3661);
 		co.printSolutions(solutions);
 	}
 
@@ -364,14 +365,7 @@ public class ContractOptimizer {
 			}
 		};
 
-		// add the rest of fleet
-		List<DispatchEntry> toAdd = new ArrayList<>();
-		for (Ship ship : ships) {
-			if (ship.isActive() && ship.isFavorite() && !shipInLog(ship.getName())) {
-				toAdd.add(createDE(ship.getName(), "E", 0));
-			}
-		}
-		shipsLog.addAll(toAdd);
+
 
 		for (DispatchEntry de : shipsLog) {
 			try {
@@ -385,7 +379,7 @@ public class ContractOptimizer {
 		for (DispatchEntry de : shipsLog) {
 			if (System.currentTimeMillis() - de.willArriveAt() > 5 * 60000) {
 				// too old
-				continue;
+				//continue;
 			}
 			if (map.containsKey(de.getShip())) {
 				DispatchEntry deOld = map.get(de.getShip());
@@ -396,6 +390,14 @@ public class ContractOptimizer {
 			}
 		}
 		
+		// add the rest of fleet
+		List<DispatchEntry> toAdd = new ArrayList<>();
+		for (Ship ship : ships) {
+			if (ship.isActive() && ship.isFavorite() && !shipInLog(ship.getName())) {
+				toAdd.add(createDE(ship.getName(), "E", 0));
+			}
+		}
+		shipsLog.addAll(toAdd);
 
 		shipsLog = new ArrayList<>(map.values());
 
@@ -407,6 +409,18 @@ public class ContractOptimizer {
 			}
 		}
 		shipsLog.removeAll(toRemove);
+		
+		if (minusMeansLast) {
+			for (DispatchEntry de : shipsLog) {
+				if (System.currentTimeMillis() -  de.willArriveAt() > 5000) {
+					de.setDest("E");
+					de.setDestObj(getDestinationByAbbr(de.getDest()));
+					
+					de.setTime(System.currentTimeMillis() +  1000);//de.getDestObj().getTime() * 60000 +
+				}
+			}
+			
+		}
 		
 		// sort by arrival
 		sortLogByArrival(shipsLog);
@@ -482,6 +496,14 @@ public class ContractOptimizer {
 				return (int) (de1.willArriveAt() - de2.willArriveAt());
 			}
 		});
+	}
+
+	public boolean isMinusMeansLast() {
+		return minusMeansLast;
+	}
+
+	public void setMinusMeansLast(boolean minusMeansLast) {
+		this.minusMeansLast = minusMeansLast;
 	}
 
 }

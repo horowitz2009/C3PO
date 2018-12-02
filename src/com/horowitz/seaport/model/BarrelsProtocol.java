@@ -169,13 +169,13 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 						_mouse.click(p);
 						_mouse.delay(50);
 
-						p.x += 6;
-						p.y += 6;
+						p.x += _settings.getInt("barrels.xOff1", 6);
+						p.y += _settings.getInt("barrels.yOff1", 6);
 						_mouse.click(p);
 						_mouse.delay(50);
 
-						p.x -= 12;
-						p.y -= 6;
+						p.x += _settings.getInt("barrels.xOff2", -12);
+						p.y += _settings.getInt("barrels.yOff2", -6);
 						_mouse.click(p);
 						_mouse.delay(100);
 						if (_capture) {
