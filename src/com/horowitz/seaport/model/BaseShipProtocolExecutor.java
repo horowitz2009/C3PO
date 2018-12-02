@@ -410,7 +410,7 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			//buttonArea.x += 130;
 			//buttonArea.width -= 130;
 			//buttonArea.height = 67;
-			Pixel b = _scanner.scanOne("dest/discover.bmp", buttonArea, false);
+			Pixel b = _scanner.scanOne("dest/discover.png", buttonArea, false);
 			if (b != null) {
 				_mouse.click(b);
 				return false;
