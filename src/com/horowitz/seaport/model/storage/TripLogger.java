@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 
+import com.horowitz.commons.DateUtils;
 import com.horowitz.seaport.model.Destination;
 import com.horowitz.seaport.model.DispatchEntry;
 import com.horowitz.seaport.model.Ship;
@@ -63,7 +64,21 @@ public class TripLogger {
 		File f = getFile();
 		String newLog = DateFormatUtils.format(System.currentTimeMillis(), _timePattern) + " " + dest.getAbbr() + " "
 				+ ship.getName();
+
+		long size = FileUtils.sizeOf(f);
+		if (size > 100000) { //100kb
+			File d = new File(_folder);
+			if (!d.exists()) {
+				d.mkdirs();
+			}
+			
+			File f2 = new File(d, "backup " + DateUtils.formatDateForFile(System.currentTimeMillis()) + " " + _filename);
+			FileUtils.copyFile(f, f2);
+			FileUtils.writeStringToFile(f, "<previous log backed>" + System.lineSeparator());
+		}
+		
 		FileUtils.writeStringToFile(f, newLog + System.lineSeparator(), true);
+
 	}
 
 	public void log3(DispatchEntry de) throws IOException {

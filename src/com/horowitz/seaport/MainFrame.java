@@ -89,6 +89,8 @@ import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
 import com.horowitz.seaport.model.storage.JsonStorage;
+import com.horowitz.seaport.optimize.COFrame;
+import com.horowitz.seaport.optimize.Solution;
 
 import Catalano.Core.IntRange;
 import Catalano.Imaging.FastBitmap;
@@ -100,7 +102,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v154a";
+	private static String APP_TITLE = "Seaport v155b";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -249,10 +251,10 @@ public class MainFrame extends JFrame {
 			}
 			_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
 			_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
-			_barrelsTask.setProtocol((AbstractGameProtocol)_barrelsProtocol);
-			
-//			ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
-//			_barrelsTask.setProtocol(imageBarrelsProtocol);
+			_barrelsTask.setProtocol((AbstractGameProtocol) _barrelsProtocol);
+
+			// ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
+			// _barrelsTask.setProtocol(imageBarrelsProtocol);
 			_tasks.add(_barrelsTask);
 
 			_stopAllThreads = false;
@@ -903,6 +905,7 @@ public class MainFrame extends JFrame {
 		// RUN MAGIC
 		{
 			AbstractAction action = new AbstractAction("Run") {
+
 				public void actionPerformed(ActionEvent e) {
 					runMagic();
 				}
@@ -912,6 +915,7 @@ public class MainFrame extends JFrame {
 		}
 		// SCAN AND RUN MAGIC
 		{
+
 			AbstractAction action = new AbstractAction("SRun") {
 				public void actionPerformed(ActionEvent e) {
 					_mapManager.reset();
@@ -984,7 +988,7 @@ public class MainFrame extends JFrame {
 						@Override
 						public void run() {
 							try {
-								//testMap();
+								// testMap();
 								_scanner.findRockAgain(_scanner.getRock());
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -1007,236 +1011,257 @@ public class MainFrame extends JFrame {
 		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 
-		// SCAN
+		// SHIPS
+		_fishToggle = new JToggleButton("Fish");
+		// _fishToggle.setSelected(true);
+		_fishToggle.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				_fishTask.setEnabled(b);
+				_settings.setProperty("fish", "" + b);
+				_settings.saveSettingsSorted();
+			}
+		});
+		// toolbar.add(_fishToggle);
+
+		// SHIPS
+		_shipsToggle = new JToggleButton("Ships");
+		// _shipsToggle.setSelected(true);
+		_shipsToggle.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				_shipsTask.setEnabled(b);
+				_settings.setProperty("ships", "" + b);
+				_settings.saveSettingsSorted();
+			}
+		});
+		toolbar.add(_shipsToggle);
+
+		// BUILDINGS
+		_industriesToggle = new JToggleButton("Industries");
+		// _industriesToggle.setSelected(true);
+		_industriesToggle.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				_buildingsTask.setEnabled(b);
+				_settings.setProperty("industries", "" + b);
+				_settings.saveSettingsSorted();
+
+			}
+		});
+		// toolbar.add(_industriesToggle);
+
+		// BARRELS
+		_barrelsSToggle = new JToggleButton("BS");
+		// _industriesToggle.setSelected(true);
+		_barrelsSToggle.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				// if (b && _barrelsAToggle.isSelected())
+				// _barrelsAToggle.setSelected(false);
+
+				_barrelsTask.setEnabled(b);
+				_settings.setProperty("barrelsS", "" + b);
+				_settings.saveSettingsSorted();
+
+			}
+		});
+		toolbar.add(_barrelsSToggle);
+
+		// _barrelsAToggle = new JToggleButton("BA");
+		// // _industriesToggle.setSelected(true);
+		// _barrelsAToggle.addItemListener(new ItemListener() {
+		// @Override
+		// public void itemStateChanged(ItemEvent e) {
+		// boolean b = e.getStateChange() == ItemEvent.SELECTED;
+		// if (b && _barrelsSToggle.isSelected())
+		// _barrelsSToggle.setSelected(false);
+		// _settings.setProperty("barrelsA", "" + b);
+		// _settings.saveSettingsSorted();
+		//
+		// }
+		// });
+		// toolbar.add(_barrelsAToggle);
+
+		_fullScreenToggle = new JToggleButton("FS");
+		_fullScreenToggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				LOGGER.info("Full Screen mode: " + (b ? "on" : "off"));
+				_settings.setProperty("fullScreen", "" + b);
+				_settings.saveSettingsSorted();
+			}
+		});
+		// _slowToggle.setSelected(false);
+		toolbar.add(_fullScreenToggle);
+
+		_miniLayoutToggle = new JToggleButton("ML");
+		_miniLayoutToggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				LOGGER.info("Mini Layout mode: " + (b ? "on" : "off"));
+				_settings.setProperty("miniLayout", "" + b);
+				_settings.saveSettingsSorted();
+				transformLayout();
+			}
+		});
+		// _slowToggle.setSelected(false);
+		toolbar.add(_miniLayoutToggle);
+
+		_autoRefreshToggle = new JToggleButton("AR");
+		_autoRefreshToggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				LOGGER.info("Auto Refresh mode: " + (b ? "on" : "off"));
+				_settings.setProperty("autoRefresh", "" + b);
+				_settings.saveSettingsSorted();
+			}
+		});
+		// _slowToggle.setSelected(false);
+		toolbar.add(_autoRefreshToggle);
+
+		_autoSailorsToggle = new JToggleButton("AS");
+		// _autoSailorsToggle.setSelected(false);
+		_autoSailorsToggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				LOGGER.info("AutoSailors mode: " + (b ? "on" : "off"));
+				if (!b) {
+					_speedTime = null;
+				}
+				_settings.setProperty("autoSailors", "" + b);
+				_settings.saveSettingsSorted();
+
+			}
+		});
+
+		// toolbar.add(_autoSailorsToggle);
+
+		// /////////////
+
+		_slowToggle = new JToggleButton("SL");
+		_slowToggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				if (b)
+					_mouse.setMode(MouseRobot.SLOW);
+				else
+					_mouse.setMode(MouseRobot.NORMAL);
+
+				LOGGER.info("Slow mode: " + (b ? "on" : "off"));
+				_settings.setProperty("slow", "" + b);
+				_settings.saveSettingsSorted();
+			}
+		});
+		// _slowToggle.setSelected(false);
+		toolbar.add(_slowToggle);
+
+		// /////////////
+
+		_pingToggle = new JToggleButton("P1");
+		// _autoSailorsToggle.setSelected(false);
+		_pingToggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				LOGGER.info("Ping: " + (b ? "on" : "off"));
+				_settings.setProperty("ping", "" + b);
+				_settings.saveSettingsSorted();
+
+			}
+		});
+
+		// toolbar.add(_pingToggle);
+
+		_ping2Toggle = new JToggleButton("Ps");
+		// _autoSailorsToggle.setSelected(false);
+		_ping2Toggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				// _barrelsProtocol.setCapture(false);// TODO OFF FOR GOOD!!!! move it to settings, motherfucker!
+				LOGGER.info("Ping2: " + (b ? "on" : "off"));
+				_settings.setProperty("ping2", "" + b);
+				_settings.saveSettingsSorted();
+
+			}
+		});
+
+		toolbar.add(_ping2Toggle);
+
+		_ping3Toggle = new JToggleButton("Pm");
+		// _autoSailorsToggle.setSelected(false);
+		_ping3Toggle.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				boolean b = e.getStateChange() == ItemEvent.SELECTED;
+				LOGGER.info("Ping3: " + (b ? "on" : "off"));
+				_settings.setProperty("ping3", "" + b);
+				_settings.saveSettingsSorted();
+
+			}
+		});
+
+		toolbar.add(_ping3Toggle);
+
+		// CONTRACT OPTIMIZER Button
 		{
-			// SHIPS
-			_fishToggle = new JToggleButton("Fish");
-			// _fishToggle.setSelected(true);
-			_fishToggle.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					_fishTask.setEnabled(b);
-					_settings.setProperty("fish", "" + b);
-					_settings.saveSettingsSorted();
-				}
-			});
-			// toolbar.add(_fishToggle);
-
-			// SHIPS
-			_shipsToggle = new JToggleButton("Ships");
-			// _shipsToggle.setSelected(true);
-			_shipsToggle.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					_shipsTask.setEnabled(b);
-					_settings.setProperty("ships", "" + b);
-					_settings.saveSettingsSorted();
-				}
-			});
-			toolbar.add(_shipsToggle);
-
-			// BUILDINGS
-			_industriesToggle = new JToggleButton("Industries");
-			// _industriesToggle.setSelected(true);
-			_industriesToggle.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					_buildingsTask.setEnabled(b);
-					_settings.setProperty("industries", "" + b);
-					_settings.saveSettingsSorted();
-
-				}
-			});
-			// toolbar.add(_industriesToggle);
-
-			// BARRELS
-			_barrelsSToggle = new JToggleButton("BS");
-			// _industriesToggle.setSelected(true);
-			_barrelsSToggle.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					// if (b && _barrelsAToggle.isSelected())
-					// _barrelsAToggle.setSelected(false);
-
-					_barrelsTask.setEnabled(b);
-					_settings.setProperty("barrelsS", "" + b);
-					_settings.saveSettingsSorted();
-
-				}
-			});
-			toolbar.add(_barrelsSToggle);
-
-			// _barrelsAToggle = new JToggleButton("BA");
-			// // _industriesToggle.setSelected(true);
-			// _barrelsAToggle.addItemListener(new ItemListener() {
-			// @Override
-			// public void itemStateChanged(ItemEvent e) {
-			// boolean b = e.getStateChange() == ItemEvent.SELECTED;
-			// if (b && _barrelsSToggle.isSelected())
-			// _barrelsSToggle.setSelected(false);
-			// _settings.setProperty("barrelsA", "" + b);
-			// _settings.saveSettingsSorted();
-			//
-			// }
-			// });
-			// toolbar.add(_barrelsAToggle);
-
-			_fullScreenToggle = new JToggleButton("FS");
-			_fullScreenToggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					LOGGER.info("Full Screen mode: " + (b ? "on" : "off"));
-					_settings.setProperty("fullScreen", "" + b);
-					_settings.saveSettingsSorted();
-				}
-			});
-			// _slowToggle.setSelected(false);
-			toolbar.add(_fullScreenToggle);
-
-			_miniLayoutToggle = new JToggleButton("ML");
-			_miniLayoutToggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					LOGGER.info("Mini Layout mode: " + (b ? "on" : "off"));
-					_settings.setProperty("miniLayout", "" + b);
-					_settings.saveSettingsSorted();
-					transformLayout();
-				}
-			});
-			// _slowToggle.setSelected(false);
-			toolbar.add(_miniLayoutToggle);
-
-			_autoRefreshToggle = new JToggleButton("AR");
-			_autoRefreshToggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					LOGGER.info("Auto Refresh mode: " + (b ? "on" : "off"));
-					_settings.setProperty("autoRefresh", "" + b);
-					_settings.saveSettingsSorted();
-				}
-			});
-			// _slowToggle.setSelected(false);
-			toolbar.add(_autoRefreshToggle);
-
-			_autoSailorsToggle = new JToggleButton("AS");
-			// _autoSailorsToggle.setSelected(false);
-			_autoSailorsToggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					LOGGER.info("AutoSailors mode: " + (b ? "on" : "off"));
-					if (!b) {
-						_speedTime = null;
+			AbstractAction action = new AbstractAction("CO") {
+				public void actionPerformed(ActionEvent e) {
+					if (coFrame == null) {
+					  coFrame = new COFrame();
+					  coFrame.addPropertyChangeListener(new PropertyChangeListener() {
+							
+							@Override
+							public void propertyChange(PropertyChangeEvent evt) {
+								_shipProtocolManagerUI.applySolution((Solution) evt.getNewValue());
+							}
+						});
 					}
-					_settings.setProperty("autoSailors", "" + b);
-					_settings.saveSettingsSorted();
+					coFrame.setVisible(true);
+					// TODO open a Contract Optimizer window
 
+					// Thread myThread = new Thread(new Runnable() {
+					// @Override
+					// public void run() {
+					// try {
+					// //testMap();
+					// _scanner.findRockAgain(_scanner.getRock());
+					// } catch (Exception e) {
+					// e.printStackTrace();
+					// }
+					// }
+					//
+					// });
+					//
+					// myThread.start();
 				}
-			});
-
-			// toolbar.add(_autoSailorsToggle);
-
-			// /////////////
-
-			_slowToggle = new JToggleButton("SL");
-			_slowToggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					if (b)
-						_mouse.setMode(MouseRobot.SLOW);
-					else
-						_mouse.setMode(MouseRobot.NORMAL);
-
-					LOGGER.info("Slow mode: " + (b ? "on" : "off"));
-					_settings.setProperty("slow", "" + b);
-					_settings.saveSettingsSorted();
-				}
-			});
-			// _slowToggle.setSelected(false);
-			toolbar.add(_slowToggle);
-
-			// /////////////
-
-			_pingToggle = new JToggleButton("P1");
-			// _autoSailorsToggle.setSelected(false);
-			_pingToggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					LOGGER.info("Ping: " + (b ? "on" : "off"));
-					_settings.setProperty("ping", "" + b);
-					_settings.saveSettingsSorted();
-
-				}
-			});
-
-			toolbar.add(_pingToggle);
-
-			_ping2Toggle = new JToggleButton("P2");
-			// _autoSailorsToggle.setSelected(false);
-			_ping2Toggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					//_barrelsProtocol.setCapture(false);// TODO OFF FOR GOOD!!!! move it to settings, motherfucker!
-					LOGGER.info("Ping2: " + (b ? "on" : "off"));
-					_settings.setProperty("ping2", "" + b);
-					_settings.saveSettingsSorted();
-
-				}
-			});
-
-			toolbar.add(_ping2Toggle);
-
-			_ping3Toggle = new JToggleButton("P3");
-			// _autoSailorsToggle.setSelected(false);
-			_ping3Toggle.addItemListener(new ItemListener() {
-
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					boolean b = e.getStateChange() == ItemEvent.SELECTED;
-					LOGGER.info("Ping3: " + (b ? "on" : "off"));
-					_settings.setProperty("ping3", "" + b);
-					_settings.saveSettingsSorted();
-
-				}
-			});
-
-			toolbar.add(_ping3Toggle);
-
-			// _xpToggle = new JToggleButton("XP");
-			// _xpToggle.setSelected(_mapManager.getMarketStrategy().equals("XP"));
-			// _xpToggle.addItemListener(new ItemListener() {
-			//
-			// @Override
-			// public void itemStateChanged(ItemEvent e) {
-			// boolean b = e.getStateChange() == ItemEvent.SELECTED;
-			// String strategy = b ? "XP" : "COINS";
-			// LOGGER.info("MARKET STRATEGY: " + strategy);
-			// _mapManager.setMarketStrategy(strategy);
-			// }
-			// });
-			// toolbar.add(_xpToggle);
-
+			};
+			toolbar.add(action);
 		}
+
 		return toolbar;
 	}
 
+	private COFrame coFrame = null;
+	
 	protected void transformLayout() {
 		Thread t = new Thread(new Runnable() {
 			public void run() {
@@ -2099,7 +2124,7 @@ public class MainFrame extends JFrame {
 
 	private Long _speedTime = null;
 
-	//private BarrelsProtocol _barrelsProtocol;
+	// private BarrelsProtocol _barrelsProtocol;
 
 	private void scanSailors() {
 		Pixel sailorsPos = _scanner.getSailorsPos();
@@ -2193,10 +2218,10 @@ public class MainFrame extends JFrame {
 		}
 
 		boolean ships = "true".equalsIgnoreCase(_settings.getProperty("ships"));
-		//if (ships != _shipsToggle.isSelected()) {
+		// if (ships != _shipsToggle.isSelected()) {
 		_shipsToggle.setSelected(ships);
 		_shipsTask.setEnabled(ships);
-		//}
+		// }
 
 		boolean industries = "true".equalsIgnoreCase(_settings.getProperty("industries"));
 		if (industries != _industriesToggle.isSelected()) {
@@ -2280,8 +2305,8 @@ public class MainFrame extends JFrame {
 			setProtocol(sp);
 		}
 
-//		_barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
-//		_barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
+		// _barrelsProtocol.setBlobMin(_settings.getInt("barrels.blobMin", 15 * 20));
+		// _barrelsProtocol.setBlobMax(_settings.getInt("barrels.blobMax", 28 * 32));
 
 	}
 
