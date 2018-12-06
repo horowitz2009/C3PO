@@ -52,28 +52,33 @@ public class COFrame extends JFrame {
 		getContentPane().add(toolbars, BorderLayout.NORTH);
 		JToolBar toolbar1 = createToolbar1();
 		toolbars.add(toolbar1);
+		JToolBar toolbar2 = createToolbar2();
+		toolbars.add(toolbar2);
 
 		main = new JPanel(new BorderLayout());
 		getContentPane().add(main);
 
 	}
 
+	private JTextField limitTF;
 	private JTextField minTF;
 	private JTextField maxTF;
 	private JTextField destTF;
 	private JTextField goalTF;
 	private JScrollPane scrollPane;
 
-	private JToolBar createToolbar1() {
 
+	private JToolBar createToolbar1() {
+		
 		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
-
+		
 		minTF = new JTextField(5);
-
+		
 		maxTF = new JTextField(5);
 		destTF = new JTextField(5);
 		goalTF = new JTextField(10);
+		limitTF = new JTextField(5);
 		toolbar.add(new JLabel("from "));
 		toolbar.add(minTF);
 		toolbar.add(new JLabel("to "));
@@ -92,9 +97,9 @@ public class COFrame extends JFrame {
 						public void run() {
 							calculate(false);
 						}
-
+						
 					});
-
+					
 					myThread.start();
 				}
 			};
@@ -108,9 +113,9 @@ public class COFrame extends JFrame {
 						public void run() {
 							calculate(true);
 						}
-
+						
 					});
-
+					
 					myThread.start();
 				}
 			};
@@ -119,11 +124,25 @@ public class COFrame extends JFrame {
 		toolbar.add(new JLabel("    "));
 		return toolbar;
 	}
+	
+	private JToolBar createToolbar2() {
 
+		JToolBar toolbar = new JToolBar();
+		toolbar.setFloatable(false);
+
+		//limitTF = new JTextField(5);
+
+		toolbar.add(new JLabel("limit "));
+		toolbar.add(limitTF);
+		return toolbar;
+	}
+	
+	
 	private void reload() {
-		minTF.setText("194");
-		maxTF.setText("499");
+		minTF.setText("210");
+		maxTF.setText("700");
 		destTF.setText("E");
+		limitTF.setText("7");
 
 	}
 
@@ -134,12 +153,24 @@ public class COFrame extends JFrame {
 			co.setMinusMeansLast(minusMeansLast);
 			co.init();
 			co.loadShipsLog();
-			List<Solution> solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()));
+			List<Solution> solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), 0);
+			
 			co.printSolutions(solutions);
 			solutions = sortByPrecission(solutions, 5);
 			for (Solution s : solutions) {
 				s.destination = destTF.getText();
 			}
+			
+			List<Solution> solutions2 = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), Integer.parseInt(limitTF.getText()));
+			
+			co.printSolutions(solutions2);
+			solutions = sortByPrecission(solutions2, 5);
+			for (Solution s : solutions2) {
+				s.destination = destTF.getText();
+			}
+			
+			
+			
 			displaySolutions(solutions);
 			LOGGER.info("solutions: " + solutions.size());
 		} catch (IOException e) {

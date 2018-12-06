@@ -44,7 +44,7 @@ public class ContractOptimizer {
 		co.init();
 		co.loadShipsLog();
 
-		List<Solution> solutions = co.getSolutionForFAST(3661);
+		List<Solution> solutions = co.getSolutionForFAST(3661, 0);
 		co.printSolutions(solutions);
 	}
 
@@ -59,9 +59,9 @@ public class ContractOptimizer {
 		
 	}
 	
-	public List<Solution> getSolutionForFAST(int cap) {
-		precission = 0;
-		solutionsLimit = 5;
+	public List<Solution> getSolutionForFAST(int cap, int precissionArg) {
+		precission = precissionArg;
+		solutionsLimit = solutionsLimit2;
 		_solutions.clear();
 		List<DispatchEntry> solution = new ArrayList<>();
 		getFirstShipFor(new ArrayList<>(shipsLog), cap, solution);
