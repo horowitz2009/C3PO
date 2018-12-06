@@ -130,7 +130,6 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 				ColorFiltering colorFiltering2 = new ColorFiltering(new IntRange(rmin2, rmax2), new IntRange(gmin2, gmax2),
 				    new IntRange(bmin2, bmax2));
 				colorFiltering2.applyInPlace(fb2);
-				fb2.saveAsPNG("IMAGE2rgbb.png");
 
 				if (fb2.isRGB())
 					fb2.toGrayscale();

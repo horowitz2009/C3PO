@@ -39,6 +39,14 @@ public class ContractOptimizer {
 		this.solutionsLimit2 = solutionsLimit;
 	}
 
+	public int getSolutionsLimit2() {
+		return solutionsLimit2;
+	}
+
+	public void setSolutionsLimit2(int solutionsLimit2) {
+		this.solutionsLimit2 = solutionsLimit2;
+	}
+
 	public static void main(String[] args) throws IOException {
 		ContractOptimizer co = new ContractOptimizer(100, 450, 500);
 		co.init();

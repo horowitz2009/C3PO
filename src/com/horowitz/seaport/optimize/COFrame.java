@@ -67,14 +67,13 @@ public class COFrame extends JFrame {
 	private JTextField goalTF;
 	private JScrollPane scrollPane;
 
-
 	private JToolBar createToolbar1() {
-		
+
 		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
-		
+
 		minTF = new JTextField(5);
-		
+
 		maxTF = new JTextField(5);
 		destTF = new JTextField(5);
 		goalTF = new JTextField(10);
@@ -97,9 +96,9 @@ public class COFrame extends JFrame {
 						public void run() {
 							calculate(false);
 						}
-						
+
 					});
-					
+
 					myThread.start();
 				}
 			};
@@ -113,9 +112,9 @@ public class COFrame extends JFrame {
 						public void run() {
 							calculate(true);
 						}
-						
+
 					});
-					
+
 					myThread.start();
 				}
 			};
@@ -124,20 +123,19 @@ public class COFrame extends JFrame {
 		toolbar.add(new JLabel("    "));
 		return toolbar;
 	}
-	
+
 	private JToolBar createToolbar2() {
 
 		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
 
-		//limitTF = new JTextField(5);
+		// limitTF = new JTextField(5);
 
 		toolbar.add(new JLabel("limit "));
 		toolbar.add(limitTF);
 		return toolbar;
 	}
-	
-	
+
 	private void reload() {
 		minTF.setText("210");
 		maxTF.setText("700");
@@ -149,28 +147,31 @@ public class COFrame extends JFrame {
 	private void calculate(boolean minusMeansLast) {
 		try {
 			ContractOptimizer co = new ContractOptimizer(Integer.parseInt(minTF.getText()), Integer.parseInt(maxTF.getText()),
-			    500);
+			    5);
 			co.setMinusMeansLast(minusMeansLast);
 			co.init();
 			co.loadShipsLog();
-			List<Solution> solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), 0);
 			
+			List<Solution> solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), 0);
+
 			co.printSolutions(solutions);
 			solutions = sortByPrecission(solutions, 5);
 			for (Solution s : solutions) {
 				s.destination = destTF.getText();
 			}
-			
-			List<Solution> solutions2 = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), Integer.parseInt(limitTF.getText()));
-			
-			co.printSolutions(solutions2);
-			solutions = sortByPrecission(solutions2, 5);
-			for (Solution s : solutions2) {
-				s.destination = destTF.getText();
+			if (solutions.isEmpty()) {
+				co.setSolutionsLimit2(20);
+				List<Solution> solutions2 = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()),
+				    Integer.parseInt(limitTF.getText()));
+
+				co.printSolutions(solutions2);
+				solutions2 = sortByPrecission(solutions2, 5);
+				for (Solution s : solutions2) {
+					s.destination = destTF.getText();
+				}
+				solutions.addAll(solutions2);
 			}
-			
-			
-			
+
 			displaySolutions(solutions);
 			LOGGER.info("solutions: " + solutions.size());
 		} catch (IOException e) {
