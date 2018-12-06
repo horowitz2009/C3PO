@@ -241,7 +241,6 @@ public class MainFrame extends JFrame {
 
 			ManualBuildingsProtocol buildingsProtocol = new ManualBuildingsProtocol(_scanner, _mouse, _buildingManager);
 			_buildingsTask.setProtocol(buildingsProtocol);
-			_tasks.add(_buildingsTask);
 
 			_barrelsTask = new Task("Barrels", 1);
 			if (_settings.getBoolean("barrels.image", true)) {
@@ -255,6 +254,8 @@ public class MainFrame extends JFrame {
 
 			// ImageBarrelsProtocol imageBarrelsProtocol = new ImageBarrelsProtocol(_scanner, _mouse, _settings);
 			// _barrelsTask.setProtocol(imageBarrelsProtocol);
+			_tasks.add(_barrelsTask);
+			_tasks.add(_buildingsTask);
 			_tasks.add(_barrelsTask);
 
 			_stopAllThreads = false;
