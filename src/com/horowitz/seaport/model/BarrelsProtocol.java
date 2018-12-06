@@ -91,11 +91,12 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 			LOGGER.info("Barrels..." + blobMin + " - " + blobMax);
 			// _scanner.captureArea(_barrelsArea, "barrelsArea.png", false);
 
-			FastBitmap fb = new FastBitmap(new Robot().createScreenCapture(area));
+			BufferedImage capture = new Robot().createScreenCapture(area);
+			FastBitmap fb = new FastBitmap(capture);
 
-			if (debug)
-				fb.saveAsPNG("IMAGE.PNG");
-
+			if (debug) {
+				fb.saveAsPNG("IMAGEa.PNG");
+			}
 			// FILTER BROWN
 			// ColorFiltering colorFiltering = new ColorFiltering(new IntRange(40, 255), new IntRange(30, 255), new IntRange(0,
 			// 110));
@@ -113,11 +114,35 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 
 			if (fb.isRGB())
 				fb.toGrayscale();
-			Threshold thr = new Threshold(70);// was 80
+			Threshold thr = new Threshold(_settings.getInt("barrels.threshold", 70));
 			thr.applyInPlace(fb);
+			FastBitmap fb2 = null;
 
-			if (debug)
-				fb.saveAsPNG("IMAGE2.png");
+			if (_settings.getBoolean("barrels2.use", false)) {
+				fb2 = new FastBitmap(capture);
+				int rmin2 = _settings.getInt("barrels2.rmin", 98);
+				int rmax2 = _settings.getInt("barrels2.rmax", 255);
+				int gmin2 = _settings.getInt("barrels2.gmin", 148);
+				int gmax2 = _settings.getInt("barrels2.gmax", 250);
+				int bmin2 = _settings.getInt("barrels2.bmin", 178);
+				int bmax2 = _settings.getInt("barrels2.bmax", 242);
+
+				ColorFiltering colorFiltering2 = new ColorFiltering(new IntRange(rmin2, rmax2), new IntRange(gmin2, gmax2),
+				    new IntRange(bmin2, bmax2));
+				colorFiltering2.applyInPlace(fb2);
+				fb2.saveAsPNG("IMAGE2rgbb.png");
+
+				if (fb2.isRGB())
+					fb2.toGrayscale();
+				Threshold thr2 = new Threshold(_settings.getInt("barrels2.threshold", 20));
+				thr2.applyInPlace(fb2);
+				if (debug) {
+					fb2.saveAsPNG("IMAGE2b.png");
+				}
+			}
+			if (debug) {
+				fb.saveAsPNG("IMAGE2a.png");
+			}
 
 			// //
 
@@ -129,6 +154,12 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 			// OR
 			Or or = new Or(landFB);
 			or.applyInPlace(fb);
+
+			if (fb2 != null) {
+				or = new Or(fb2);
+				or.applyInPlace(fb);
+			}
+			
 			if (debug)
 				fb.saveAsPNG("IMAGE2OR.png");
 			// //
@@ -152,7 +183,7 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 			th = new Threshold(10);
 			th.applyInPlace(fb);
 			if (debug)
-				fb.saveAsPNG("IMAGE2blurredTHHHHHHHHHHHHH.png");
+				fb.saveAsPNG("IMAGE2blurredTHHHHHHHHHHHHH-LAST.png");
 
 			List<Blob> blobs = bd.ProcessImage(fb);
 			for (Blob blob : blobs) {
@@ -166,8 +197,8 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 					// || (p.x <= _scanner.getBottomRight().x - 381 && p.y > _scanner.getTopLeft().y + 69))
 					// && p.y < _scanner.getRock().y + 126) {//to avoid store ship icon was 72
 					if (p.y > _scanner.getTopLeft().y + 69 && p.y < _scanner.getRock().y + 126) {
-						_mouse.click(p);
-						_mouse.delay(50);
+						//_mouse.click(p);
+						//_mouse.delay(50);
 
 						p.x += _settings.getInt("barrels.xOff1", 6);
 						p.y += _settings.getInt("barrels.yOff1", 6);
