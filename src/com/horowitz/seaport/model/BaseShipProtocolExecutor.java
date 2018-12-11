@@ -236,16 +236,31 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		}
 		if (_lastShip == null) {
 			LOGGER.info("SHIP: " + "UNKNOWN!!!");
+			if (_settings.getBoolean("ships.unknown.capture", false)) {
+
+				if (_settings.getBoolean("ships.unknown.capture.stats", false)) {
+					nameArea.x -= 96;
+					nameArea.y -= 70;
+					nameArea.width += 96;
+					nameArea.height += 70;
+					_scanner.writeAreaTS(nameArea, "unknown-ship-with-stats.png");
+					LOGGER.info("captured unknown ship with stats");
+				} else {
+					_scanner.writeAreaTS(nameArea, "unknown-ship.png");
+					LOGGER.info("captured unknown ship");
+
+				}
+			}
 		}
 		return _lastShip;
 	}
 
 	protected boolean manageGlobalCase(Destination dest) throws IOException, AWTException, RobotInterruptedException {
-//		Rectangle buttonArea = _scanner.generateWindowedArea(625, 503);
-//		buttonArea.y += 411;
-//		buttonArea.x += 130;
-//		buttonArea.width -= 130;
-//		buttonArea.height = 67;
+		// Rectangle buttonArea = _scanner.generateWindowedArea(625, 503);
+		// buttonArea.y += 411;
+		// buttonArea.x += 130;
+		// buttonArea.width -= 130;
+		// buttonArea.height = 67;
 		Rectangle buttonArea = new Rectangle(_scanner.getTopLeft().x + _scanner.getGameWidth() / 2 - 180,
 		    _scanner.getBottomRight().y - 240, 310, 240);
 		Pixel destButton = null;
@@ -405,11 +420,11 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 				_mouse.delay(500);
 			}
 			// check is already done
-			//buttonArea = _scanner.generateWindowedArea(624, 505);
-			//buttonArea.y += 411;
-			//buttonArea.x += 130;
-			//buttonArea.width -= 130;
-			//buttonArea.height = 67;
+			// buttonArea = _scanner.generateWindowedArea(624, 505);
+			// buttonArea.y += 411;
+			// buttonArea.x += 130;
+			// buttonArea.width -= 130;
+			// buttonArea.height = 67;
 			Pixel b = _scanner.scanOne("dest/discover.png", buttonArea, false);
 			if (b != null) {
 				_mouse.click(b);

@@ -412,6 +412,7 @@ public class ContractOptimizer {
 		//remove not-favorite ones
 		List<DispatchEntry> toRemove = new ArrayList<>();
 		for (DispatchEntry de : shipsLog) {
+			System.out.println(de.getShip());
 			if (!de.getShipObj().isFavorite()) {
 				toRemove.add(de);
 			}

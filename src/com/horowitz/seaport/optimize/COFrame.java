@@ -24,15 +24,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 
+import com.horowitz.commons.Settings;
+
 public class COFrame extends JFrame {
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
 	PropertyChangeSupport support;
 
-	public COFrame() throws HeadlessException {
+	private Settings settings;
+
+	public COFrame(Settings settings) throws HeadlessException {
 		super();
 		support = new PropertyChangeSupport(this);
-
+		this.settings = settings;
 		initLayout();
 	}
 
@@ -137,10 +141,10 @@ public class COFrame extends JFrame {
 	}
 
 	private void reload() {
-		minTF.setText("210");
-		maxTF.setText("700");
-		destTF.setText("E");
-		limitTF.setText("7");
+		minTF.setText(settings.getProperty("contract.optimizer.min", "210"));
+		maxTF.setText(settings.getProperty("contract.optimizer.max", "700"));
+		destTF.setText(settings.getProperty("contract.optimizer.dest", "E"));
+		limitTF.setText(settings.getProperty("contract.optimizer.limit", "7"));
 
 	}
 

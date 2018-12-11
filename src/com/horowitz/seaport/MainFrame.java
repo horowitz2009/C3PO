@@ -102,7 +102,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v156a";
+	private static String APP_TITLE = "Seaport v157";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1227,7 +1227,7 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("CO") {
 				public void actionPerformed(ActionEvent e) {
 					if (coFrame == null) {
-					  coFrame = new COFrame();
+					  coFrame = new COFrame(_settings);
 					  coFrame.addPropertyChangeListener(new PropertyChangeListener() {
 							
 							@Override
