@@ -15,5 +15,26 @@ public class Solution {
 	public String toString() {
 		return "Solution [destination=" + destination + ", goal=" + goal + ", ships=" + ships + "]";
 	}
+	
+	public void combine() {
+		
+		List<DispatchEntry> newList = new ArrayList<>();
+		for (DispatchEntry de : ships) {
+			boolean found = false;
+			for (DispatchEntry newDE : newList) {
+				if (newDE.getShip().equals(de.getShip())) {
+					found = true;
+					newDE.setTimes(newDE.getTimes() + 1);
+				}
+			}
+			if (!found) {
+				DispatchEntry newDE = de.copy();
+				newDE.setTimes(1);
+				newList.add(newDE);
+			}
+			
+		}
+		ships = newList;
+	}
 
 }

@@ -84,6 +84,7 @@ import com.horowitz.seaport.model.FishingProtocol;
 import com.horowitz.seaport.model.IBarrelsProtocol;
 import com.horowitz.seaport.model.ImageBarrelsProtocol;
 import com.horowitz.seaport.model.ManualBuildingsProtocol;
+import com.horowitz.seaport.model.OrderedShipProtocolExecutor;
 import com.horowitz.seaport.model.ProtocolEntry;
 import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
@@ -102,7 +103,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v157";
+	private static String APP_TITLE = "Seaport v158";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -223,7 +224,7 @@ public class MainFrame extends JFrame {
 			// SHIPS TASK
 			_shipsTask = new Task("Ships", 2);
 			_shipsTask.setEnabled(true);
-			_shipProtocolExecutor = new BalancedShipProtocolExecutor(_scanner, _mouse, _mapManager, _settings);
+			_shipProtocolExecutor = new OrderedShipProtocolExecutor(_scanner, _mouse, _mapManager, _settings);
 			_shipProtocolExecutor.addPropertyChangeListener(new StatsListener());
 			_mapManager.addPropertyChangeListener("TRIP_REGISTERED", new PropertyChangeListener() {
 
@@ -605,7 +606,7 @@ public class MainFrame extends JFrame {
 
 	private ShipProtocol _shipProtocol;
 	private String _lastProtocolName;
-	private BalancedShipProtocolExecutor _shipProtocolExecutor;
+	private OrderedShipProtocolExecutor _shipProtocolExecutor;
 
 	private JToggleButton _autoSailorsToggle;
 

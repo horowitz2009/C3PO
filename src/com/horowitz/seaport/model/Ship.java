@@ -7,6 +7,7 @@ public class Ship extends GameUnit {
 
 	private boolean _active;
 	private boolean _favorite;
+	private int _count = 1;
 
 	public Ship(String name, int capacity, String image, String imageTitle) {
 		super(name, image, imageTitle);
@@ -20,6 +21,14 @@ public class Ship extends GameUnit {
 
 	public Ship(String name) {
 		super(name);
+	}
+
+	public int getCount() {
+		return _count;
+	}
+
+	public void setCount(int count) {
+		_count = count;
 	}
 
 	public boolean isFavorite() {
@@ -48,7 +57,7 @@ public class Ship extends GameUnit {
 
 	@Override
 	public String toString() {
-		return getName() + (_crew > 0 ? " " + _crew +  " " : "") + (_capacity > 0 ? " " + _capacity : "");
+		return getName() + (_crew > 0 ? " " + _crew + " " : "") + (_capacity > 0 ? " " + _capacity : "");
 	}
 
 	public void setCrew(int crew) {

@@ -191,6 +191,7 @@ public class COFrame extends JFrame {
 		JPanel solutionPanel = new JPanel(new GridLayout(0, 1, 5, 5));
 
 		for (Solution solution : solutions) {
+			solution.combine();
 			SolutionView solutionView = new SolutionView(solution);
 			solutionPanel.add(solutionView);
 			solutionView.addPropertyChangeListener(new PropertyChangeListener() {

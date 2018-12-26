@@ -30,6 +30,7 @@ public class ContractOptimizer {
 	private int precission = 5;
 	private int solutionsLimit2;
 	private boolean minusMeansLast = false;
+	private long start;
 
 	public ContractOptimizer(int min, int max, int solutionsLimit) {
 		super();
@@ -48,11 +49,11 @@ public class ContractOptimizer {
 	}
 
 	public static void main(String[] args) throws IOException {
-		ContractOptimizer co = new ContractOptimizer(100, 450, 500);
+		ContractOptimizer co = new ContractOptimizer(265, 700, 5);
 		co.init();
 		co.loadShipsLog();
 
-		List<Solution> solutions = co.getSolutionForFAST(3661, 0);
+		List<Solution> solutions = co.getSolutionForFAST(22430, 0);
 		co.printSolutions(solutions);
 	}
 
@@ -61,17 +62,19 @@ public class ContractOptimizer {
 		solutionsLimit = solutionsLimit2;
 		_solutions.clear();
 		List<DispatchEntry> solution = new ArrayList<>();
+		start = System.currentTimeMillis();
 		getFirstShipFor(new ArrayList<>(shipsLog), cap, solution);
 		// printLog(solution);
 		return _solutions;
-		
+
 	}
-	
+
 	public List<Solution> getSolutionForFAST(int cap, int precissionArg) {
 		precission = precissionArg;
 		solutionsLimit = solutionsLimit2;
 		_solutions.clear();
 		List<DispatchEntry> solution = new ArrayList<>();
+		start = System.currentTimeMillis();
 		getFirstShipFor(new ArrayList<>(shipsLog), cap, solution);
 		// printLog(solution);
 		return _solutions;
@@ -93,8 +96,7 @@ public class ContractOptimizer {
 			sortLogByArrival(ships);
 			printLog(ships);
 		}
-		
-		
+
 		System.out.println("==================================== BY TIME =====================================");
 		Collections.sort(solutions, new Comparator<Solution>() {
 			@Override
@@ -104,8 +106,9 @@ public class ContractOptimizer {
 		});
 
 		for (Solution solution : solutions.stream().limit(5).collect(Collectors.toList())) {
+			solution.combine();
 			List<DispatchEntry> ships = new ArrayList<>(solution.ships);
-			sortLogByArrival(ships);
+			sortLogByCap(ships);
 			printLog(ships);
 		}
 
@@ -114,7 +117,7 @@ public class ContractOptimizer {
 	private void printLog(List<DispatchEntry> log) {
 		System.out.println("LOG:");
 		for (DispatchEntry de : log) {
-			System.out.println(de.getShipObj().getCapacity() + "    " + de);
+			System.out.println(de.getTimes() + "x " + de.getShipObj().getCapacity() + "    " + de);
 		}
 		System.out.println("SUM: " + calcSum(log));
 	}
@@ -122,7 +125,7 @@ public class ContractOptimizer {
 	private int calcSum(List<DispatchEntry> solution) {
 		int sum = 0;
 		for (DispatchEntry de : solution) {
-			sum += de.getShipObj().getCapacity();
+			sum += (de.getTimes() * de.getShipObj().getCapacity());
 		}
 		return sum;
 	}
@@ -140,6 +143,11 @@ public class ContractOptimizer {
 					// enough
 					break;
 				}
+				long now = System.currentTimeMillis();
+				if (now - start > 10000) {
+					// time's up
+					break;
+				}
 
 				// if (sum + de.getShipObj().getCapacity() + 5 > goal) {
 				// //skip this ship
@@ -151,15 +159,39 @@ public class ContractOptimizer {
 				newLog.remove(de);
 				newSolution.add(de);
 
-				// add the ship at the end of the log with new time
+				int time = 120;
+				int howMany = howMany(newSolution, de.getShip());
+				if (de.getShipObj().getCount() > 1 && howMany == 0) {
+					time = 10;
+				}
+				if (howMany <= 3) {
+					// add the ship at the end of the log with new time
+					DispatchEntry newDE = de.copy();
+					newDE.setTime(newDE.getTime() + time * 60000); // TODO use the dest this solution is and use its time
+					newLog.add(newDE);
+				}
+				// if (de.getShipObj().getCount() >= howMany(newSolution, de.getShip())) {
+				// // add the ship at the end of the log with new time
 				// DispatchEntry newDE = de.copy();
-				// newDE.setTime(newDE.getTime() + 121 * 60000); //TODO use the dest this solution is and use its time
+				// newDE.setTime(newDE.getTime() + 30 * 60000); // TODO use the dest this solution is and use its time
 				// newLog.add(newDE);
+				//
+				// }
 
 				getFirstShipFor(newLog, goal, newSolution);
 				// solution.remove(de);
 			}
 		}
+	}
+
+	private int howMany(List<DispatchEntry> solution, String ship) {
+		int cnt = 0;
+		for (DispatchEntry de : solution) {
+			if (de.getShip().equals(ship)) {
+				cnt++;
+			}
+		}
+		return cnt;
 	}
 
 	private int getFirstShipForOLD(List<DispatchEntry> log, int goal, List<DispatchEntry> solution) {
@@ -274,7 +306,7 @@ public class ContractOptimizer {
 	private long getLatest(List<DispatchEntry> solution) {
 		return solution.get(solution.size() - 1).willArriveAt();
 	}
-	
+
 	private long getLatestOLD(List<DispatchEntry> solution) {
 		long latest = 0;
 		for (DispatchEntry de : solution) {
@@ -287,7 +319,7 @@ public class ContractOptimizer {
 
 	private void registerSolution(List<DispatchEntry> shipLog) {
 		boolean found = false;
-		sortLogByArrival(shipLog);
+		// sortLogByArrival(shipLog);
 		for (Solution s : _solutions) {
 			if (s.ships.containsAll(shipLog)) {
 				// solution already registered
@@ -305,7 +337,7 @@ public class ContractOptimizer {
 		if (!found) {
 			Solution sol = new Solution();
 			sol.ships.addAll(shipLog);
-			sortLogByArrival(sol.ships);
+			// sortLogByArrival(sol.ships);
 			sol.latest = getLatest(shipLog);
 			sol.goal = calcSum(shipLog);
 			// Date d = new Date(sol.latest);
@@ -364,7 +396,7 @@ public class ContractOptimizer {
 					DispatchEntry de = (DispatchEntry) deserializable;
 					de.setShipObj(shipMap.get(de.getShip()));
 					de.setDestObj(getDestinationByAbbr(de.getDest()));
-
+					de.setTimes(1);
 					if (de.getLastTime() != null && !de.getLastTime().isEmpty())
 						de.setLastTime(de.getLastTime());
 					else
@@ -372,8 +404,6 @@ public class ContractOptimizer {
 				}
 			}
 		};
-
-
 
 		for (DispatchEntry de : shipsLog) {
 			try {
@@ -387,7 +417,7 @@ public class ContractOptimizer {
 		for (DispatchEntry de : shipsLog) {
 			if (System.currentTimeMillis() - de.willArriveAt() > 5 * 60000) {
 				// too old
-				//continue;
+				// continue;
 			}
 			if (map.containsKey(de.getShip())) {
 				DispatchEntry deOld = map.get(de.getShip());
@@ -397,7 +427,7 @@ public class ContractOptimizer {
 				map.put(de.getShip(), de);
 			}
 		}
-		
+
 		// add the rest of fleet
 		List<DispatchEntry> toAdd = new ArrayList<>();
 		for (Ship ship : ships) {
@@ -409,7 +439,7 @@ public class ContractOptimizer {
 
 		shipsLog = new ArrayList<>(map.values());
 
-		//remove not-favorite ones
+		// remove not-favorite ones
 		List<DispatchEntry> toRemove = new ArrayList<>();
 		for (DispatchEntry de : shipsLog) {
 			System.out.println(de.getShip());
@@ -418,19 +448,19 @@ public class ContractOptimizer {
 			}
 		}
 		shipsLog.removeAll(toRemove);
-		
+
 		if (minusMeansLast) {
 			for (DispatchEntry de : shipsLog) {
-				if (System.currentTimeMillis() -  de.willArriveAt() > 5000) {
+				if (System.currentTimeMillis() - de.willArriveAt() > 5000) {
 					de.setDest("E");
 					de.setDestObj(getDestinationByAbbr(de.getDest()));
-					
-					de.setTime(System.currentTimeMillis() +  1000);//de.getDestObj().getTime() * 60000 +
+
+					de.setTime(System.currentTimeMillis() + 1000);// de.getDestObj().getTime() * 60000 +
 				}
 			}
-			
+
 		}
-		
+
 		// sort by arrival
 		sortLogByArrival(shipsLog);
 

@@ -56,7 +56,7 @@ public class ShipProtocolEditor extends JPanel {
 	private void initLayout() {
 		JPanel mainRoot = new JPanel(new BorderLayout());
 		JPanel headerPanel = new JPanel(new BorderLayout());
-		//headerPanel.setBackground(Color.LIGHT_GRAY);
+		// headerPanel.setBackground(Color.LIGHT_GRAY);
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		// NAME
@@ -174,11 +174,11 @@ public class ShipProtocolEditor extends JPanel {
 			setVisible(false);
 		}
 	}
-	
+
 	public void applySolution(Solution solution) {
-		for (DispatchEntry	de : solution.ships) {
+		for (DispatchEntry de : solution.ships) {
 			ProtocolEntry pe = new ProtocolEntry();
-			pe.setChainStr(solution.destination + "-1,G-199");
+			pe.setChainStr(solution.destination + "-" + (int) de.getShipObj().getCount() + ",G-199");
 			pe.setShipName(de.getShip());
 			ProtocolEntryView pev = new ProtocolEntryView();
 			ComboBoxModel<Ship> m = pev._shipFieldCB.getModel();
@@ -190,7 +190,7 @@ public class ShipProtocolEditor extends JPanel {
 			}
 			pev._destField.setText(pe.getChainStr());
 			_box.add(pev);
-			
+
 		}
 		_box.revalidate();
 	}
@@ -270,12 +270,12 @@ public class ShipProtocolEditor extends JPanel {
 			}
 
 			// Ship select = new Ship("-- choose ship --");
-			//Ship all = new Ship("<ALL>");
+			// Ship all = new Ship("<ALL>");
 			Ship rest = new Ship("<Rest>");
 			Ship unknown = new Ship("<Unknown>");
 			Ship custom = new Ship("<CUSTOM>");
 			Ship customLast = new Ship("<CUSTOM-LAST>");
-			//ships.add(0, all);
+			// ships.add(0, all);
 			ships.add(0, rest);
 			ships.add(1, unknown);
 			ships.add(2, custom);
