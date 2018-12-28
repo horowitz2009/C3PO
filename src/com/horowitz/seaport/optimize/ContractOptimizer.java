@@ -53,7 +53,7 @@ public class ContractOptimizer {
 		co.init();
 		co.loadShipsLog();
 
-		List<Solution> solutions = co.getSolutionForFAST(22430, 0);
+		List<Solution> solutions = co.getSolutionForFAST(13674, 0);
 		co.printSolutions(solutions);
 	}
 

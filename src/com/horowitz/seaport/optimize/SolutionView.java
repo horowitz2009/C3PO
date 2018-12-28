@@ -48,7 +48,7 @@ public class SolutionView extends JPanel {
 		// });
 		long now = System.currentTimeMillis();
 		for (DispatchEntry de : solution.ships) {
-			JLabel deLabel = new JLabel(de.getShipObj().getCount() + "x " + de.getShipObj().getCapacity() + "  "
+			JLabel deLabel = new JLabel(de.getTimes() + "x " + de.getShipObj().getCapacity() + "  "
 			    + de.getShip() + "  " + DateUtils.fancyTime2(de.willArriveAt() - now));
 			add(deLabel, gbc);
 			gbc.gridy++;

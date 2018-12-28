@@ -89,7 +89,7 @@ public class DispatchEntry implements Serializable, Deserializable {
 		int cap = 0;
 		if (shipObj != null)
 			cap = shipObj.getCapacity();
-		return cap + " DE [" + _ship + ", dest=" + _dest + ", lastTime=" + _lastTime + ". Will arrive at: "
+		return _times + "x " + cap + " DE [" + _ship + ", dest=" + _dest + ", lastTime=" + _lastTime + ". Will arrive at: "
 		    + DateUtils.formatDateToISO(willArriveAt()) + "]";
 	}
 
