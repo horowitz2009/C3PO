@@ -328,6 +328,7 @@ public class ScreenScanner {
 			ImageData imageData = null;
 			try {
 				imageData = new ImageData(filename, defaultArea, _comparator, xOff, yOff);
+				imageData.setColorToBypass(Color.RED);
 			} catch (IOException e) {
 				System.err.println(e);
 				return null;

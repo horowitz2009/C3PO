@@ -75,7 +75,6 @@ import com.horowitz.ocr.OCRB;
 import com.horowitz.seaport.dest.BuildingManager;
 import com.horowitz.seaport.dest.MapManager;
 import com.horowitz.seaport.model.AbstractGameProtocol;
-import com.horowitz.seaport.model.BalancedShipProtocolExecutor;
 import com.horowitz.seaport.model.BarrelsProtocol;
 import com.horowitz.seaport.model.Building;
 import com.horowitz.seaport.model.Destination;
@@ -90,6 +89,7 @@ import com.horowitz.seaport.model.Ship;
 import com.horowitz.seaport.model.ShipProtocol;
 import com.horowitz.seaport.model.Task;
 import com.horowitz.seaport.model.storage.JsonStorage;
+import com.horowitz.seaport.ocr.OCRContract;
 import com.horowitz.seaport.optimize.COFrame;
 import com.horowitz.seaport.optimize.Solution;
 
@@ -103,7 +103,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v158";
+	private static String APP_TITLE = "Seaport v159";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -991,7 +991,8 @@ public class MainFrame extends JFrame {
 						public void run() {
 							try {
 								// testMap();
-								_scanner.findRockAgain(_scanner.getRock());
+								// _scanner.findRockAgain(_scanner.getRock());
+								testOCRContract();
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -1228,9 +1229,9 @@ public class MainFrame extends JFrame {
 			AbstractAction action = new AbstractAction("CO") {
 				public void actionPerformed(ActionEvent e) {
 					if (coFrame == null) {
-					  coFrame = new COFrame(_settings);
-					  coFrame.addPropertyChangeListener(new PropertyChangeListener() {
-							
+						coFrame = new COFrame(_settings);
+						coFrame.addPropertyChangeListener(new PropertyChangeListener() {
+
 							@Override
 							public void propertyChange(PropertyChangeEvent evt) {
 								_shipProtocolManagerUI.applySolution((Solution) evt.getNewValue());
@@ -1263,7 +1264,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private COFrame coFrame = null;
-	
+
 	protected void transformLayout() {
 		Thread t = new Thread(new Runnable() {
 			public void run() {
@@ -2555,6 +2556,69 @@ public class MainFrame extends JFrame {
 		result *= 60000;
 
 		return result;
+	}
+
+	private void testOCRContract() {
+		try {
+			// TODO Auto-generated method stub
+			Rectangle area = _scanner.generateWindowedArea(712, 489);
+			Pixel p = _scanner.scanOneFast("ocr/contract/progress.png", area, false);
+			LOGGER.info("P:" + p);
+			if (p != null) {
+				area = new Rectangle(p.x + 170, p.y - 7, 215, 28);
+				BufferedImage image = new Robot().createScreenCapture(area);
+				OCRContract ocrContract = new OCRContract();
+				ocrContract.learn();
+				
+				String res = ocrContract.scanProgress(image);
+				LOGGER.info("res: " + res);
+				_scanner.writeArea(area, "progress.png");
+				area = new Rectangle(p.x + 356, p.y - 27, 122, 60);
+				image = new Robot().createScreenCapture(area);
+				String res2 = ocrContract.scanCargo(image);
+				LOGGER.info("res: " + res2);
+				_scanner.writeArea(area, "cargo.png");
+				processContract(res, res2);
+
+			}
+
+		} catch (RobotInterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (AWTException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void processContract(String contractStr, String cargoStr) {
+		if (contractStr != null && !contractStr.isEmpty() && cargoStr != null && !cargoStr.isEmpty()) {
+			String[] ss = contractStr.split("/");
+			if (ss.length == 2) {
+				try {
+					int progress = Integer.parseInt(ss[0]);
+					int goal = Integer.parseInt(ss[1]);
+					int cargo = Integer.parseInt(cargoStr);
+
+					double need = (((double) (goal - progress)) / cargo);
+					LOGGER.info("need: " + need);
+					if (need - (int) need > 0)
+						need += 1.0;
+					LOGGER.info("TO DELIVER: " + (int) need);
+					if (coFrame != null) {
+						coFrame.setGoal((int)need);
+					}
+
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+
+			}
+		}
+
 	}
 
 }

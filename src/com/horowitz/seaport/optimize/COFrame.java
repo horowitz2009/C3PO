@@ -155,7 +155,7 @@ public class COFrame extends JFrame {
 			co.setMinusMeansLast(minusMeansLast);
 			co.init();
 			co.loadShipsLog();
-			
+
 			List<Solution> solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), 0);
 
 			co.printSolutions(solutions);
@@ -234,5 +234,9 @@ public class COFrame extends JFrame {
 
 	public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		support.addPropertyChangeListener(propertyName, listener);
+	}
+
+	public void setGoal(int need) {
+		goalTF.setText("" + need);
 	}
 }
