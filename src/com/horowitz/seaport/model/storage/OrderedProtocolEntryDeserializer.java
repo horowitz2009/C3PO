@@ -36,10 +36,10 @@ public class OrderedProtocolEntryDeserializer implements Deserializer {
 
 			String[] sss = ds.split("-");
 			de.setDest(sss[0]);
-			float goal = 1000.0f;
+			int goal = 1000;
 			if (sss.length > 1) {
 				try {
-					goal = Float.parseFloat(sss[1]);
+					goal = Integer.parseInt(sss[1]);
 				} catch (NumberFormatException e) {
 					// TODO report for this error
 					e.printStackTrace();
