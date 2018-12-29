@@ -103,7 +103,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v159";
+	private static String APP_TITLE = "Seaport v160";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -2560,28 +2560,57 @@ public class MainFrame extends JFrame {
 
 	private void testOCRContract() {
 		try {
-			// TODO Auto-generated method stub
 			Rectangle area = _scanner.generateWindowedArea(712, 489);
 			Pixel p = _scanner.scanOneFast("ocr/contract/progress.png", area, false);
-			LOGGER.info("P:" + p);
 			if (p != null) {
+				//LOGGER.info("P1:" + p);
 				area = new Rectangle(p.x + 170, p.y - 7, 215, 28);
 				BufferedImage image = new Robot().createScreenCapture(area);
 				OCRContract ocrContract = new OCRContract();
 				ocrContract.learn();
-				
+
 				String res = ocrContract.scanProgress(image);
 				LOGGER.info("res: " + res);
 				_scanner.writeArea(area, "progress.png");
+				
+				
+				//cargo
 				area = new Rectangle(p.x + 356, p.y - 27, 122, 60);
 				image = new Robot().createScreenCapture(area);
 				String res2 = ocrContract.scanCargo(image);
-				LOGGER.info("res: " + res2);
+				LOGGER.info("cargo: " + res2);
 				_scanner.writeArea(area, "cargo.png");
 				processContract(res, res2);
 
-			}
+			} else {
+				area = _scanner.generateWindowedArea(412, 402);
+				p = _scanner.scanOneFast("ocr/contract/remaining.png", area, false);
+				if (p == null)
+					p = _scanner.scanOneFast("ocr/contract/upgrade.png", area, false);
+					
+				if (p != null) {
+					//LOGGER.info("P2:" + p);
+					area = new Rectangle(p.x - 21, p.y + 16, 115, 20);
+					BufferedImage image = new Robot().createScreenCapture(area);
+					OCRContract ocrContract = new OCRContract();
+					ocrContract.learn();
 
+					String res = ocrContract.scanRemaining(image);
+					LOGGER.info("res: " + res);
+					_scanner.writeArea(area, "remaining.png");
+					
+					//cargo
+					area = new Rectangle(p.x - 8, p.y + 63, 115, 40);
+					image = new Robot().createScreenCapture(area);
+					String res2 = ocrContract.scanCargo(image);
+					LOGGER.info("cargo: " + res2);
+					_scanner.writeArea(area, "cargo2.png");
+					if (res != null)
+						res= "0/" + res;
+					processContract(res, res2);
+
+				}
+			}
 		} catch (RobotInterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -2604,12 +2633,12 @@ public class MainFrame extends JFrame {
 					int cargo = Integer.parseInt(cargoStr);
 
 					double need = (((double) (goal - progress)) / cargo);
-					LOGGER.info("need: " + need);
+					//LOGGER.info("need: " + need);
 					if (need - (int) need > 0)
 						need += 1.0;
 					LOGGER.info("TO DELIVER: " + (int) need);
 					if (coFrame != null) {
-						coFrame.setGoal((int)need);
+						coFrame.setGoal((int) need);
 					}
 
 				} catch (NumberFormatException e) {
