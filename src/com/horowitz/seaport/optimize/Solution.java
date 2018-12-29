@@ -29,7 +29,7 @@ public class Solution {
 			}
 			if (!found) {
 				DispatchEntry newDE = de.copy();
-				newDE.setTimes(1);
+				newDE.setTimes(de.getTimes());
 				newList.add(newDE);
 			}
 			
