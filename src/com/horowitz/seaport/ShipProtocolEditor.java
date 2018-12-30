@@ -178,7 +178,7 @@ public class ShipProtocolEditor extends JPanel {
 	public void applySolution(Solution solution) {
 		for (DispatchEntry de : solution.ships) {
 			ProtocolEntry pe = new ProtocolEntry();
-			pe.setChainStr(solution.destination + "-" + (int) de.getShipObj().getCount() + ",G-199");
+			pe.setChainStr(solution.destination + "-" + (int) de.getGoal() + ",G-199");
 			pe.setShipName(de.getShip());
 			ProtocolEntryView pev = new ProtocolEntryView();
 			ComboBoxModel<Ship> m = pev._shipFieldCB.getModel();
