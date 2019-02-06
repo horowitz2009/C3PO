@@ -2,9 +2,11 @@ package com.horowitz.seaport;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.HeadlessException;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +28,9 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
@@ -71,14 +75,18 @@ public class ShipProtocolEditor extends JPanel {
 		// CENTER
 		// //////////
 		JPanel root = new JPanel(new BorderLayout());
-		mainRoot.add(root, BorderLayout.CENTER);
+		JScrollPane sp = new JScrollPane(root);
+		int h = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 2.35);
+		sp.setMaximumSize(new Dimension(400, h));
+		sp.setPreferredSize(new Dimension(200, h));
+		sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		mainRoot.add(sp, BorderLayout.CENTER);
 
 		_box = Box.createVerticalBox();
 		DragMouseAdapter dmAdapter = new DragMouseAdapter(JFrame.getFrames()[0]);
 		_box.addMouseListener(dmAdapter);
 		_box.addMouseMotionListener(dmAdapter);
 		root.add(_box, BorderLayout.NORTH);
-
 		// ADD BUTTON
 		Box tempBar = Box.createHorizontalBox();
 
@@ -178,7 +186,7 @@ public class ShipProtocolEditor extends JPanel {
 	public void applySolution(Solution solution) {
 		for (DispatchEntry de : solution.ships) {
 			ProtocolEntry pe = new ProtocolEntry();
-			pe.setChainStr(solution.destination + "-" + (int) de.getTimes() + ",G-199");
+			pe.setChainStr(solution.destination + "-" + (int) de.getTimes() + "," + solution.destination2 + "-199");
 			pe.setShipName(de.getShip());
 			ProtocolEntryView pev = new ProtocolEntryView();
 			ComboBoxModel<Ship> m = pev._shipFieldCB.getModel();

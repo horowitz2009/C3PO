@@ -215,7 +215,8 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 				}
 
 			}
-
+			_scanner.handlePopups();
+			
 			if (isNotInterrupted()) {
 				// additional clicks
 				int n = _settings.getInt("barrels.additional", 5);
@@ -229,7 +230,8 @@ public class BarrelsProtocol extends AbstractGameProtocol implements IBarrelsPro
 					}
 				}
 				_mouse.delay(100);
-
+				_scanner.handlePopups();
+				_mouse.delay(100);
 			}
 			LOGGER.info("BARRELS CNT: " + cnt);
 

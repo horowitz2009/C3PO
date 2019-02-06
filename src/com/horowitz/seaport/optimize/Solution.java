@@ -10,6 +10,7 @@ public class Solution {
 	public long latest = 0;
 	public int goal;
 	public String destination;
+	public String destination2;
 
 	@Override
 	public String toString() {

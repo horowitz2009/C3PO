@@ -1313,7 +1313,7 @@ public class ScreenScanner {
 		String filename = filenamePrefix;
 		if (timestamp)
 			filename += DateUtils.formatDateForFile(System.currentTimeMillis());
-		filename += ".jpg";
+		filename += ".png";
 		writeArea(area, filename);
 		if (!_settings.getBoolean("ping.keep", false))
 			deleteOlder("ping", _settings.getInt("ping.cnt", 12));
@@ -1400,6 +1400,11 @@ public class ScreenScanner {
 		}
 
 		return null;
+	}
+
+	public void clearImageCache() throws IOException, AWTException, RobotInterruptedException {
+		_imageDataCache.clear();
+		setKeyAreas();
 	}
 
 }

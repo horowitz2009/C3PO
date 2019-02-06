@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -103,7 +104,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v160";
+	private static String APP_TITLE = "Seaport v163";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -156,6 +157,7 @@ public class MainFrame extends JFrame {
 	public static void main(String[] args) {
 
 		try {
+
 			boolean isTestmode = false;
 			if (args.length > 0) {
 				for (String arg : args) {
@@ -325,6 +327,8 @@ public class MainFrame extends JFrame {
 
 		if (_testMode)
 			APP_TITLE += " TEST";
+		String computerName = System.getenv().get("COMPUTERNAME");
+		System.err.println(computerName);
 		setTitle(APP_TITLE);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -339,6 +343,7 @@ public class MainFrame extends JFrame {
 		_mainToolbar1 = createToolbar1();
 		_mainToolbar2 = createToolbar2();
 		_mainToolbar4 = createToolbar4();
+		_mainToolbar5 = createToolbar5();
 
 		JPanel toolbars = new JPanel(new GridLayout(0, 1));
 		// JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -348,6 +353,7 @@ public class MainFrame extends JFrame {
 		// toolbars.add(jToolBar);
 		// }
 		toolbars.add(_mainToolbar4);
+		toolbars.add(_mainToolbar5);
 
 		// toolbars.add(createToolbar5());
 
@@ -355,7 +361,7 @@ public class MainFrame extends JFrame {
 		north.add(toolbars);
 		_statsPanel = createStatsPanel();
 		_shipProtocolManagerPanel = createShipProtocolManagerPanel();
-		north.add(_statsPanel);
+		// north.add(_statsPanel);
 		north.add(_shipProtocolManagerPanel);
 
 		if (_testMode) {
@@ -948,22 +954,22 @@ public class MainFrame extends JFrame {
 			mainToolbar1.add(action);
 		}
 
-		// RECORD
-		{
-			AbstractAction action = new AbstractAction("Reload") {
-				public void actionPerformed(ActionEvent e) {
-					Thread myThread = new Thread(new Runnable() {
-						@Override
-						public void run() {
-							reload();
-						}
-					});
-
-					myThread.start();
-				}
-			};
-			mainToolbar1.add(action);
-		}
+//		// RELOAD
+//		{
+//			AbstractAction action = new AbstractAction("Reload") {
+//				public void actionPerformed(ActionEvent e) {
+//					Thread myThread = new Thread(new Runnable() {
+//						@Override
+//						public void run() {
+//							reload();
+//						}
+//					});
+//
+//					myThread.start();
+//				}
+//			};
+//			mainToolbar1.add(action);
+//		}
 
 		// RESET BUILDINGS
 		{
@@ -982,7 +988,28 @@ public class MainFrame extends JFrame {
 			};
 			mainToolbar1.add(action);
 		}
-		// TEST Button
+		// TL
+		{
+			AbstractAction action = new AbstractAction("TL") {
+				public void actionPerformed(ActionEvent e) {
+					Thread myThread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								testOCRContract(true);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+						
+					});
+					
+					myThread.start();
+				}
+			};
+			mainToolbar1.add(action);
+		}
+		// T
 		{
 			AbstractAction action = new AbstractAction("T") {
 				public void actionPerformed(ActionEvent e) {
@@ -990,16 +1017,14 @@ public class MainFrame extends JFrame {
 						@Override
 						public void run() {
 							try {
-								// testMap();
-								// _scanner.findRockAgain(_scanner.getRock());
-								testOCRContract();
+								testOCRContract(_settings.getBoolean("ocrContracts.learn", false));
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
-
+						
 					});
-
+					
 					myThread.start();
 				}
 			};
@@ -1415,7 +1440,38 @@ public class MainFrame extends JFrame {
 	private JToolBar createToolbar5() {
 		JToolBar toolbar = new JToolBar();
 		toolbar.setFloatable(false);
+		// computers=CSCBG,BEAST,MONSTER
+		String s = _settings.getProperty("computers", "CSC,BEAST,MONSTER");
+		String[] ss = s.split(",");
+		for (final String compName : ss) {
+			Action action = new AbstractAction(compName) {
 
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.err.println(compName);
+					File d = new File("requests");
+					File[] listFiles = d.listFiles(new FileFilter() {
+						@Override
+						public boolean accept(File f) {
+							return !f.isDirectory() && f.getName().startsWith("refresh-" + compName) && f.getName().endsWith("inprogress");
+						}
+					});
+					if (listFiles.length == 1) {
+						File f = listFiles[0];
+						f.renameTo(new File("requests/refresh-"+compName));
+					} else if (listFiles.length == 0) {
+						File f = new File("requests/refresh-"+compName);
+						try {
+							f.createNewFile();
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+			};
+			toolbar.add(action);
+		}
 		// Temp bar for custom protocol
 		return toolbar;
 	}
@@ -2360,9 +2416,24 @@ public class MainFrame extends JFrame {
 				service.inProgress(r);
 				processClick(r);
 			} else if (r.startsWith("refresh")) {
-				service.inProgress(r);
 
-				bounce();
+				if (r.contains("-")) {
+					String thisComp = System.getenv("COMPUTERNAME");
+					if (thisComp.length() > 5) {
+						thisComp = thisComp.substring(0, 5);
+					}
+					if (r.contains(thisComp)) {
+						LOGGER.info("Refreshing " + thisComp);
+						service.inProgress(r);
+						bounce();
+
+					}
+				} else {
+
+					service.inProgress(r);
+					bounce();
+
+				}
 
 			} else if (r.startsWith("ping") || r.startsWith("p")) {
 				service.inProgress(r);
@@ -2371,6 +2442,7 @@ public class MainFrame extends JFrame {
 				service.done(r);
 			} else if (r.startsWith("reload")) {
 				service.inProgress(r);
+				clearImageCache();
 				reload();
 				service.done(r);
 			} else if (r.startsWith("reset")) {
@@ -2381,6 +2453,19 @@ public class MainFrame extends JFrame {
 		}
 
 		// service.purgeOld(1000 * 60 * 60);// 1 hour old
+	}
+
+	private void clearImageCache() {
+		try {
+			_scanner.clearImageCache();
+			LOGGER.info("CLEARED IMAGE CACHE...");
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		} catch (RobotInterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void bounce() {
@@ -2464,8 +2549,8 @@ public class MainFrame extends JFrame {
 	private JToolBar _mainToolbar1;
 
 	private JToolBar _mainToolbar2;
-
 	private JToolBar _mainToolbar4;
+	private JToolBar _mainToolbar5;
 
 	private JTextArea _shipLog;
 
@@ -2558,23 +2643,23 @@ public class MainFrame extends JFrame {
 		return result;
 	}
 
-	private void testOCRContract() {
+	private void testOCRContract(boolean learn) {
 		try {
 			Rectangle area = _scanner.generateWindowedArea(712, 489);
 			Pixel p = _scanner.scanOneFast("ocr/contract/progress.png", area, false);
 			if (p != null) {
-				//LOGGER.info("P1:" + p);
+				LOGGER.info("P1:" + p);
 				area = new Rectangle(p.x + 170, p.y - 7, 215, 28);
 				BufferedImage image = new Robot().createScreenCapture(area);
 				OCRContract ocrContract = new OCRContract();
-				ocrContract.learn();
+				if (learn)
+				  ocrContract.learn();
 
 				String res = ocrContract.scanProgress(image);
 				LOGGER.info("res: " + res);
 				_scanner.writeArea(area, "progress.png");
-				
-				
-				//cargo
+
+				// cargo
 				area = new Rectangle(p.x + 356, p.y - 27, 122, 60);
 				image = new Robot().createScreenCapture(area);
 				String res2 = ocrContract.scanCargo(image);
@@ -2587,9 +2672,9 @@ public class MainFrame extends JFrame {
 				p = _scanner.scanOneFast("ocr/contract/remaining.png", area, false);
 				if (p == null)
 					p = _scanner.scanOneFast("ocr/contract/upgrade.png", area, false);
-					
+
 				if (p != null) {
-					//LOGGER.info("P2:" + p);
+					LOGGER.info("P2:" + p);
 					area = new Rectangle(p.x - 21, p.y + 16, 115, 20);
 					BufferedImage image = new Robot().createScreenCapture(area);
 					OCRContract ocrContract = new OCRContract();
@@ -2598,15 +2683,15 @@ public class MainFrame extends JFrame {
 					String res = ocrContract.scanRemaining(image);
 					LOGGER.info("res: " + res);
 					_scanner.writeArea(area, "remaining.png");
-					
-					//cargo
+
+					// cargo
 					area = new Rectangle(p.x - 8, p.y + 63, 115, 40);
 					image = new Robot().createScreenCapture(area);
 					String res2 = ocrContract.scanCargo(image);
 					LOGGER.info("cargo: " + res2);
 					_scanner.writeArea(area, "cargo2.png");
 					if (res != null)
-						res= "0/" + res;
+						res = "0/" + res;
 					processContract(res, res2);
 
 				}
@@ -2631,14 +2716,15 @@ public class MainFrame extends JFrame {
 					int progress = Integer.parseInt(ss[0]);
 					int goal = Integer.parseInt(ss[1]);
 					int cargo = Integer.parseInt(cargoStr);
-
-					double need = (((double) (goal - progress)) / cargo);
-					//LOGGER.info("need: " + need);
-					if (need - (int) need > 0)
-						need += 1.0;
-					LOGGER.info("TO DELIVER: " + (int) need);
+					int need = goal - progress;
+					double toDeliver = (((double) (need)) / cargo);
+					// LOGGER.info("need: " + need);
+					if (toDeliver - (int) toDeliver > 0)
+						toDeliver += 1.0;
+					LOGGER.info("material needed: " + need);
+					LOGGER.info("TO DELIVER: " + (int) toDeliver);
 					if (coFrame != null) {
-						coFrame.setGoal((int) need);
+						coFrame.setGoal((int) toDeliver);
 					}
 
 				} catch (NumberFormatException e) {

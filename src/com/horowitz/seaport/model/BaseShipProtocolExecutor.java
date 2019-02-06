@@ -474,22 +474,38 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 			buttonArea.width -= 130;
 			buttonArea.height = 67;
 
-		} else if (dest.getName().startsWith("Merchant")) {
-			Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
-			if (merchantTitle != null) {
-				int option = Integer.parseInt(dest.getOption());
-				Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
+		} else if (dest.getName().startsWith("MER")) {
+			Pixel px = _scanner.scanOneFast("buildings/x.bmp", null, false);
+			if (px != null) {
+				String ss = dest.getOption();
+				if (ss != null && !ss.isEmpty()) {
 
-				// click the 'go back' button first
-				_mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
-				_mouse.delay(250);
+					// click the 'go back' button first
+					_mouse.click(px.x - 13, px.y + 185);
+					_mouse.delay(250);
 
-				// click the desired commodity
-				_mouse.click(commodityP);
-				_mouse.delay(250);
-
-				// look for send button
+					String[] sss = ss.split(":");
+					px.x += Integer.parseInt(sss[0]);
+					px.y += Integer.parseInt(sss[1]);
+					_mouse.click(px);
+					_mouse.delay(250);
+				}
 			}
+			// Pixel merchantTitle = _scanner.scanOne("dest/MerchantTitle.bmp", null, false);
+			// if (merchantTitle != null) {
+			// int option = Integer.parseInt(dest.getOption());
+			// Pixel commodityP = new Pixel(merchantTitle.x + 11 + (option - 1) * 95, merchantTitle.y + 211);
+			//
+			// // click the 'go back' button first
+			// _mouse.click(merchantTitle.x + 344, merchantTitle.y + 177);
+			// _mouse.delay(250);
+			//
+			// // click the desired commodity
+			// _mouse.click(commodityP);
+			// _mouse.delay(250);
+			//
+			// // look for send button
+			// }
 		}
 
 		if (good) {

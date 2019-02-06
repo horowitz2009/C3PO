@@ -10,6 +10,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -43,7 +44,7 @@ public class COFrame extends JFrame {
 	private void initLayout() {
 		setTitle("Contract Optimizer");
 
-		int w = 400;
+		int w = 450;
 		int h = 700;
 		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		int x, y;
@@ -68,6 +69,7 @@ public class COFrame extends JFrame {
 	private JTextField minTF;
 	private JTextField maxTF;
 	private JTextField destTF;
+	private JTextField dest2TF;
 	private JTextField goalTF;
 	private JScrollPane scrollPane;
 
@@ -80,14 +82,17 @@ public class COFrame extends JFrame {
 
 		maxTF = new JTextField(5);
 		destTF = new JTextField(5);
+		dest2TF = new JTextField(5);
 		goalTF = new JTextField(10);
 		limitTF = new JTextField(5);
 		toolbar.add(new JLabel("from "));
 		toolbar.add(minTF);
 		toolbar.add(new JLabel("to "));
 		toolbar.add(maxTF);
-		toolbar.add(new JLabel(" dest "));
+		toolbar.add(new JLabel(" d1 "));
 		toolbar.add(destTF);
+		toolbar.add(new JLabel(" d2 "));
+		toolbar.add(dest2TF);
 		toolbar.add(new JLabel(" GOAL "));
 		toolbar.add(goalTF);
 		reload();
@@ -98,7 +103,7 @@ public class COFrame extends JFrame {
 					Thread myThread = new Thread(new Runnable() {
 						@Override
 						public void run() {
-							calculate(false);
+							calculate1(false);
 						}
 
 					});
@@ -114,7 +119,7 @@ public class COFrame extends JFrame {
 					Thread myThread = new Thread(new Runnable() {
 						@Override
 						public void run() {
-							calculate(true);
+							calculate1(true);
 						}
 
 					});
@@ -137,6 +142,23 @@ public class COFrame extends JFrame {
 
 		toolbar.add(new JLabel("limit "));
 		toolbar.add(limitTF);
+		{
+			AbstractAction action = new AbstractAction("CalcF") {
+				public void actionPerformed(ActionEvent e) {
+					Thread myThread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							calculateFast(false);
+						}
+
+					});
+
+					myThread.start();
+				}
+			};
+			toolbar.add(action);
+		}
+
 		return toolbar;
 	}
 
@@ -144,24 +166,56 @@ public class COFrame extends JFrame {
 		minTF.setText(settings.getProperty("contract.optimizer.min", "210"));
 		maxTF.setText(settings.getProperty("contract.optimizer.max", "700"));
 		destTF.setText(settings.getProperty("contract.optimizer.dest", "E"));
+		dest2TF.setText(settings.getProperty("contract.optimizer.dest2", "G"));
 		limitTF.setText(settings.getProperty("contract.optimizer.limit", "7"));
 
 	}
 
-	private void calculate(boolean minusMeansLast) {
+	private void calculateFast(boolean minusMeansLast) {
+
 		try {
+			List<Solution> solutions = new ArrayList<Solution>(0);
 			ContractOptimizer co = new ContractOptimizer(Integer.parseInt(minTF.getText()), Integer.parseInt(maxTF.getText()),
 			    5);
 			co.setMinusMeansLast(minusMeansLast);
 			co.init();
 			co.loadShipsLog();
+			co.setSolutionsLimit2(20);
+			List<Solution> solutions2 = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()),
+			    Integer.parseInt(limitTF.getText()));
 
-			List<Solution> solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), 0);
+			co.printSolutions(solutions2);
+			solutions2 = sortByTime(solutions2, 5);
+			for (Solution s : solutions2) {
+				s.destination = destTF.getText();
+				s.destination2 = dest2TF.getText();
+			}
+			solutions.addAll(solutions2);
 
+			displaySolutions(solutions);
+			LOGGER.info("solutions: " + solutions.size());
+		} catch (IOException e) {
+			LOGGER.info("Error finding solutions: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
+
+	private void calculate1(boolean minusMeansLast) {
+
+		try {
+			List<Solution> solutions = new ArrayList<Solution>(0);
+			ContractOptimizer co = new ContractOptimizer(Integer.parseInt(minTF.getText()), Integer.parseInt(maxTF.getText()),
+			    5);
+			co.setMinusMeansLast(minusMeansLast);
+			co.init();
+			co.loadShipsLog();
+			solutions = co.getSolutionForFAST(Integer.parseInt(goalTF.getText()), 0);
 			co.printSolutions(solutions);
 			solutions = sortByPrecission(solutions, 5);
 			for (Solution s : solutions) {
 				s.destination = destTF.getText();
+				s.destination2 = dest2TF.getText();
 			}
 			if (solutions.isEmpty()) {
 				co.setSolutionsLimit2(20);
@@ -172,6 +226,7 @@ public class COFrame extends JFrame {
 				solutions2 = sortByPrecission(solutions2, 5);
 				for (Solution s : solutions2) {
 					s.destination = destTF.getText();
+					s.destination2 = dest2TF.getText();
 				}
 				solutions.addAll(solutions2);
 			}
@@ -191,7 +246,7 @@ public class COFrame extends JFrame {
 		JPanel solutionPanel = new JPanel(new GridLayout(0, 1, 5, 5));
 
 		for (Solution solution : solutions) {
-			//solution.combine();
+			// solution.combine();
 			SolutionView solutionView = new SolutionView(solution);
 			solutionPanel.add(solutionView);
 			solutionView.addPropertyChangeListener(new PropertyChangeListener() {
@@ -225,6 +280,17 @@ public class COFrame extends JFrame {
 			}
 		});
 
+		return solutions.stream().limit(limit).collect(Collectors.toList());
+	}
+	
+	private List<Solution> sortByTime(List<Solution> solutions, int limit) {
+		Collections.sort(solutions, new Comparator<Solution>() {
+			@Override
+			public int compare(Solution s1, Solution s2) {
+				return (int)(s1.latest - s2.latest);
+			}
+		});
+		
 		return solutions.stream().limit(limit).collect(Collectors.toList());
 	}
 
