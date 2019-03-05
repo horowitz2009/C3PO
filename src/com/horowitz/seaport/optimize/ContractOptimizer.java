@@ -520,21 +520,35 @@ public class ContractOptimizer {
 	}
 
 	private void sortLogByCap(List<DispatchEntry> log) {
-		Collections.sort(log, new Comparator<DispatchEntry>() {
-			@Override
-			public int compare(DispatchEntry de1, DispatchEntry de2) {
-				return de1.getShipObj().getCapacity() - de2.getShipObj().getCapacity();
-			}
-		});
+		try {
+			Collections.sort(log, new Comparator<DispatchEntry>() {
+				@Override
+				public int compare(DispatchEntry de1, DispatchEntry de2) {
+					return de1.getShipObj().getCapacity() - de2.getShipObj().getCapacity();
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void sortLogByArrival(List<DispatchEntry> log) {
-		Collections.sort(log, new Comparator<DispatchEntry>() {
-			@Override
-			public int compare(DispatchEntry de1, DispatchEntry de2) {
-				return (int) (de1.willArriveAt() - de2.willArriveAt());
-			}
-		});
+		try {
+			Collections.sort(log, new Comparator<DispatchEntry>() {
+				@Override
+				public int compare(DispatchEntry de1, DispatchEntry de2) {
+					long v = de1.willArriveAt() - de2.willArriveAt();
+					if (v < 0)
+						return -1;
+					if (Math.abs(v) < 0.0000001)
+						return 0;
+								
+					return 1;
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public boolean isMinusMeansLast() {

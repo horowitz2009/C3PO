@@ -195,7 +195,7 @@ public class ScreenScanner {
 		_safePoint = new Pixel(_br.x - 15, _br.y - 115);
 		_parkingPoint = new Pixel(_br.x, _br.y - 100);
 
-		getImageData("market/ROCK.bmp", _scanArea, 10, 44);
+		getImageData("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), _scanArea, _settings.getInt("rock.offset.x", 10), _settings.getInt("rock.offset.y", 44));
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
 		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
 		getImageData("dest/mapNotification.bmp", area, 0, 0);
@@ -428,7 +428,7 @@ public class ScreenScanner {
 			if (isFullScreen()) {
 				area = new Rectangle(_tl.x + 685, _tl.y + 562, 472, 250);
 			} else
-				area = new Rectangle(_tl.x + 760, _tl.y + 318, 107, 173);
+				area = new Rectangle(_tl.x + 700, _tl.y + 150, 300, 450);
 		} else if (screenSize.width > 1590) {
 			// 1600x1200
 			area = new Rectangle(_tl.x + 622, _tl.y + 148, 75, 134);
@@ -438,13 +438,13 @@ public class ScreenScanner {
 		long start = System.currentTimeMillis();
 		Pixel p = null;
 		LOGGER.info("looking for rock " + 1);
-		p = scanOne("market/ROCK.bmp", area, false);
+		p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
 
 		if (p == null) {
 			LOGGER.info("looking for rock " + 2);
 
 			area = new Rectangle(_tl.x, _tl.y, getGameWidth(), getGameHeight());
-			p = scanOne("market/ROCK.bmp", area, false);
+			p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
 		}
 		LOGGER.info("time: " + (System.currentTimeMillis() - start));
 		return p;
@@ -453,7 +453,7 @@ public class ScreenScanner {
 		// do {
 		// tries++;
 		// LOGGER.info("looking for rock " + tries);
-		// p = scanOne("market/ROCK.bmp", area, false);
+		// p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
 		// // writeImage(area, "admArea1.png");
 		// if (p == null) {
 		// LOGGER.info("Rock try 2 ...");
@@ -465,7 +465,7 @@ public class ScreenScanner {
 		// area = new Rectangle(_tl.x + 570, _tl.y + 133, 75, 111);
 		// }
 		//
-		// p = scanOne("market/ROCK.bmp", area, false);
+		// p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
 		// if (p == null) {
 		// LOGGER.info("Rock try 3 ...");
 		// if (screenSize.width > 1900) {
@@ -475,9 +475,9 @@ public class ScreenScanner {
 		// // 1600x1200
 		// area = new Rectangle(_tl.x + 567, _tl.y + 70, 244, getGameHeight() - 70);
 		// }
-		// p = scanOne("market/ROCK.bmp", area, false);
+		// p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
 		// if (p == null)
-		// p = scanOne("market/ROCK.bmp", getScanArea(), false);
+		// p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), getScanArea(), false);
 		// }
 		// }
 		// // _rock = p;
@@ -486,14 +486,14 @@ public class ScreenScanner {
 	}
 
 	public Pixel findRockAgain(Pixel oldRock) throws IOException, AWTException, RobotInterruptedException {
-		ImageData rockData = getImageData("market/ROCK.bmp");
+		ImageData rockData = getImageData("market/" + _settings.getProperty("rock.image", "ROCK.bmp"));
 		Rectangle area = rockData.getDefaultArea();
 		if (oldRock != null) {
 			int x = oldRock.x - rockData.get_xOff();
 			int y = oldRock.y - rockData.get_yOff();
 			area = new Rectangle(x - 50, y - 50, 31 + 140, 28 + 140);
 		}
-		Pixel p = scanOne("market/ROCK.bmp", area, false);
+		Pixel p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
 		if (p == null) {
 			LOGGER.info("Rock not found in the same place.");
 			LOGGER.info("Looking again for the rock...");
