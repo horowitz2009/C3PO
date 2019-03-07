@@ -2296,8 +2296,8 @@ public class MainFrame extends JFrame {
 		boolean barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsS"));
 		if (barrels != _barrelsSToggle.isSelected()) {
 			_barrelsSToggle.setSelected(barrels);
-			_barrelsTask.setEnabled(barrels);
 		}
+		_barrelsTask.setEnabled(barrels);
 
 		// barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsA"));
 		// if (barrels != _barrelsAToggle.isSelected()) {
