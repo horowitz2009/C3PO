@@ -195,7 +195,8 @@ public class ScreenScanner {
 		_safePoint = new Pixel(_br.x - 15, _br.y - 115);
 		_parkingPoint = new Pixel(_br.x, _br.y - 100);
 
-		getImageData("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), _scanArea, _settings.getInt("rock.offset.x", 10), _settings.getInt("rock.offset.y", 44));
+		getImageData("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), _scanArea,
+		    _settings.getInt("rock.offset.x", 10), _settings.getInt("rock.offset.y", 44));
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
 		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
 		getImageData("dest/mapNotification.bmp", area, 0, 0);
@@ -388,9 +389,10 @@ public class ScreenScanner {
 		boolean needAdjusting = false;
 		if (_rock == null) {
 			_rock = findRock();
-			LOGGER.info("rock found for the first time.");
 			needRecalc = true;
 			needAdjusting = true;
+			if (_rock == null)
+				return false;
 		} else {
 			Pixel newRock = findRockAgain(_rock);
 			needRecalc = !_rock.equals(newRock);
@@ -437,16 +439,26 @@ public class ScreenScanner {
 		area = new Rectangle(_tl.x + 533, _tl.y + 50, getGameWidth() - 533 - 551, getGameHeight() - 50 - 18);
 		long start = System.currentTimeMillis();
 		Pixel p = null;
-		LOGGER.info("looking for rock " + 1);
-		p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
+		int tries = 0;
+		do {
+			LOGGER.info("looking for rock " + 1);
+			p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
+			if (p == null)
+				_mouse.delay(5000);
+		} while (p == null && ++tries < 5);
 
 		if (p == null) {
-			LOGGER.info("looking for rock " + 2);
-
 			area = new Rectangle(_tl.x, _tl.y, getGameWidth(), getGameHeight());
-			p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
+			tries = 0;
+			do {
+				LOGGER.info("looking for rock " + 2);
+				p = scanOne("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), area, false);
+				if (p == null)
+					_mouse.delay(5000);
+			} while (p == null && ++tries < 5);
 		}
-		LOGGER.info("time: " + (System.currentTimeMillis() - start));
+		if (p != null)
+			LOGGER.info("SUCCESSFULLY FOUND ROCK in " + (System.currentTimeMillis() - start) + "ms");
 		return p;
 
 		// int tries = 0;
@@ -620,8 +632,8 @@ public class ScreenScanner {
 		} else {
 			yy = _br.y - (area.y + area.height);
 			if (yy < 0)
-			  // too south
-			  _mouse.drag(_tl.x + 5, y1, _tl.x + 5, y1 + yy - 20);
+				// too south
+				_mouse.drag(_tl.x + 5, y1, _tl.x + 5, y1 + yy - 20);
 		}
 
 		int xx = area.x - _tl.x;
@@ -632,8 +644,8 @@ public class ScreenScanner {
 		} else {
 			xx = _br.x - (area.x + area.width);
 			if (xx < 0)
-			  // too east
-			  _mouse.drag(x1, _br.y - 5, x1 + xx - 20, _br.y - 5);
+				// too east
+				_mouse.drag(x1, _br.y - 5, x1 + xx - 20, _br.y - 5);
 		}
 		return new Pixel(xx, yy);
 	}

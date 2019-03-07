@@ -259,7 +259,7 @@ public class MainFrame extends JFrame {
 			// _barrelsTask.setProtocol(imageBarrelsProtocol);
 			_tasks.add(_barrelsTask);
 			_tasks.add(_buildingsTask);
-			_tasks.add(_barrelsTask);
+			//_tasks.add(_barrelsTask);
 
 			_stopAllThreads = false;
 
@@ -1943,8 +1943,11 @@ public class MainFrame extends JFrame {
 			}
 			p = _scanner.getBottomRight();
 			p.x -= 129;
-			p.y += 3;
+			p.y += 5;
 			_mouse.click(p.x, p.y);
+			_mouse.delay(150);
+			_mouse.click(p.x, p.y);
+			_mouse.delay(1000);
 			try {
 				Robot robot = new Robot();
 				robot.keyPress(KeyEvent.VK_F5);
@@ -1975,14 +1978,17 @@ public class MainFrame extends JFrame {
 
 			// LOCATE THE GAME
 			if (_scanner.locateGameArea(false)) {
-				_scanner.checkAndAdjustRock();
-				if (_scanner.getRock() != null) {
-					_mapManager.update();
-					_buildingManager.update();
-
-					LOGGER.info("Game located successfully!");
-					done = true;
-				}
+				int tries = 0;
+				do {
+				  _scanner.checkAndAdjustRock();
+				  if (_scanner.getRock() != null) {
+					  _mapManager.update();
+					  _buildingManager.update();
+  					LOGGER.info("Game located successfully!");
+	  				done = true;
+				  } else
+					  _mouse.delay(5000);
+				} while (!done && ++tries < 3);
 			} else {
 				processRequests();
 			}
@@ -2290,6 +2296,7 @@ public class MainFrame extends JFrame {
 		boolean barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsS"));
 		if (barrels != _barrelsSToggle.isSelected()) {
 			_barrelsSToggle.setSelected(barrels);
+			_barrelsTask.setEnabled(barrels);
 		}
 
 		// barrels = "true".equalsIgnoreCase(_settings.getProperty("barrelsA"));
