@@ -746,29 +746,26 @@ public abstract class BaseShipProtocolExecutor extends AbstractGameProtocol {
 		Pixel pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
 		if (pc != null) {
 			_mouse.click(pc.x + 13, pc.y + 9);
-			_mouse.delay(200);
+			_mouse.delay(333);
 			return true;
 		} else {
 			boolean found = false;
-			scrollUpNew(mt);
-			_mouse.delay(450);
-			int turns = 0;
-			do {
+			int xScroller = mt.x - 136 + 5;
+			int height = 234;
+			int step = 15;
+			for (int yy = y; yy <= y + height; yy += step) {
+				_mouse.click(xScroller, yy);
+				_mouse.delay(300);
 				pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
 				if (pc != null) {
-					_mouse.delay(1000);
 					pc = _scanner.scanOneFast("market/" + commodity + "M1.bmp", menuArea, false);
 					_mouse.click(pc.x + 13, pc.y + 9);
 					_mouse.delay(200);
 					found = true;
-				} else {
-					turns++;
-					scrollDown(mt, 2);
-					_mouse.delay(333);
+					break;
 				}
-			} while (!found && turns < 20);
-			if (turns >= 20)
-				LOGGER.info("reached limit of 20 scroll turns...");
+			}
+			LOGGER.info("reached the bottom of scrollbar...");
 			return found;
 		}
 	}
