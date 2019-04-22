@@ -104,7 +104,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v165";
+	private static String APP_TITLE = "Seaport v166a";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -259,7 +259,7 @@ public class MainFrame extends JFrame {
 			// _barrelsTask.setProtocol(imageBarrelsProtocol);
 			_tasks.add(_barrelsTask);
 			_tasks.add(_buildingsTask);
-			//_tasks.add(_barrelsTask);
+			// _tasks.add(_barrelsTask);
 
 			_stopAllThreads = false;
 
@@ -954,22 +954,22 @@ public class MainFrame extends JFrame {
 			mainToolbar1.add(action);
 		}
 
-//		// RELOAD
-//		{
-//			AbstractAction action = new AbstractAction("Reload") {
-//				public void actionPerformed(ActionEvent e) {
-//					Thread myThread = new Thread(new Runnable() {
-//						@Override
-//						public void run() {
-//							reload();
-//						}
-//					});
-//
-//					myThread.start();
-//				}
-//			};
-//			mainToolbar1.add(action);
-//		}
+		// // RELOAD
+		// {
+		// AbstractAction action = new AbstractAction("Reload") {
+		// public void actionPerformed(ActionEvent e) {
+		// Thread myThread = new Thread(new Runnable() {
+		// @Override
+		// public void run() {
+		// reload();
+		// }
+		// });
+		//
+		// myThread.start();
+		// }
+		// };
+		// mainToolbar1.add(action);
+		// }
 
 		// RESET BUILDINGS
 		{
@@ -1001,9 +1001,9 @@ public class MainFrame extends JFrame {
 								e.printStackTrace();
 							}
 						}
-						
+
 					});
-					
+
 					myThread.start();
 				}
 			};
@@ -1022,9 +1022,9 @@ public class MainFrame extends JFrame {
 								e.printStackTrace();
 							}
 						}
-						
+
 					});
-					
+
 					myThread.start();
 				}
 			};
@@ -1453,18 +1453,48 @@ public class MainFrame extends JFrame {
 					File[] listFiles = d.listFiles(new FileFilter() {
 						@Override
 						public boolean accept(File f) {
-							return !f.isDirectory() && f.getName().startsWith("refresh-" + compName) && f.getName().endsWith("inprogress");
+							return !f.isDirectory() && f.getName().startsWith("refresh-" + compName)
+							    && f.getName().endsWith("inprogress");
 						}
 					});
 					if (listFiles.length == 1) {
 						File f = listFiles[0];
-						f.renameTo(new File("requests/refresh-"+compName));
+						f.renameTo(new File("requests/refresh-" + compName));
 					} else if (listFiles.length == 0) {
-						File f = new File("requests/refresh-"+compName);
+						File f = new File("requests/refresh-" + compName);
 						try {
 							f.createNewFile();
 						} catch (IOException e1) {
 							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+			};
+			toolbar.add(action);
+		}
+		for (final String compName : ss) {
+			Action action = new AbstractAction(compName) {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.err.println(compName);
+					File d = new File("requests");
+					File[] listFiles = d.listFiles(new FileFilter() {
+						@Override
+						public boolean accept(File f) {
+							return !f.isDirectory() && f.getName().startsWith("stop-" + compName)
+									&& f.getName().endsWith("inprogress");
+						}
+					});
+					if (listFiles.length == 1) {
+						File f = listFiles[0];
+						f.renameTo(new File("requests/stop-" + compName));
+					} else if (listFiles.length == 0) {
+						File f = new File("requests/stop-" + compName);
+						try {
+							f.createNewFile();
+						} catch (IOException e1) {
 							e1.printStackTrace();
 						}
 					}
@@ -1871,8 +1901,8 @@ public class MainFrame extends JFrame {
 				}
 
 				_mouse.checkUserMovement();
-				if (_autoSailorsToggle.isSelected())
-					scanSailors();
+//				if (_autoSailorsToggle.isSelected())
+//					scanSailors();
 				// recalcPositions(false, 1);
 
 				// 3. DO TASKS
@@ -1929,7 +1959,7 @@ public class MainFrame extends JFrame {
 
 		Pixel p;
 		if (bookmark || !_scanner.isOptimized()) {
-			p = _scanner.scanOne("seaportBookmark.bmp", null, false);
+			p = null; // _scanner.scanOne("seaportBookmark.bmp", null, false);
 			if (p == null)
 				p = new Pixel(79, 76);
 			_mouse.click(p.x, p.y);
@@ -1980,14 +2010,14 @@ public class MainFrame extends JFrame {
 			if (_scanner.locateGameArea(false)) {
 				int tries = 0;
 				do {
-				  _scanner.checkAndAdjustRock();
-				  if (_scanner.getRock() != null) {
-					  _mapManager.update();
-					  _buildingManager.update();
-  					LOGGER.info("Game located successfully!");
-	  				done = true;
-				  } else
-					  _mouse.delay(5000);
+					_scanner.checkAndAdjustRock();
+					if (_scanner.getRock() != null) {
+						_mapManager.update();
+						_buildingManager.update();
+						LOGGER.info("Game located successfully!");
+						done = true;
+					} else
+						_mouse.delay(5000);
 				} while (!done && ++tries < 3);
 			} else {
 				processRequests();
@@ -2407,10 +2437,24 @@ public class MainFrame extends JFrame {
 		for (String r : requests) {
 
 			if (r.startsWith("stop")) {
-				service.inProgress(r);
-				_monitor.stopMonitoring();
-				stopMagic();
-				_scanner.captureScreen(null, true);
+				if (r.contains("-")) {
+					String thisComp = System.getenv("COMPUTERNAME");
+					if (thisComp.length() > 5) {
+						thisComp = thisComp.substring(0, 5);
+					}
+					if (r.contains(thisComp)) {
+						LOGGER.info("Stopping " + thisComp);
+						service.inProgress(r);
+						_monitor.stopMonitoring();
+						stopMagic();
+						_scanner.captureScreen(null, true);
+					}
+				} else {
+					service.inProgress(r);
+					_monitor.stopMonitoring();
+					stopMagic();
+					_scanner.captureScreen(null, true);
+				}
 
 			} else if (r.startsWith("run") || r.startsWith("start")) {
 				service.inProgress(r);
@@ -2660,7 +2704,7 @@ public class MainFrame extends JFrame {
 				BufferedImage image = new Robot().createScreenCapture(area);
 				OCRContract ocrContract = new OCRContract();
 				if (learn)
-				  ocrContract.learn();
+					ocrContract.learn();
 
 				String res = ocrContract.scanProgress(image);
 				LOGGER.info("res: " + res);

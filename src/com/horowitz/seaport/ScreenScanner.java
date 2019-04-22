@@ -157,7 +157,7 @@ public class ScreenScanner {
 		_leftNumbersArea = new Rectangle(_tl.x, _tl.y, xxx, 72);
 		_rightNumbersArea = new Rectangle(_br.x - xxx, _tl.y, xxx, 72);
 
-		_sailorsPos = scanOne("sailors.bmp", _rightNumbersArea, false);
+		//_sailorsPos = scanOne("sailors.bmp", _rightNumbersArea, false);
 
 		_fishes = new Pixel[] { new Pixel(-96, 37), new Pixel(-171, 10), new Pixel(-234, -30), new Pixel(-295, -73),
 		    new Pixel(-365, -105) }; // museum off , new Pixel(-94, -129)
@@ -195,7 +195,7 @@ public class ScreenScanner {
 		_safePoint = new Pixel(_br.x - 15, _br.y - 115);
 		_parkingPoint = new Pixel(_br.x, _br.y - 100);
 
-		getImageData("market/" + _settings.getProperty("rock.image", "ROCK.bmp"), _scanArea,
+		getImageData("market/" + _settings.getProperty("rock.image", "ROCK.png"), _scanArea,
 		    _settings.getInt("rock.offset.x", 10), _settings.getInt("rock.offset.y", 44));
 		getImageData("dest/shipwreck.bmp", _scanArea, 36, 45);
 		area = new Rectangle(_br.x - 60, _br.y - 90, 48, 72);
@@ -204,19 +204,19 @@ public class ScreenScanner {
 		getImageData("ships/explore.bmp", _scanArea, 22, 3);
 		getImageData("ships/wheel.bmp", _scanArea, 9, 9).setColorToBypass(Color.RED);
 
-		getImageData("pin.bmp", _scanArea, 6, 6);
-		getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
-		getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
-		getImageData("market/barrel1.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
-		getImageData("market/barrel2.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
-		getImageData("market/barrel3.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
-		getImageData("market/barrel4.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+		//getImageData("pin.bmp", _scanArea, 6, 6);
+		//getImageData("refreshChrome.bmp", new Rectangle(0, 0, 500, 500), 8, 8);
+		//getImageData("seaportBookmark.bmp", new Rectangle(0, 0, 600, 300), 8, 8);
+//		getImageData("market/barrel1.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+//		getImageData("market/barrel2.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+//		getImageData("market/barrel3.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
+//		getImageData("market/barrel4.bmp", new Rectangle(0, 0, 600, 300), 5, 5);
 
 		area = new Rectangle(_br.x - 110, _br.y - 110, 70, 75);
-		getImageData("anchor.bmp", area, 11, 46);
+		//getImageData("market/anchor.png", area, 0, 46);
 
-		_anchorButton = getImageData("anchor.bmp", area, 11, 36);
-		_mapButton = getImageData("mapButton.bmp", area, 20, 7);
+		_anchorButton = getImageData("market/anchor.png", area, 0, 46);
+		_mapButton = getImageData("dest/bottomRight.png", area, 20, 7);
 
 		area = new Rectangle(_br.x - 30, _tl.y + 100, 30, getGameHeight() / 2 - 100);
 		ImageData sb = getImageData("scoreBoard.bmp", area, 0, 17);
@@ -353,8 +353,8 @@ public class ScreenScanner {
 			setKeyAreas();
 			return true;
 		} else {
-			boolean found = _gameLocator.locateGameArea(new ImageData("topLeft.bmp", null, _comparator, -22, -12),
-			    new ImageData("bottomRight.bmp", null, _comparator, 45 + 53, 64), false);
+			boolean found = _gameLocator.locateGameArea(new ImageData("dest/topLeft.png", null, _comparator, -22, -12),
+			    new ImageData("dest/bottomRight.png", null, _comparator, 45 + 53, 64), false);
 			if (found) {
 				_tl = _gameLocator.getTopLeft();
 				_br = _gameLocator.getBottomRight();
