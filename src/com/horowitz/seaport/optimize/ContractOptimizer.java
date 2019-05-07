@@ -443,7 +443,7 @@ public class ContractOptimizer {
 		List<DispatchEntry> toRemove = new ArrayList<>();
 		for (DispatchEntry de : shipsLog) {
 			System.out.println(de.getShip());
-			if (!de.getShipObj().isFavorite()) {
+			if (de.getShipObj() == null || (de.getShipObj() != null && !de.getShipObj().isFavorite())) {
 				toRemove.add(de);
 			}
 		}
@@ -542,7 +542,7 @@ public class ContractOptimizer {
 						return -1;
 					if (Math.abs(v) < 0.0000001)
 						return 0;
-								
+
 					return 1;
 				}
 			});
