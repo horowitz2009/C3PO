@@ -104,7 +104,7 @@ public class MainFrame extends JFrame {
 
 	private final static Logger LOGGER = Logger.getLogger("MAIN");
 
-	private static String APP_TITLE = "Seaport v166c";
+	private static String APP_TITLE = "Seaport v166d";
 
 	private Settings _settings;
 	private Stats _stats;
@@ -1263,6 +1263,8 @@ public class MainFrame extends JFrame {
 							}
 						});
 					}
+					if (coFrame.getExtendedState() == JFrame.ICONIFIED)
+						coFrame.setExtendedState(JFrame.NORMAL);
 					coFrame.setVisible(true);
 					// TODO open a Contract Optimizer window
 
